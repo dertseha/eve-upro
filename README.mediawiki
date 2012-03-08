@@ -1,0 +1,17 @@
+= EVE upro - README =
+
+== Project Structure ==
+
+Although initially not intended, the Eclipse project ended up in a dedicated folder, so it's now eve-upro/eve-upro.
+But I don't see too much of a problem with that - makes the readme stand out more.
+
+== Used Tools for Development ==
+
+I'm using
+* Eclipse Indigo
+** Plugins
+*** for JavaScript development
+*** for PHP development
+*** MakeGood for PHP unit tests: http://redmine.piece-framework.com/
+*** JsTestDriver for JavaScript unit tests: http://code.google.com/p/js-test-driver/
+* XAMPP 1.7.7
