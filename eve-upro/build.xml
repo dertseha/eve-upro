@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="YUICompression" default="BuildUpro">
+
+<target name="BuildUpro" description="Builds all of upro into bin directory">
+
+   <!-- Cleanup -->
+   <delete includeemptydirs="true">
+      <fileset dir="${basedir}/bin/" includes="**/*"/>
+   </delete>
+
+   <!-- PHP -->
+   <copy todir="${basedir}/bin">
+      <fileset dir="${basedir}/src/php"/>
+   </copy>
+
+   <!-- JavaScript -->
+   <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+      <classpath>
+         <pathelement path="${basedir}/lib/build/yuicompressor-2.4.6.jar"/>
+         <pathelement path="${basedir}/lib/build/YUIAnt.jar"/>
+      </classpath>
+   </taskdef>
+
+   <concat
+      destfile="${basedir}/bin/upro-1.0.js"
+      append="no"
+      encoding="UTF-8"
+      outputencoding="UTF-8"
+      fixlastline="true"
+   >
+
+      <path>
+         <pathelement location="${basedir}/src/js/upro.js" />
+         <pathelement location="${basedir}/src/js/Uuid.js" />
+
+      </path>
+
+   </concat>
+
+   <yuicompress
+      charset="UTF-8"
+      linebreak="120"
+      warn="true"
+      munge="yes"
+      preserveallsemicolons="true"
+      preservestringlitterals="true"
+      outputfolder="${basedir}/bin/"
+      outputsuffix="-min"
+   >
+      <fileset dir="${basedir}/bin/">
+         <include name="upro-1.0.js"/>  <!-- **/*.js -->
+      </fileset>
+   </yuicompress>
+
+   <!-- libraries -->
+   <copy todir="${basedir}/bin/lib">
+      <fileset dir="${basedir}/lib/js/release">
+         <include name="*.js"/>
+      </fileset>
+   </copy>
+
+   <!-- resources -->
+   <copy todir="${basedir}/bin/res/eve">
+      <fileset dir="${basedir}/res/js/eve">
+         <include name="*.js"/>
+      </fileset>
+   </copy>
+
+</target>
+
+</project>
