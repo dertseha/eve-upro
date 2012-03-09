@@ -1,0 +1,69 @@
+<html>
+<head>
+   <title>upro - hud.Controls Test</title>
+
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/glMatrix.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/prototype.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/puremvc-multicore-prototypejs-1.0-min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/raphael.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/scale.raphael.js"></script>
+
+   <script type="text/javascript" charset="utf-8" src="../../../bin/upro-1.0.js"></script>
+
+   <script type="text/javascript" charset="utf-8" src="Buttons.js"></script>
+   <script type="text/javascript" charset="utf-8" src="Labels.js"></script>
+   <script type="text/javascript" charset="utf-8" src="Tables.js"></script>
+
+   <style type="text/css">
+      *
+      {
+         padding: 0;
+         margin: 0;
+      }
+      body
+      {
+         background-color: black
+      }
+      #hud
+      {
+         z-index: 1;
+         position: absolute;
+         top: 0px;
+         left: 0px;
+      }
+   </style>
+
+</head>
+<body>
+   <div id="hud"></div>
+   <script>
+
+      function createLabel(y, text)
+      {
+         hudSystem.paper.text(200, y, text).attr({"font-size": 15, "text-anchor": "end", "fill": "#FFF" });
+      }
+
+      function createIcon(pathData)
+      {
+         var temp = hudSystem.paper.path(pathData);
+
+         temp.attr("fill", "#FFF");
+
+         return temp;
+      }
+
+      document.observe("dom:loaded", function()
+      {
+         context = new upro.sys.ResizableContextWindow("hud");
+         hudSystem = new upro.hud.HudSystem(context);
+         keyListener = new upro.sys.KeyboardListener(hudSystem.getKeyboardHandler());
+
+         hudSystem.debugMessage("Manual Testing Alive!");
+
+         testButtons();
+         testLabels();
+         testTables();
+      });
+   </script>
+</body>
+</html>

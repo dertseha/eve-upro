@@ -1,0 +1,53 @@
+<html>
+<head>
+   <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+   <title>upro - KeyboardListener Test</title>
+
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/glMatrix.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/prototype.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/puremvc-multicore-prototypejs-1.0-min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/raphael.min.js"></script>
+   <script type="text/javascript" charset="utf-8" src="../../../bin/lib/scale.raphael.js"></script>
+
+   <script type="text/javascript" charset="utf-8" src="../../../bin/upro-1.0.js"></script>
+
+   <script type="text/javascript" charset="utf-8" src="TestHandler.js"></script>
+
+   <style type="text/css">
+      *
+      {
+         padding: 0;
+         margin: 0;
+      }
+      body
+      {
+         background-color: black
+      }
+      #hud
+      {
+         z-index: 1;
+         position: absolute;
+         top: 0px;
+         left: 0px;
+      }
+   </style>
+
+</head>
+<body>
+   <div id="hud"></div>
+   <script>
+
+      document.observe("dom:loaded", function()
+      {
+         context = new upro.sys.ResizableContextWindow("hud");
+         hudSystem = new upro.hud.HudSystem(context);
+
+         hudSystem.debugMessage("Keyboard Testing. Play With It.");
+
+         handler = new TestHandler();
+         listener = new upro.sys.KeyboardListener(handler);
+      });
+   </script>
+</body>
+</html>
