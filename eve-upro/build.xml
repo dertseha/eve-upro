@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="YUICompression" default="BuildUpro">
+<project name="eve-upro" default="BuildUpro">
 
 <target name="BuildUpro" description="Builds all of upro into bin directory">
 
@@ -11,6 +11,11 @@
    <!-- PHP -->
    <copy todir="${basedir}/bin">
       <fileset dir="${basedir}/src/php"/>
+   </copy>
+
+   <!-- shader -->
+   <copy todir="${basedir}/bin/res/shader">
+      <fileset dir="${basedir}/src/shader"/>
    </copy>
 
    <!-- JavaScript -->
@@ -238,6 +243,11 @@
    <copy todir="${basedir}/bin/res/eve">
       <fileset dir="${basedir}/res/js/eve">
          <include name="*.js"/>
+      </fileset>
+   </copy>
+   <copy todir="${basedir}/bin/res">
+      <fileset dir="${basedir}/res">
+         <include name="*.css"/>
       </fileset>
    </copy>
 
