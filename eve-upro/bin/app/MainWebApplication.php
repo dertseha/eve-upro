@@ -28,7 +28,7 @@ class MainWebApplication implements \upro\web\WebApplication
       \upro\web\InlineScriptResource::getForCascadingStyleSheet($context->getFileResource('res/upro.css')->getContent())->addToPage($pageBuilder);
       // enter body to have the stylesheet take effect immediately
       $pageBuilder->enterBody();
-      $pageBuilder->addNode('canvas', array('id' => 'scene'), 'test');
+      $pageBuilder->addNode('canvas', array('id' => 'scene'), '');
       $pageBuilder->addNode('div', array('id' => 'hud'), '');
 
       // add dependent libraries
