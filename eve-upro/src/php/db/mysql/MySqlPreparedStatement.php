@@ -125,6 +125,10 @@ class MySqlPreparedStatement implements \upro\db\PreparedStatement
       {
          $result = 'null';
       }
+      else if (is_bool($value))
+      {
+         $result = $value ? 'TRUE' : 'FALSE';
+      }
       else if (is_numeric($value))
       {
          $result = 0 + $value;
