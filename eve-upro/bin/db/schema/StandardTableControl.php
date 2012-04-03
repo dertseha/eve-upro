@@ -16,8 +16,14 @@ class StandardTableControl implements \upro\db\schema\TableControl
     */
    private $tableName;
 
+   /**
+    * @var array of column names in this table
+    */
    private $columnNames;
 
+   /**
+    * @var string:\upro\db\schema\ColumnControl the map of contained columns
+    */
    private $columns;
 
    /**
@@ -58,13 +64,6 @@ class StandardTableControl implements \upro\db\schema\TableControl
       $this->columns[$columnName] = $control;
 
       return $control;
-   }
-
-   /** {@inheritDoc */
-   function dropColumn($columnName)
-   {
-
-      return $this;
    }
 }
 

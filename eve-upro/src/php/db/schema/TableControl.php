@@ -16,13 +16,6 @@ interface TableControl extends \upro\db\schema\TableDefinition
     * @return \upro\db\schema\ColumnControl the added column
     */
    function addColumn($columnName, $dataType);
-
-   /**
-    * Drops a column with given name
-    * @param string $columnName
-    * @return \upro\db\schema\TableControl this
-    */
-   function dropColumn($columnName);
 }
 
 }
