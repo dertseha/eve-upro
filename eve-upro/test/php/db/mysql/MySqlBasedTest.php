@@ -20,6 +20,26 @@ class MySqlBasedTest extends PHPUnit_Framework_TestCase
 
    private $connection;
 
+   protected function getTestServer()
+   {
+      return $this->testServer;
+   }
+
+   protected function getTestUser()
+   {
+      return $this->testUser;
+   }
+
+   protected function getTestUserPassword()
+   {
+      return $this->testUserPassword;
+   }
+
+   protected function getTestDatabaseName()
+   {
+      return $this->testDatabaseName;
+   }
+
    private function verifyAvailability()
    {
       try

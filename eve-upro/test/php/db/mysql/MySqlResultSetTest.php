@@ -40,7 +40,7 @@ class MySqlResultSetTest extends MySqlBasedTest
 
    protected function givenADatabaseForTest()
    {
-      $this->getConnection()->setDatabase('upro_unittests');
+      $this->getConnection()->setDatabase($this->getTestDatabaseName());
    }
 
    protected function givenAPreparedStatement($query)

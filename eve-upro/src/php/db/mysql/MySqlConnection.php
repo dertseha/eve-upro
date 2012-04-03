@@ -2,10 +2,12 @@
 namespace upro\db\mysql
 {
 require_once realpath(dirname(__FILE__)) . '/../Connection.php';
+require_once realpath(dirname(__FILE__)) . '/../BufferTableRowReader.php';
 
 require_once realpath(dirname(__FILE__)) . '/MySqlHelper.php';
 require_once realpath(dirname(__FILE__)) . '/MySqlPreparedStatement.php';
 require_once realpath(dirname(__FILE__)) . '/MySqlResultSet.php';
+require_once realpath(dirname(__FILE__)) . '/MySqlTableControlProvider.php';
 
 /**
  * A MySql specific connection
@@ -88,6 +90,12 @@ class MySqlConnection implements \upro\db\Connection
       return new MySqlPreparedStatement($this, $name);
    }
 
+   /** {@inheritDoc} */
+   public function getTableControlProvider()
+   {
+      return new \upro\db\mysql\MySqlTableControlProvider($this);
+   }
+
    /**
     * Escapes an arbitrary string to be used in an SQL query
     * @param unknown_type $value
@@ -141,6 +149,32 @@ class MySqlConnection implements \upro\db\Connection
       {
          MySqlResultSet::closeResult($result);
       }
+   }
+
+   /**
+    * Returns a string representing the given value in SQL form
+    * @param string $value to represent
+    */
+   public function getTypeBasedString($value)
+   {
+      if (is_null($value))
+      {
+         $result = 'NULL';
+      }
+      else if (is_bool($value))
+      {
+         $result = $value ? 'TRUE' : 'FALSE';
+      }
+      else if (is_numeric($value))
+      {
+         $result = '' . (0 + $value);
+      }
+      else
+      {
+         $result = '"' . $this->escapeString($value) . '"';
+      }
+
+      return $result;
    }
 }
 

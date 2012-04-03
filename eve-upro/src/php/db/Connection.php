@@ -30,6 +30,12 @@ interface Connection
     * @return \upro\db\PreparedStatement the prepared statement
     */
    function prepareStatement($query);
+
+   /**
+    * Retrieves a Table control provider
+    * @return \upro\db\scheme\TableControlProvider
+    */
+   function getTableControlProvider();
 }
 
 }

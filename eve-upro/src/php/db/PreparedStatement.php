@@ -13,6 +13,7 @@ interface PreparedStatement extends \upro\db\Statement
     * Sets a parameter of a statement with placeholder to a given value
     * @param int $index 0 based index of the parameter to set
     * @param mixed $value value to set
+    * @return \upro\db\PreparedStatement this
     */
    function setParameter($index, $value);
 

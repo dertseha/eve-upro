@@ -90,6 +90,8 @@ class MySqlPreparedStatement implements \upro\db\PreparedStatement
       {
          $this->parameterCount = $index + 1;
       }
+
+      return $this;
    }
 
    /** {@inheritDoc} */
@@ -110,35 +112,9 @@ class MySqlPreparedStatement implements \upro\db\PreparedStatement
    private function setParameterInDatabase($index, $value)
    {
       $paramName = $this->getParameterName($index);
-      $query = 'SET ' . $paramName . ' = ' . $this->getTypeBasedString($value);
+      $query = 'SET ' . $paramName . ' = ' . $this->connection->getTypeBasedString($value);
 
       $this->connection->executeIgnoreResult($query);
-   }
-
-   /**
-    * Returns a string representing the given value in SQL form
-    * @param string $value to represent
-    */
-   private function getTypeBasedString($value)
-   {
-      if (is_null($value))
-      {
-         $result = 'null';
-      }
-      else if (is_bool($value))
-      {
-         $result = $value ? 'TRUE' : 'FALSE';
-      }
-      else if (is_numeric($value))
-      {
-         $result = 0 + $value;
-      }
-      else
-      {
-         $result = '"' . $this->connection->escapeString($value) . '"';
-      }
-
-      return $result;
    }
 
    /**
