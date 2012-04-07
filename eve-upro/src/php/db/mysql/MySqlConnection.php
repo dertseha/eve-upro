@@ -4,10 +4,13 @@ namespace upro\db\mysql
 require_once realpath(dirname(__FILE__)) . '/../Connection.php';
 require_once realpath(dirname(__FILE__)) . '/../BufferTableRowReader.php';
 
+require_once realpath(dirname(__FILE__)) . '/../sql/StandardSqlDictionary.php';
+
 require_once realpath(dirname(__FILE__)) . '/MySqlHelper.php';
 require_once realpath(dirname(__FILE__)) . '/MySqlPreparedStatement.php';
 require_once realpath(dirname(__FILE__)) . '/MySqlResultSet.php';
 require_once realpath(dirname(__FILE__)) . '/MySqlTableControlProvider.php';
+require_once realpath(dirname(__FILE__)) . '/MySqlTransactionControl.php';
 
 /**
  * A MySql specific connection
@@ -62,6 +65,12 @@ class MySqlConnection implements \upro\db\Connection
    }
 
    /** {@inheritDoc} */
+   function getSqlDictionary()
+   {
+      return new \upro\db\sql\StandardSqlDictionary();
+   }
+
+   /** {@inheritDoc} */
    public function setDatabase($databaseName)
    {
       $param = array('databaseName' => $databaseName, 'link' => $this->handle);
@@ -96,6 +105,12 @@ class MySqlConnection implements \upro\db\Connection
       return new \upro\db\mysql\MySqlTableControlProvider($this);
    }
 
+   /** {@inheritDoc} */
+   public function getTransactionControl()
+   {
+      return new \upro\db\mysql\MySqlTransactionControl($this);
+   }
+
    /**
     * Escapes an arbitrary string to be used in an SQL query
     * @param unknown_type $value
@@ -127,7 +142,6 @@ class MySqlConnection implements \upro\db\Connection
     */
    public function execute($query)
    {
-      //print 'Executing <' . $query . ">\n";
       $param = array('query' => $query, 'link' => $this->handle);
       $wrapper = function ($param)
       {

@@ -13,6 +13,11 @@ interface Connection
    function close();
 
    /**
+    * @return \upro\db\sql\SqlDictionary to use when creating statement texts
+    */
+   function getSqlDictionary();
+
+   /**
     * Sets the database to be used for further commands
     * @param mixed $databaseName
     */
