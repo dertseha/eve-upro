@@ -1,0 +1,78 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+package DataModelFramework {
+
+class DataModel {
+   + id: UUID [primaryKey]
+
+   + name: string
+
+   + instance: int
+}
+
+class DataModelChangeHistory {
+   + dataModelId: UUID
+   + dataModelInstance: int
+   
+   + contextId: UUID
+   + message: string
+}
+
+}
+
+package UserManagement {
+
+class User {
+   + id: UUID [primaryKey]
+
+   + name: string
+}
+
+class Session {
+   + id: UUID [primaryKey]
+
+   + userId: UUID
+}
+
+class SessionClient {
+   + id: UUID [primaryKey]
+
+   + sessionId: UUID
+   + lastAliveTime: timestamp
+   + clientData -- identifying the client
+   
+   + userId: UUID -- for quicker reference
+}
+
+}
+
+package GroupManagment {
+
+class Group {
+   + id: UUID [primaryKey]
+   
+}
+
+class GroupInterest {
+   + id: UUID
+   
+   + groupId: UUID
+   + contextId: UUID
+   
+   + validFromInstanceId: int
+   + validToInstanceId: int
+}
+
+class GroupMembership {
+   + groupId: UUID
+   
+   + userId: UUID
+}
+
+}
+
+
+@enduml

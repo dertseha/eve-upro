@@ -1,0 +1,75 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+package dataModel {
+
+interface WriteContext {
+   + start()
+   + stop()
+   + cancel()
+   
+   + addHistoryEntry(message: string, context: UUID): int
+}
+
+interface DataModelProvider {
+   + isModelExisting(name: string): boolean
+   + createDataModel(name: string)
+
+   + getWriteContext(name: string): WriteContext
+   + getReadContext(name: string): ReadContext
+}
+
+interface ReadContext {
+   + prepare()
+   + unprepare()
+   
+   + readHistoryEntries(lastInstance: int, reader: HistoryReader) 
+}
+
+interface HistoryReader {
+   + reset(instance: int)
+   + receive(instance: int, message: string, context: UUID)
+}
+
+}
+
+package database {
+class DatabaseDataContext {
+   - transactionControl
+   - statementExecutor
+   - tableNames: string[]
+   - modelId: UUID
+   # startTransaction(forWrite: boolean)
+   # commitTransaction()
+   # rollbackTransaction()
+}
+
+class DatabaseWriteContext {
+   - newInstance: int
+   - historyInsertQuery: InsertQuery
+   - historyInsertExecutor: StatementExecutor
+}
+
+class DatabaseReadContext {
+   - historySelectQuery: SelectQuery
+   - historySelectExecutor: StatementExecutor
+}
+
+class DatabaseDataModelProvider {
+   - transactionControl
+   - statementExecutor
+   - tableNames: string[]
+}
+
+ReadContext <|-down- DatabaseReadContext
+DatabaseDataContext <|-down- DatabaseReadContext
+DatabaseDataContext <|-down- DatabaseWriteContext
+WriteContext <|-down- DatabaseWriteContext
+
+DataModelProvider <|-down- DatabaseDataModelProvider
+
+}
+
+@enduml
