@@ -38,7 +38,7 @@ interface HistoryReader {
 package database {
 class DatabaseDataContext {
    - transactionControl
-   - statementExecutor
+   - statementExecutorFactory
    - tableNames: string[]
    - modelId: UUID
    # startTransaction(forWrite: boolean)
@@ -59,7 +59,7 @@ class DatabaseReadContext {
 
 class DatabaseDataModelProvider {
    - transactionControl
-   - statementExecutor
+   - statementExecutorFactory
    - tableNames: string[]
 }
 
