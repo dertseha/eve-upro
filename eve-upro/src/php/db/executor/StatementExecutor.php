@@ -1,7 +1,7 @@
 <?php
 namespace upro\db\executor
 {
-require_once realpath(dirname(__FILE__)) . '/../TableRowReader.php';
+require_once realpath(dirname(__FILE__)) . '/ResultSetHandler.php';
 
 
 /**
@@ -9,6 +9,11 @@ require_once realpath(dirname(__FILE__)) . '/../TableRowReader.php';
  */
 interface StatementExecutor
 {
+   /**
+    * Closes the contained statement
+    */
+   function close();
+
    /**
     * Executes the statement and provides the result set (if any) to the given handler
     * @param \upro\db\executor\ResultSetHandler $handler to receive a result set

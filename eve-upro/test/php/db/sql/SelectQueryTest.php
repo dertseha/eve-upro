@@ -17,9 +17,9 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
       $this->query = new \upro\db\sql\SelectQuery();
    }
 
-   protected function whenSelectingAValue($value)
+   protected function whenSelectingAConstant($value)
    {
-      $this->query->selectValue($value);
+      $this->query->selectConstant($value);
    }
 
    protected function whenSelectingColumn($columnName)
@@ -42,6 +42,16 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
       $this->query->fromTable($tableName);
    }
 
+   protected function whenOrderingByColumn($columnName)
+   {
+      $this->query->orderByColumn($columnName);
+   }
+
+   protected function whenOrderingByColumnDescending($columnName)
+   {
+      $this->query->orderByColumn($columnName, false);
+   }
+
    protected function thenTheSqlTextShouldBe($expected)
    {
       $dict = new \upro\db\sql\StandardSqlDictionary();
@@ -59,7 +69,7 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
    {
       $this->givenASelectStatement();
 
-      $this->whenSelectingAValue(1);
+      $this->whenSelectingAConstant(1);
 
       $this->thenTheSqlTextShouldBe('SELECT ?');
    }
@@ -68,8 +78,8 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
    {
       $this->givenASelectStatement();
 
-      $this->whenSelectingAValue(1);
-      $this->whenSelectingAValue(2);
+      $this->whenSelectingAConstant(1);
+      $this->whenSelectingAConstant(2);
 
       $this->thenTheSqlTextShouldBe('SELECT ?, ?');
    }
@@ -106,5 +116,28 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
       $this->whenClauseIs($subj->equalsParameter($box));
 
       $this->thenTheSqlTextShouldBe('SELECT TestColumn FROM TestTable WHERE OtherColumn = ?');
+   }
+
+   public function testSelect_All_FromTable_OrderByColumn()
+   {
+      $this->givenASelectStatement();
+
+      $this->whenSelectingAll();
+      $this->whenQueryingTable("TestTable");
+      $this->whenOrderingByColumn('TestColumn');
+
+      $this->thenTheSqlTextShouldBe('SELECT * FROM TestTable ORDER BY TestColumn ASC');
+   }
+
+   public function testSelect_All_FromTable_OrderByTowColumns()
+   {
+      $this->givenASelectStatement();
+
+      $this->whenSelectingAll();
+      $this->whenQueryingTable("TestTable");
+      $this->whenOrderingByColumn('TestColumn1');
+      $this->whenOrderingByColumnDescending('TestColumn2');
+
+      $this->thenTheSqlTextShouldBe('SELECT * FROM TestTable ORDER BY TestColumn1 ASC, TestColumn2 DESC');
    }
 }

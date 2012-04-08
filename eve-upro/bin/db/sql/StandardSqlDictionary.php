@@ -100,6 +100,35 @@ class StandardSqlDictionary implements \upro\db\sql\SqlDictionary
       return ' = ';
    }
 
+   /** {@inheritDoc} */
+   public function getGreater()
+   {
+      return ' > ';
+   }
+
+   /** {@inheritDoc} */
+   public function getSmaller()
+   {
+      return ' < ';
+   }
+
+   /** {@inheritDoc} */
+   public function getOrderBy()
+   {
+      return ' ORDER BY ';
+   }
+
+   /** {@inheritDoc} */
+   public function getAscending()
+   {
+      return 'ASC';
+   }
+
+   /** {@inheritDoc} */
+   public function getDescending()
+   {
+      return 'DESC';
+   }
 }
 
 }

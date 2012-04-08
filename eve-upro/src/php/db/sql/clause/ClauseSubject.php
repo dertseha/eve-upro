@@ -24,6 +24,34 @@ interface ClauseSubject extends \upro\db\sql\SqlTextable
     * @return \upro\db\sql\clause\Clause the resulting clause
     */
    function equalsParameter(\upro\db\sql\ParameterBox $parameterBox);
+
+   /**
+    * Creates a greater clause with given parameter
+    * @param \upro\db\sql\clause\ClauseSubject $other to compare this subject to
+    * @return \upro\db\sql\clause\Clause the resulting clause
+    */
+   function isGreaterThan(\upro\db\sql\clause\ClauseSubject $other);
+
+   /**
+    * Creates a greater clause with given parameter
+    * @param \upro\db\sql\ParameterBox $parameterBox to compare this subject to
+    * @return \upro\db\sql\clause\Clause the resulting clause
+    */
+   function isGreaterThanParameter(\upro\db\sql\ParameterBox $parameterBox);
+
+   /**
+    * Creates a smaller clause with given parameter
+    * @param \upro\db\sql\clause\ClauseSubject $other to compare this subject to
+    * @return \upro\db\sql\clause\Clause the resulting clause
+    */
+   function isSmallerThan(\upro\db\sql\clause\ClauseSubject $other);
+
+   /**
+    * Creates a smaller clause with given parameter
+    * @param \upro\db\sql\ParameterBox $parameterBox to compare this subject to
+    * @return \upro\db\sql\clause\Clause the resulting clause
+    */
+   function isSmallerThanParameter(\upro\db\sql\ParameterBox $parameterBox);
 }
 
 }

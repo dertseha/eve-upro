@@ -12,6 +12,9 @@ require_once realpath(dirname(__FILE__)) . '/ParameterSelectExpression.php';
 
 require_once realpath(dirname(__FILE__)) . '/TableSelectSource.php';
 
+require_once realpath(dirname(__FILE__)) . '/OrderExpression.php';
+require_once realpath(dirname(__FILE__)) . '/ColumnOrderExpression.php';
+
 /**
  * A select query
  */
@@ -33,11 +36,17 @@ class SelectQuery implements \upro\db\sql\Query
    private $clause;
 
    /**
+    * @var array of \upro\db\sql\OrderExpression
+    */
+   private $orderExpressions;
+
+   /**
     * Default Constructor
     */
    function __construct()
    {
       $this->selectExpressions = array();
+      $this->orderExpressions = array();
    }
 
    /** {@inheritDoc} */
@@ -53,6 +62,10 @@ class SelectQuery implements \upro\db\sql\Query
       if ($this->clause != null)
       {
          $result = $result->append($this->clause->toSqlText($dict), $dict->getWhere());
+      }
+      if (count($this->orderExpressions) > 0)
+      {
+         $result = $result->append(\upro\db\sql\SqlBuildHelper::joinList($dict, $this->orderExpressions), $dict->getOrderBy());
       }
 
       return $result;
@@ -75,7 +88,7 @@ class SelectQuery implements \upro\db\sql\Query
     * @param mixed $value to select
     * @return \upro\db\sql\SelectQuery this
     */
-   public function selectValue($value)
+   public function selectConstant($value)
    {
       $valueBox = new \upro\db\sql\ParameterBox($value);
 
@@ -143,6 +156,32 @@ class SelectQuery implements \upro\db\sql\Query
       return $this;
    }
 
+   /**
+    * Orders by given expression
+    * @param \upro\db\sql\OrderExpression $order to order by
+    * @return \upro\db\sql\SelectQuery this
+    */
+   public function orderBy(\upro\db\sql\OrderExpression $order)
+   {
+      $this->orderExpressions[] = $order;
+
+      return $this;
+   }
+
+   /**
+    * Orders by given column
+    * @param string $columnName to order by
+    * @param boolean $ascending whether to order ascending or descending
+    * @return \upro\db\sql\SelectQuery this
+    */
+   public function orderByColumn($columnName, $ascending = true)
+   {
+      $expr = new \upro\db\sql\ColumnOrderExpression($columnName);
+
+      $expr->ascending($ascending);
+
+      return $this->orderBy($expr);
+   }
 }
 
 }

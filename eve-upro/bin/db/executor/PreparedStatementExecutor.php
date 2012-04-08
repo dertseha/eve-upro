@@ -29,9 +29,7 @@ class PreparedStatementExecutor implements \upro\db\executor\StatementExecutor
 
    }
 
-   /**
-    * Closes the contained statement
-    */
+   /** {@inheritDoc} */
    public function close()
    {
       if ($this->statement != null)

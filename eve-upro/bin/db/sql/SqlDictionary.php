@@ -77,6 +77,31 @@ interface SqlDictionary
     * @return string equals string
     */
    function getEquals();
+
+   /**
+    * @return string greater string
+    */
+   function getGreater();
+
+   /**
+    * @return string smaller string
+    */
+   function getSmaller();
+
+   /**
+    * @return string ORDER BY string
+    */
+   function getOrderBy();
+
+   /**
+    * @return string ASC string
+    */
+   function getAscending();
+
+   /**
+    * @return string DESC string
+    */
+   function getDescending();
 }
 
 }

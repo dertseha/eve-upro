@@ -5,6 +5,7 @@ require_once realpath(dirname(__FILE__)) . '/Query.php';
 
 require_once realpath(dirname(__FILE__)) . '/SqlBuildHelper.php';
 require_once realpath(dirname(__FILE__)) . '/ValueExpression.php';
+require_once realpath(dirname(__FILE__)) . '/ParameterValueExpression.php';
 
 /**
  * An insert query
@@ -125,6 +126,17 @@ class InsertQuery implements \upro\db\sql\Query
       return $this;
    }
 
+   /**
+    * Adds a constant to use as value
+    * @param mixed $value to use
+    * @return \upro\db\sql\InsertQuery this
+    */
+   public function valueConstant($value)
+   {
+      $valueBox = new \upro\db\sql\ParameterBox($value);
+
+      return $this->value(new \upro\db\sql\ParameterValueExpression($valueBox));
+   }
 }
 
 }
