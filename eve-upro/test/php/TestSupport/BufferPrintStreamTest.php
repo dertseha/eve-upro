@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'BufferPrintStream.php';
 
 class BufferPrintStreamTest extends PHPUnit_Framework_TestCase

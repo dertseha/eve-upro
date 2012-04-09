@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'db/sql/StandardSqlDictionary.php';
 
 require_once 'dataModel/db/DatabaseWriteContext.php';

@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'db/Connection.php';
 require_once 'db/NullTableRowReader.php';
 require_once 'db/sql/SelectQuery.php';

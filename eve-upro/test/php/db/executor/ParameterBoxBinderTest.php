@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'db/sql/ParameterBox.php';
 require_once 'db/executor/ParameterBoxBinder.php';
 

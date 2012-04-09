@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'db/DatabaseException.php';
 require_once 'db/mysql/MySqlDataSource.php';
 

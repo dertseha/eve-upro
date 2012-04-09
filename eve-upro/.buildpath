@@ -3,4 +3,5 @@
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
 	<buildpathentry kind="con" path="org.eclipse.dltk.USER_LIBRARY/PEAR"/>
 	<buildpathentry kind="src" path="src/php"/>
+	<buildpathentry kind="con" path="org.eclipse.dltk.USER_LIBRARY/PHPUnit"/>
 </buildpath>

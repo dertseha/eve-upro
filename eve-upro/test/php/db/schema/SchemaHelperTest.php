@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'db/schema/SchemaHelper.php';
 
 class SchemaHelperTest extends PHPUnit_Framework_TestCase

@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'db/sql/ParameterizedSqlText.php';
 require_once 'db/sql/StandardSqlDictionary.php';
 

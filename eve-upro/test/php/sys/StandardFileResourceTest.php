@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'sys/StandardFileResource.php';
 
 class StandardFileResourceTest extends PHPUnit_Framework_TestCase

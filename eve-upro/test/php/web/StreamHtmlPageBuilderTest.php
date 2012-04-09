@@ -1,5 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
 require_once 'BufferPrintStream.php';
 
 require_once 'web/StreamHtmlPageBuilder.php';

@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'web/ReferencedJavaScriptResource.php';
 
 class ReferencedJavaScriptResourceTest extends PHPUnit_Framework_TestCase

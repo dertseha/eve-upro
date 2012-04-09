@@ -1,6 +1,4 @@
 <?php
-require_once 'PHPUnit.php';
-
 require_once 'web/InlineScriptResource.php';
 
 class InlineScriptResourceTest extends PHPUnit_Framework_TestCase
