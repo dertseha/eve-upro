@@ -6,6 +6,7 @@ require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
 
 require_once realpath(dirname(__FILE__)) . '/../../Uuid.php';
 require_once realpath(dirname(__FILE__)) . '/../WriteContext.php';
+require_once realpath(dirname(__FILE__)) . '/../WriteAccess.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/InsertQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/DeleteQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/UpdateQuery.php';
@@ -14,8 +15,14 @@ require_once realpath(dirname(__FILE__)) . '/../../db/executor/NullResultSetHand
 /**
  * A write context for a database
  */
-class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implements \upro\dataModel\WriteContext
+class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataModel\WriteAccess
 {
+   /**
+    * Helper for data actions
+    * @var \upro\dataModel\db\DatabaseDataContext
+    */
+   private $dataContext;
+
    /**
     * @var int the new instance value, valid during an active transaction
     */
@@ -37,7 +44,12 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
    private $historyEntryModelInstanceBox;
 
    /**
-    * @var \upro\db\sql\ParameterBox for the history entry context ID
+    * @var \upro\db\sql\ParameterBox for the history entry context entry type
+    */
+   private $historyEntryContextEntryTypeBox;
+
+   /**
+    * @var \upro\db\sql\ParameterBox for the history entry context key
     */
    private $historyEntryContextIdBox;
 
@@ -48,16 +60,11 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
 
    /**
     * Constructor
-    * @param \upro\db\TransactionControl $transactionControl to use
-    * @param \upro\db\executor\StatementExecutorFactory $statementExecutorFactory to use
-    * @param array $tableNames list of table names the model consists of
-    * @param string $modelId UUID of the model
+    * @param \upro\dataModel\db\DatabaseDataContext $dataContext the data context to work in
     */
-   function __construct(\upro\db\TransactionControl $transactionControl,
-         \upro\db\executor\StatementExecutorFactory $statementExecutorFactory, $tableNames, $modelId)
+   function __construct(\upro\dataModel\db\DatabaseDataContext $dataContext)
    {
-      parent::__construct($transactionControl, $statementExecutorFactory, $tableNames, $modelId);
-
+      $this->dataContext = $dataContext;
       $this->newInstance = 0;
    }
 
@@ -68,10 +75,10 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
       {
          $this->prepareHistoryInsertQuery();
 
-         $this->startTransaction(true);
-
-         $this->newInstance = $this->getCurrentDataModelInstance();
+         $this->newInstance = $this->dataContext->startTransaction(true);
       }
+
+      return $this;
    }
 
    /** {@inheritDoc} */
@@ -83,7 +90,7 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
          $this->updateNewInstanceValue();
          $this->deleteOldHistoryEntries();
 
-         $this->commitTransaction();
+         $this->dataContext->commitTransaction();
 
          $this->newInstance = 0;
          $this->cleanupHistoryInsertQuery();
@@ -95,7 +102,7 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
    {
       if ($this->isContextStarted())
       {
-         $this->rollbackTransaction();
+         $this->dataContext->rollbackTransaction();
 
          $this->newInstance = 0;
          $this->cleanupHistoryInsertQuery();
@@ -103,7 +110,7 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
    }
 
    /** {@inheritDoc} */
-	public function addHistoryEntry($message, $context)
+	public function addHistoryEntry($message, $contextId)
 	{
 	   $result = 0;
 
@@ -111,7 +118,8 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
 	   {
    	   $result = $this->newInstance + 1;
          $this->historyEntryModelInstanceBox->setValue($result);
-   	   $this->historyEntryContextIdBox->setValue($context);
+   	   $this->historyEntryContextEntryTypeBox->setValue($contextId->getEntryType());
+         $this->historyEntryContextIdBox->setValue($contextId->getKey());
    	   $this->historyEntryMessageBox->setValue($message);
 
    	   $this->historyInsertExecutor->execute(new \upro\db\executor\NullResultSetHandler());
@@ -137,11 +145,16 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
 	   $query = new \upro\db\sql\InsertQuery();
 
 	   $query->intoTable(DatabaseDataModelConstants::TABLE_NAME_DATA_MODEL_CHANGE_HISTORY);
-	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_ID)->valueConstant($this->getModelId());
+	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_ID)
+	      ->valueConstant($this->dataContext->getModelId());
 
 	   $this->historyEntryModelInstanceBox = new \upro\db\sql\ParameterBox(null);
 	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE)
 	      ->value(new \upro\db\sql\ParameterValueExpression($this->historyEntryModelInstanceBox));
+
+	   $this->historyEntryContextEntryTypeBox = new \upro\db\sql\ParameterBox(null);
+	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ENTRY_TYPE)
+	      ->value(new \upro\db\sql\ParameterValueExpression($this->historyEntryContextEntryTypeBox));
 
 	   $this->historyEntryContextIdBox = new \upro\db\sql\ParameterBox(\Uuid::EMPTY_UUID);
 	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ID)
@@ -152,7 +165,7 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
 	      ->value(new \upro\db\sql\ParameterValueExpression($this->historyEntryMessageBox));
 
 	   $this->historyInsertQuery = $query;
-	   $this->historyInsertExecutor = $this->getStatementExecutor($this->historyInsertQuery);
+	   $this->historyInsertExecutor = $this->dataContext->getStatementExecutor($this->historyInsertQuery);
 	}
 
 	/**
@@ -184,11 +197,11 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
 	      $dataModelIdSubject = new \upro\db\sql\clause\ColumnClauseSubject(
 	            DatabaseDataModelConstants::COLUMN_NAME_ID);
 
-	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->getModelId()));
+	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->dataContext->getModelId()));
 	      $query->where($clause);
 	   }
 
-	   $executor = $this->getStatementExecutor($query);
+	   $executor = $this->dataContext->getStatementExecutor($query);
 	   $executor->execute(new \upro\db\executor\NullResultSetHandler());
 	   $executor->close();
 	}
@@ -208,12 +221,12 @@ class DatabaseWriteContext extends \upro\dataModel\db\DatabaseDataContext implem
 	            DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE);
 
 	      $dataModelInstanceBox = new \upro\db\sql\ParameterBox($this->newInstance - DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
-	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->getModelId()))
+	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->dataContext->getModelId()))
 	         ->andThat($dataModelInstanceSubject->isSmallerThanParameter($dataModelInstanceBox));
 	      $query->where($clause);
 	   }
 
-	   $executor = $this->getStatementExecutor($query);
+	   $executor = $this->dataContext->getStatementExecutor($query);
 	   $executor->execute(new \upro\db\executor\NullResultSetHandler());
 	   $executor->close();
 	}

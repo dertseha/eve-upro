@@ -24,6 +24,7 @@ interface ReadContext
     * Requests any new entries from the model happening since the last instance ID.
     * @param int $lastInstance the last known data model instance known to the caller
     * @param \upro\dataModel\HistoryReader $reader the reader which shall receive the messages
+    * @return int the current instance value of the model, to be used for the next request
     */
 	function readHistoryEntries($lastInstance, \upro\dataModel\HistoryReader $reader);
 }

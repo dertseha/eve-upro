@@ -16,7 +16,8 @@ class DataModel {
 class DataModelChangeHistory {
    + dataModelId: UUID
    + dataModelInstance: int
-   
+
+   + contextEntryType: string   
    + contextId: UUID
    + message: string
 }
@@ -54,6 +55,8 @@ package GroupManagment {
 class Group {
    + id: UUID [primaryKey]
    
+   + validFromInstance: int
+   + validToInstance: int
 }
 
 class GroupInterest {
@@ -62,15 +65,23 @@ class GroupInterest {
    + groupId: UUID
    + contextId: UUID
    
-   + validFromInstanceId: int
-   + validToInstanceId: int
+   + validFromInstance: int
+   + validToInstance: int
+}
+
+class GroupProperty {
+   + groupId: UUID
+   + contextId: UUID
 }
 
 class GroupMembership {
    + groupId: UUID
    
    + userId: UUID
+   + validFromInstance: int
+   + validToInstance: int
 }
+
 
 }
 

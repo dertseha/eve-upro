@@ -5,14 +5,6 @@ hide circle
 
 package dataModel {
 
-interface WriteContext {
-   + start()
-   + stop()
-   + cancel()
-   
-   + addHistoryEntry(message: string, context: UUID): int
-}
-
 interface DataModelProvider {
    + isModelExisting(name: string): boolean
    + createDataModel(name: string)
@@ -21,6 +13,37 @@ interface DataModelProvider {
    + getReadContext(name: string): ReadContext
 }
 
+class DataEntryId {
+   - entryType: string
+   - key: UUID
+   + equals(other: DataEntryId): boolean
+}
+
+package writing {
+
+interface WriteContext {
+   + start(): WriteAccess
+   + stop()
+   + cancel()
+}
+
+DataModelProvider -down-> WriteContext
+
+interface WriteAccess {
+   + isAccessAllowed(entries: DataEntryId[]): boolean
+   + isControlAllowed(entries: DataEntryId[]): boolean
+   
+   + addHistoryEntry(message: string, contextId: DataEntryId): int
+}
+
+WriteContext --> WriteAccess
+
+}
+
+package reading {
+
+DataModelProvider -down-> ReadContext
+
 interface ReadContext {
    + prepare()
    + unprepare()
@@ -28,11 +51,26 @@ interface ReadContext {
    + readHistoryEntries(lastInstance: int, reader: HistoryReader) 
 }
 
-interface HistoryReader {
-   + reset(instance: int)
-   + receive(instance: int, message: string, context: UUID)
+ReadContext -- HistoryReader
+HistoryReader --> ReadAccess
+ReadAccess -- ModelReader
+
+interface ReadAccess {
+   + getCurrentInstanceId()
+   + isAccessAllowed(entryId: DataEntryId): boolean
+   + readModel(reader: ModelReader)
 }
 
+interface HistoryReader {
+   + reset(access: ReadAccess)
+   + receive(access: ReadAccess, entryInstance: int, message: string, contextId: DataEntryId)
+}
+
+interface ModelReader {
+   + onEntry(entryId: EntryId, data: map)
+}
+
+}
 }
 
 package database {
@@ -41,18 +79,23 @@ class DatabaseDataContext {
    - statementExecutorFactory
    - tableNames: string[]
    - modelId: UUID
-   # startTransaction(forWrite: boolean)
-   # commitTransaction()
-   # rollbackTransaction()
+   + getModelId(): UUID
+   + startTransaction(forWrite: boolean): int
+   + commitTransaction()
+   + rollbackTransaction()
+   + getStatementExecutor(query: Query): StatementExecutor
 }
 
 class DatabaseWriteContext {
+   - dataContext: DatabaseDataContext
    - newInstance: int
    - historyInsertQuery: InsertQuery
    - historyInsertExecutor: StatementExecutor
 }
 
+
 class DatabaseReadContext {
+   - dataContext: DatabaseDataContext
    - historySelectQuery: SelectQuery
    - historySelectExecutor: StatementExecutor
 }
@@ -63,13 +106,12 @@ class DatabaseDataModelProvider {
    - tableNames: string[]
 }
 
-ReadContext <|-down- DatabaseReadContext
-DatabaseDataContext <|-down- DatabaseReadContext
-DatabaseDataContext <|-down- DatabaseWriteContext
-WriteContext <|-down- DatabaseWriteContext
 
-DataModelProvider <|-down- DatabaseDataModelProvider
+DatabaseDataModelProvider -left-> DatabaseWriteContext
+DatabaseDataModelProvider -right-> DatabaseReadContext
 
+DatabaseWriteContext *-down-> DatabaseDataContext
+DatabaseReadContext *-down-> DatabaseDataContext
 }
 
 @enduml

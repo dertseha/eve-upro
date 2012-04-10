@@ -73,6 +73,7 @@ class CoreDatabaseDataModelDefinition implements DatabaseDataModelDefinition
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_ID, new \upro\db\schema\UuidDataType());
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE, new \upro\db\schema\IntegerDataType());
 
+      $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ID, new \upro\db\schema\StringDataType(32));
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ID, new \upro\db\schema\UuidDataType());
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_MESSAGE, new \upro\db\schema\StringDataType(1024));
 

@@ -2,6 +2,7 @@
 namespace upro\dataModel\db
 {
 require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
 require_once realpath(dirname(__FILE__)) . '/DatabaseWriteContext.php';
 require_once realpath(dirname(__FILE__)) . '/DatabaseReadContext.php';
 
@@ -80,13 +81,12 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
    /** {@inheritDoc} */
    public function getWriteContext($name)
    {
-      $id = $this->getDataModelId($name);
+      $modelId = $this->getDataModelId($name);
       $context = null;
 
-      if (DatabaseDataModelProvider::isDataModelIdValid($id))
+      if (DatabaseDataModelProvider::isDataModelIdValid($modelId))
       {
-         $context = new \upro\dataModel\db\DatabaseWriteContext($this->transactionControl,
-               $this->statementExecutorFactory, $this->tableNames, $id);
+         $context = new \upro\dataModel\db\DatabaseWriteContext($this->getDataContext($modelId));
       }
 
       return $context;
@@ -95,13 +95,12 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
    /** {@inheritDoc} */
    public function getReadContext($name)
    {
-      $id = $this->getDataModelId($name);
+      $modelId = $this->getDataModelId($name);
       $context = null;
 
-      if (DatabaseDataModelProvider::isDataModelIdValid($id))
+      if (DatabaseDataModelProvider::isDataModelIdValid($modelId))
       {
-         $context = new \upro\dataModel\db\DatabaseReadContext($this->transactionControl,
-               $this->statementExecutorFactory, $this->tableNames, $id);
+         $context = new \upro\dataModel\db\DatabaseReadContext($this->getDataContext($modelId));
       }
 
       return $context;
@@ -127,6 +126,17 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
       $executor->close();
 
       return $reader->getValue();
+   }
+
+   /**
+    * Creates a data context instance
+    * @param string $modelId the model ID to use
+    * @return \upro\dataModel\db\DatabaseDataContext data context instance
+    */
+   private function getDataContext($modelId)
+   {
+      return new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
+               $this->statementExecutorFactory, $this->tableNames, $modelId);
    }
 
    /**

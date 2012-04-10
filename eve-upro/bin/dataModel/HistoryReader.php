@@ -20,9 +20,9 @@ interface HistoryReader
     * Receives one data model event
     * @param int $instance the ID of the model this message has brought to
     * @param string $message the modifying message
-    * @param string $context context UUID information for filtering
+    * @param \upro\dataModel\DataEntryId $contextId context ID information for filtering
     */
-	function receive($instanceId, $message, $context);
+	function receive($instanceId, $message, $contextId);
 }
 
 }

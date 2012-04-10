@@ -1,6 +1,7 @@
 <?php
 require_once 'db/sql/StandardSqlDictionary.php';
 
+require_once 'dataModel/DataEntryId.php';
 require_once 'dataModel/db/DatabaseDataModelConstants.php';
 require_once 'dataModel/db/DatabaseReadContext.php';
 
@@ -35,14 +36,15 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
    protected function givenAModelHistoryEntry($dataModelInstance, $context, $message)
    {
-      $this->dataModelHistory->addRow(array($this->modelId, $dataModelInstance, $context, $message));
+      $this->dataModelHistory->addRow(array($this->modelId, $dataModelInstance, $context->getEntryType(), $context->getKey(), $message));
    }
 
    protected function givenADatabaseReadContext()
    {
       $this->transactionControl = $this->getMock('\upro\db\TransactionControl');
-      $this->context = new \upro\dataModel\db\DatabaseReadContext($this->transactionControl,
+      $dataContext = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
             $this->executorFactory, $this->tableNames, $this->modelId);
+      $this->context = new \upro\dataModel\db\DatabaseReadContext($dataContext);
    }
 
    protected function givenAHistoryReader()
@@ -52,13 +54,14 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
    protected function expectingHistoryReaderToBeReset($dataModelInstance)
    {
-      $this->historyReader->expects($this->once())->method('reset')->with($this->equalTo($dataModelInstance));
+      $this->historyReader->expects($this->once())->method('reset')
+         ->with($this->isInstanceOf('\upro\dataModel\ReadAccess'));
    }
 
    protected function expectingHistoryReaderToBeGivenEntry($instance, $contextId, $message)
    {
       $this->historyReader->expects($this->once())->method('receive')
-         ->with($this->equalTo($instance), $this->equalTo($message), $this->equalTo($contextId));
+         ->with($this->isInstanceOf('\upro\dataModel\ReadAccess'), $this->equalTo($instance), $this->equalTo($message), $this->equalTo($contextId));
    }
 
    protected function expectingHistoryReaderToBeGivenNoEntry()
@@ -97,6 +100,13 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $this->context->readHistoryEntries($lastInstance, $this->historyReader);
    }
 
+   protected function thenReadHistoryEntriesShouldReturn($instance)
+   {
+      $result = $this->context->readHistoryEntries($instance, $this->historyReader);
+
+      $this->assertEquals($instance, $result);
+   }
+
    protected function givenTheCurrentDataModelInstanceIs($instance)
    {
       $resultSet = new BufferResultSet();
@@ -131,6 +141,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $this->dataModelHistory = new BufferResultSet(array(
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_ID,
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ENTRY_TYPE,
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ID,
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_MESSAGE));
    }
@@ -225,7 +236,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
       $instance = 10;
-      $contextId = \Uuid::v4();
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'Test Message';
 
       $this->givenAModel($tableNames, $modelId);
@@ -262,7 +273,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
       $instance = 10;
-      $contextId = \Uuid::v4();
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'Test Message';
 
       $this->givenAModel($tableNames, $modelId);
@@ -309,5 +320,24 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
       $this->whenContextIsPrepared();
       $this->whenHistoryIsRead($instance - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
+   }
+
+   public function testReadHistoryEntriesShouldReturnInstance()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
+      $message = 'Test Message';
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseReadContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+      $this->givenAHistoryReader();
+      $this->givenAModelHistoryEntry($instance, $contextId, $message);
+
+      $this->whenContextIsPrepared();
+
+      $this->thenReadHistoryEntriesShouldReturn($instance);
    }
 }

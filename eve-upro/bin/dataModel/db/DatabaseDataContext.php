@@ -66,7 +66,7 @@ class DatabaseDataContext
    /**
     * @return string the model ID
     */
-   protected function getModelId()
+   public function getModelId()
    {
       return $this->modelId;
    }
@@ -74,20 +74,23 @@ class DatabaseDataContext
    /**
     * Requests to start a transaction
     * @param boolean $forWrite true if the model shall be locked for writing
+    * @return int the current model instance
     */
-   protected function startTransaction($forWrite)
+   public function startTransaction($forWrite)
    {
       $tablesForReadLock = $forWrite ? array() : $this->tableNames;
       $tablesForWriteLock = $forWrite ? $this->tableNames : array();
 
       $this->prepareDataModelInstanceQuery();
       $this->transactionControl->start($tablesForWriteLock, $tablesForReadLock);
+
+      return $this->getCurrentDataModelInstance();
    }
 
    /**
     * Requests to commit the active transaction
     */
-   protected function commitTransaction()
+   public function commitTransaction()
    {
       $this->transactionControl->commit();
       $this->cleanupDataModelInstanceQuery();
@@ -96,24 +99,10 @@ class DatabaseDataContext
    /**
     * Requests to roll back the active transaction
     */
-   protected function rollbackTransaction()
+   public function rollbackTransaction()
    {
       $this->transactionControl->rollback();
       $this->cleanupDataModelInstanceQuery();
-   }
-
-   /**
-    * Retrieves the current data model instance.
-    * Must be called while during an active transaction context
-    * @return int the current instance value
-    */
-   protected function getCurrentDataModelInstance()
-   {
-      $reader = new \upro\db\SingleCellTableRowReader(-1);
-
-      $this->dataModelInstanceExecutor->execute(new \upro\db\executor\SimpleResultSetHandler($reader));
-
-      return $reader->getValue();
    }
 
    /**
@@ -121,9 +110,23 @@ class DatabaseDataContext
     * @param \upro\db\sql\Query $query for which to create the executor
     * @return \upro\db\executor\StatementExecutor for the query
     */
-   protected function getStatementExecutor(\upro\db\sql\Query $query)
+   public function getStatementExecutor(\upro\db\sql\Query $query)
    {
       return $this->statementExecutorFactory->getExecutor($query);
+   }
+
+   /**
+    * Retrieves the current data model instance.
+    * Must be called while during an active transaction context
+    * @return int the current instance value
+    */
+   private function getCurrentDataModelInstance()
+   {
+      $reader = new \upro\db\SingleCellTableRowReader(-1);
+
+      $this->dataModelInstanceExecutor->execute(new \upro\db\executor\SimpleResultSetHandler($reader));
+
+      return $reader->getValue();
    }
 
    /**

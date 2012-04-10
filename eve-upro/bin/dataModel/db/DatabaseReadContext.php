@@ -7,6 +7,7 @@ require_once realpath(dirname(__FILE__)) . '/DataModelHistoryResultSetHandler.ph
 
 require_once realpath(dirname(__FILE__)) . '/../../Uuid.php';
 require_once realpath(dirname(__FILE__)) . '/../ReadContext.php';
+require_once realpath(dirname(__FILE__)) . '/../ReadAccess.php';
 require_once realpath(dirname(__FILE__)) . '/../HistoryReader.php';
 
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/SelectQuery.php';
@@ -14,8 +15,20 @@ require_once realpath(dirname(__FILE__)) . '/../../db/sql/SelectQuery.php';
 /**
  * A read context for a database
  */
-class DatabaseReadContext extends \upro\dataModel\db\DatabaseDataContext implements \upro\dataModel\ReadContext
+class DatabaseReadContext implements \upro\dataModel\ReadContext, \upro\dataModel\ReadAccess
 {
+   /**
+    * Helper for data actions
+    * @var \upro\dataModel\db\DatabaseDataContext
+    */
+   private $dataContext;
+
+   /**
+    * The current instance ID of the model
+    * @var int
+    */
+   private $currentInstance;
+
    /**
     * @var \upro\db\sql\SelectQuery for a history entry
     */
@@ -33,15 +46,12 @@ class DatabaseReadContext extends \upro\dataModel\db\DatabaseDataContext impleme
 
    /**
     * Constructor
-    * @param \upro\db\TransactionControl $transactionControl to use
-    * @param \upro\db\executor\StatementExecutorFactory $statementExecutorFactory to use
-    * @param array $tableNames list of table names the model consists of
-    * @param string $modelId UUID of the model
+    * @param \upro\dataModel\db\DatabaseDataContext $dataContext the data context to work in
     */
-   function __construct(\upro\db\TransactionControl $transactionControl,
-         \upro\db\executor\StatementExecutorFactory $statementExecutorFactory, $tableNames, $modelId)
+   function __construct(\upro\dataModel\db\DatabaseDataContext $dataContext)
    {
-      parent::__construct($transactionControl, $statementExecutorFactory, $tableNames, $modelId);
+      $this->dataContext = $dataContext;
+      $this->currentInstance = 0;
    }
 
    /** {@inheritDoc} */
@@ -66,25 +76,34 @@ class DatabaseReadContext extends \upro\dataModel\db\DatabaseDataContext impleme
    /** {@inheritDoc} */
 	public function readHistoryEntries($lastInstance, \upro\dataModel\HistoryReader $reader)
 	{
+	   $result = 0;
+
       if ($this->isPrepared())
       {
-   	   $this->startTransaction(false);
-
-   	   $currentInstance = $this->getCurrentDataModelInstance();
+   	   $this->currentInstance = $result = $this->dataContext->startTransaction(false);
 
    	   if (($lastInstance <= 0) ||
-   	         ($lastInstance <= ($currentInstance - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT)))
+   	         ($lastInstance <= ($this->currentInstance - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT)))
    	   {
-   	      $reader->reset($currentInstance);
+   	      $reader->reset($this);
    	   }
    	   else
    	   {
    	      $this->historyEntryModelInstanceBox->setValue($lastInstance);
-   	      $this->historySelectExecutor->execute(new \upro\dataModel\db\DataModelHistoryResultSetHandler($reader));
+   	      $this->historySelectExecutor->execute(new \upro\dataModel\db\DataModelHistoryResultSetHandler($this, $reader));
    	   }
 
-   	   $this->commitTransaction();
+   	   $this->dataContext->commitTransaction();
+   	   $this->currentInstance = 0;
       }
+
+      return $result;
+	}
+
+   /** {@inheritDoc} */
+	public function getCurrentInstanceId()
+	{
+	   return $this->currentInstance;
 	}
 
 	/**
@@ -110,13 +129,13 @@ class DatabaseReadContext extends \upro\dataModel\db\DatabaseDataContext impleme
 	            DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE);
 
 	      $this->historyEntryModelInstanceBox = new \upro\db\sql\ParameterBox(null);
-	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->getModelId()))
+	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->dataContext->getModelId()))
 	         ->andThat($dataModelInstanceSubject->isGreaterThanParameter($this->historyEntryModelInstanceBox));
 	      $this->historySelectQuery->where($clause);
 	   }
 	   $this->historySelectQuery->orderByColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE);
 
-	   $this->historySelectExecutor = $this->getStatementExecutor($this->historySelectQuery);
+	   $this->historySelectExecutor = $this->dataContext->getStatementExecutor($this->historySelectQuery);
 	}
 
 	/**

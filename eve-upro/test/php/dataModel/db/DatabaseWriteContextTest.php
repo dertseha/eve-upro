@@ -1,6 +1,7 @@
 <?php
 require_once 'db/sql/StandardSqlDictionary.php';
 
+require_once 'dataModel/DataEntryId.php';
 require_once 'dataModel/db/DatabaseWriteContext.php';
 
 require_once 'TestStatementExecutorFactory.php';
@@ -22,6 +23,11 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
    private $executorFactory;
 
+   /**
+    * @var \upro\dataModel\WriteAccess
+    */
+   private $access;
+
    protected function givenAModel($tableNames, $id)
    {
       $this->tableNames = $tableNames;
@@ -31,8 +37,9 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    protected function givenADatabaseWriteContext()
    {
       $this->transactionControl = $this->getMock('\upro\db\TransactionControl');
-      $this->context = new \upro\dataModel\db\DatabaseWriteContext($this->transactionControl,
+      $dataContext = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
             $this->executorFactory, $this->tableNames, $this->modelId);
+      $this->context = new \upro\dataModel\db\DatabaseWriteContext($dataContext);
    }
 
    protected function expectingTransactionToBeStarted($lockedTablesForWrite, $lockedTablesForRead)
@@ -59,7 +66,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
          $this->executorFactory->setExecutor(0, $executor);
       }
-      $this->context->start();
+      $this->access = $this->context->start();
    }
 
    protected function whenContextIsStopped()
@@ -95,12 +102,13 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
    protected function whenAddingHistoryEntry($message, $contextId)
    {
-      $this->context->addHistoryEntry($message, $contextId);
+      $this->access->addHistoryEntry($message, $contextId);
    }
 
    protected function thenAddHistoryEntryShouldReturn($expected)
    {
-      $result = $this->context->addHistoryEntry('test', \Uuid::EMPTY_UUID);
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
+      $result = $this->access->addHistoryEntry('test', $contextId);
 
       $this->assertEquals($expected, $result);
    }
@@ -263,15 +271,15 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
 
       $this->thenTheQueryShouldHaveBeen(0, 'INSERT INTO DataModelChangeHistory'
-            . ' (dataModelId, dataModelInstance, contextId, message)'
-            . ' VALUES (?, ?, ?, ?)');
+            . ' (dataModelId, dataModelInstance, contextEntryType, contextId, message)'
+            . ' VALUES (?, ?, ?, ?, ?)');
    }
 
    public function testHistoryEntryHasProperModelId_WhenAddingHistoryEntry()
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -289,7 +297,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -307,7 +315,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -326,7 +334,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -342,11 +350,11 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->thenTheQueryShouldHaveParameter(0, 1, $instance + 3);
    }
 
-   public function testHistoryEntryHasProperContextId_WhenAddingHistoryEntry()
+   public function testHistoryEntryHasProperContextEntryType_WhenAddingHistoryEntry()
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::v4();
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -357,14 +365,32 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 2, $contextId);
+      $this->thenTheQueryShouldHaveParameter(0, 2, $contextId->getEntryType());
+   }
+
+   public function testHistoryEntryHasProperContextId_WhenAddingHistoryEntry()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
+      $message = 'History Entry Message';
+      $instance = 10;
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenAddingHistoryEntry($message, $contextId);
+
+      $this->thenTheQueryShouldHaveParameter(0, 3, $contextId->getKey());
    }
 
    public function testHistoryEntryHasProperMessage_WhenAddingHistoryEntry()
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -375,29 +401,14 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 3, $message);
-   }
-
-   public function testAddHistoryEntryShouldReturnZero_WhenStopped()
-   {
-      $tableNames = array('Table1', 'Table2');
-      $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
-      $message = 'History Entry Message';
-      $instance = 10;
-
-      $this->givenAModel($tableNames, $modelId);
-      $this->givenADatabaseWriteContext();
-      $this->givenTheCurrentDataModelInstanceIs($instance);
-
-      $this->thenAddHistoryEntryShouldReturn(0);
+      $this->thenTheQueryShouldHaveParameter(0, 4, $message);
    }
 
    public function testAddHistoryEntryShouldReturnNextInstance_WhenStarted()
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
@@ -446,7 +457,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    {
       $tableNames = array('Table1', 'Table2');
       $modelId = \Uuid::v4();
-      $contextId = \Uuid::EMPTY_UUID;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
       $message = 'History Entry Message';
       $instance = 10;
 
