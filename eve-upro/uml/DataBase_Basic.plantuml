@@ -8,7 +8,7 @@ package DataModelFramework {
 class DataModel {
    + id: UUID [primaryKey]
 
-   + name: string
+   + name: string [unique]
 
    + instance: int
 }
@@ -28,20 +28,23 @@ package UserManagement {
 
 class User {
    + id: UUID [primaryKey]
+   + contextId: UUID [DataModel.id]
+   + contextEntryType: string -- "DataModel"
 
    + name: string
 }
 
 class Session {
    + id: UUID [primaryKey]
-
-   + userId: UUID
+   + contextId: UUID [User.id]
+   + contextEntryType: string -- "User"
 }
 
 class SessionClient {
    + id: UUID [primaryKey]
+   + contextId: UUID [Session.id]
+   + contextEntryType: string -- "Session"
 
-   + sessionId: UUID
    + lastAliveTime: timestamp
    + clientData -- identifying the client
    
@@ -55,27 +58,37 @@ package GroupManagment {
 class Group {
    + id: UUID [primaryKey]
    
+   + type: string -- just for tracing
+   
    + validFromInstance: int
    + validToInstance: int
 }
 
 class GroupInterest {
    + id: UUID
+   + contextId: UUID [Group.id]
+   + contextEntryType: string -- "Group"
    
-   + groupId: UUID
-   + contextId: UUID
+   + interestId: UUID
+   + interestEntryType: string
    
    + validFromInstance: int
    + validToInstance: int
 }
 
 class GroupProperty {
-   + groupId: UUID
-   + contextId: UUID
+   + id: UUID
+   + contextId: UUID [Group.id]
+   + contextEntryType: string -- "Group"
+
+   + propertyId: UUID
+   + propertyEntryType: string
 }
 
 class GroupMembership {
-   + groupId: UUID
+   + id: UUID
+   + contextId: UUID [Group.id]
+   + contextEntryType: string -- "Group"
    
    + userId: UUID
    + validFromInstance: int

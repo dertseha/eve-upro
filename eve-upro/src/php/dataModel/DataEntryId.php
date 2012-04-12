@@ -2,6 +2,9 @@
 namespace upro\dataModel
 {
 
+/**
+ * A unique identification of a specific type
+ */
 class DataEntryId
 {
    /**

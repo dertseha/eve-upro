@@ -105,6 +105,50 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->access->addHistoryEntry($message, $contextId);
    }
 
+   protected function whenRetrievingADataEntry($entryId)
+   {
+      {   // SELECT query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(2, $executor);
+      }
+      $this->access->retrieveDataEntry($entryId);
+   }
+
+   protected function whenCreatingADataEntry($entryId, $data, $contextId)
+   {
+      {   // INSERT query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(2, $executor);
+      }
+      $this->access->createDataEntry($entryId, $data, $contextId);
+   }
+
+   protected function whenUpdatingADataEntry($entryId, $data)
+   {
+      {   // UPDATE query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(2, $executor);
+      }
+      $this->access->updateDataEntry($entryId, $data);
+   }
+
+   protected function whenDeletingADataEntry($entryId)
+   {
+      {   // DELETE query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(2, $executor);
+      }
+      $this->access->deleteDataEntry($entryId);
+   }
+
    protected function thenAddHistoryEntryShouldReturn($expected)
    {
       $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
@@ -128,6 +172,29 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $paramBox = $paramText->getParameter($parameterIndex);
 
       $this->assertEquals($expected, $paramBox->getValue());
+   }
+
+   protected function thenTheQueryWithParametersShouldHaveBeen($queryIndex, $expectedQueryText, $expectedParameters)
+   {
+      $query = $this->executorFactory->getQuery($queryIndex);
+      $paramText = $query->toSqlText(new \upro\db\sql\StandardSqlDictionary());
+      $expected = array('query' => $expectedQueryText, 'parameters' => $expectedParameters);
+      $resultingParameters = array();
+
+      for ($i = 0; $i < $paramText->getParameterCount(); $i++)
+      {
+         $resultingParameters[] = $paramText->getParameter($i)->getValue();
+      }
+      $result = array('query' => $paramText->getText(), 'parameters' => $resultingParameters);
+
+      $this->assertEquals($expected, $result);
+   }
+
+   protected function thenTheNextInstanceValueShouldBe($expected)
+   {
+      $result = $this->access->getNextInstanceValue();
+
+      $this->assertEquals($expected, $result);
    }
 
    public function setUp()
@@ -535,5 +602,95 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStopped();
 
       $this->thenTheQueryShouldHaveParameter(3, 1, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
+   }
+
+   public function testProperSelectQueryShouldBeSet_WhenCallingGetDataEntry()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryId = new \upro\dataModel\DataEntryId('Table1', \Uuid::v4());
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenRetrievingADataEntry($entryId);
+
+      $this->thenTheQueryShouldHaveBeen(2, 'SELECT * FROM Table1 WHERE id = ?');
+   }
+
+   public function testProperInsertQuery_WhenCallingCreateDataEntry()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryId = new \upro\dataModel\DataEntryId('Table1', \Uuid::v4());
+      $contextId = new \upro\dataModel\DataEntryId('Table2', \Uuid::v4());
+      $data = array('Param1' => 'Value1', 'Param2' => 'Value2');
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenCreatingADataEntry($entryId, $data, $contextId);
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'INSERT INTO Table1'
+            . ' (id, contextEntryType, contextId, Param1, Param2) VALUES (?, ?, ?, ?, ?)',
+            array($entryId->getKey(), $contextId->getEntryType(), $contextId->getKey(), 'Value1', 'Value2'));
+   }
+
+   public function testProperUpdateQuery_WhenCallingUpdateDataEntry()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryId = new \upro\dataModel\DataEntryId('Table1', \Uuid::v4());
+      $data = array('Param1' => 'Value1', 'Param2' => 'Value2');
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenUpdatingADataEntry($entryId, $data);
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'UPDATE Table1'
+            . ' SET Param1 = ?, Param2 = ? WHERE id = ?',
+            array('Value1', 'Value2', $entryId->getKey()));
+   }
+
+   public function testProperDeleteQuery_WhenCallingDeleteDataEntry()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryId = new \upro\dataModel\DataEntryId('Table1', \Uuid::v4());
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenDeletingADataEntry($entryId);
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'DELETE FROM Table1 WHERE id = ?', array($entryId->getKey()));
+   }
+
+   public function testNextInstanceValueIsReported_WhenStarted()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+
+      $this->thenTheNextInstanceValueShouldBe($instance + 1);
    }
 }

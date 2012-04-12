@@ -1,13 +1,13 @@
 <?php
 namespace upro\dataModel\db
 {
-require_once realpath(dirname(__FILE__)) . 'DatabaseDataModelConstants.php';
-require_once realpath(dirname(__FILE__)) . 'DatabaseDataModelDefinition.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelDefinition.php';
 
-require_once realpath(dirname(__FILE__)) . '../../db/schema/TableControl.php';
-require_once realpath(dirname(__FILE__)) . '../../db/schema/StringDataType.php';
-require_once realpath(dirname(__FILE__)) . '../../db/schema/IntegerDataType.php';
-require_once realpath(dirname(__FILE__)) . '../../db/schema/UuidDataType.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/schema/TableControl.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/schema/StringDataType.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/schema/IntegerDataType.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/schema/UuidDataType.php';
 
 
 /**

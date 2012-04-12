@@ -30,6 +30,13 @@ interface WriteContext {
 DataModelProvider -down-> WriteContext
 
 interface WriteAccess {
+   + getNextInstanceValue(): int
+   
+   + retrieveDataEntry(entryId: DataEntryId): DataEntry
+   + createDataEntry(entryId: DataEntryId, data: map, contextId: DataEntryId)
+   + updateDataEntry(entryId: DataEntryId, data: map)
+   + deleteDataEntry(entryId: DataEntryId)
+
    + isAccessAllowed(entries: DataEntryId[]): boolean
    + isControlAllowed(entries: DataEntryId[]): boolean
    

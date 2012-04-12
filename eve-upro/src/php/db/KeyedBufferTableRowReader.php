@@ -19,9 +19,17 @@ class KeyedBufferTableRowReader extends \upro\db\BufferTableRowReader
     */
    function __construct($cellIndexByKey)
    {
-      parent::_construct();
+      parent::__construct();
 
       $this->cellIndexByKey = $cellIndexByKey;
+   }
+
+   /**
+    * @return array of key names
+    */
+   public function getKeys()
+   {
+      return array_keys($this->cellIndexByKey);
    }
 
    /**

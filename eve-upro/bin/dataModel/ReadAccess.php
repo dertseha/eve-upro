@@ -9,7 +9,7 @@ interface ReadAccess
    /**
     * @return the current data model instance
     */
-	function getCurrentInstanceId();
+   function getCurrentInstanceId();
 
 }
 

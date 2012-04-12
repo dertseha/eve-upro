@@ -2,6 +2,7 @@
 namespace upro\dataModel\db
 {
 require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelHelper.php';
 require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
 
 require_once realpath(dirname(__FILE__)) . '/../../Uuid.php';
@@ -11,6 +12,7 @@ require_once realpath(dirname(__FILE__)) . '/../../db/sql/InsertQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/DeleteQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/UpdateQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/executor/NullResultSetHandler.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/executor/KeyedBufferResultSetHandler.php';
 
 /**
  * A write context for a database
@@ -127,6 +129,99 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 	   }
 
 	   return $result;
+	}
+
+	/** {@inheritDoc} */
+	public function getNextInstanceValue()
+	{
+	   return $this->newInstance + 1;
+	}
+
+   /** {@inheritDoc} */
+	function retrieveDataEntry(\upro\dataModel\DataEntryId $entryId)
+	{
+	   $handler = new \upro\db\executor\KeyedBufferResultSetHandler();
+	   $query = new \upro\db\sql\SelectQuery();
+	   $entry = null;
+
+	   $query->selectAll()->fromTable($entryId->getEntryType());
+	   {
+	      $idSubject = new \upro\db\sql\clause\ColumnClauseSubject(DatabaseDataModelConstants::COLUMN_NAME_ID);
+	      $clause = $idSubject->equalsParameter(new \upro\db\sql\ParameterBox($entryId->getKey()));
+
+	      $query->where($clause);
+	   }
+
+	   $executor = $this->dataContext->getStatementExecutor($query);
+	   $executor->execute($handler);
+	   $executor->close();
+
+	   $reader = $handler->getReader();
+	   if ($reader->getRowCount() == 1)
+	   {
+	      $entry = DatabaseDataModelHelper::extractDataEntry($reader, 0);
+	   }
+
+	   return $entry;
+	}
+
+   /** {@inheritDoc} */
+	function createDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
+	{
+	   $query = new \upro\db\sql\InsertQuery();
+
+	   $query->intoTable($entryId->getEntryType());
+	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_ID)->valueConstant($entryId->getKey());
+	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE)->valueConstant($contextId->getEntryType());
+	   $query->columnName(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID)->valueConstant($contextId->getKey());
+	   foreach ($data as $key => $value)
+	   {
+	      $query->columnName($key)->valueConstant($value);
+	   }
+
+	   $executor = $this->dataContext->getStatementExecutor($query);
+	   $executor->execute(new \upro\db\executor\NullResultSetHandler());
+	   $executor->close();
+	}
+
+   /** {@inheritDoc} */
+	function updateDataEntry(\upro\dataModel\DataEntryId $entryId, $data)
+	{
+	   $query = new \upro\db\sql\UpdateQuery();
+
+	   $query->updateTable($entryId->getEntryType());
+		foreach ($data as $key => $value)
+	   {
+	      $query->set($key, new \upro\db\sql\ParameterValueExpression(new \upro\db\sql\ParameterBox($value)));
+	   }
+	   {
+	      $idSubject = new \upro\db\sql\clause\ColumnClauseSubject(DatabaseDataModelConstants::COLUMN_NAME_ID);
+	      $clause = $idSubject->equalsParameter(new \upro\db\sql\ParameterBox($entryId->getKey()));
+
+	      $query->where($clause);
+	   }
+
+	   $executor = $this->dataContext->getStatementExecutor($query);
+	   $executor->execute(new \upro\db\executor\NullResultSetHandler());
+	   $executor->close();
+	}
+
+   /** {@inheritDoc} */
+	function deleteDataEntry(\upro\dataModel\DataEntryId $entryId)
+	{
+	   $query = new \upro\db\sql\DeleteQuery();
+
+	   $query->deleteFromTable($entryId->getEntryType());
+	   {
+	      $idSubject = new \upro\db\sql\clause\ColumnClauseSubject(DatabaseDataModelConstants::COLUMN_NAME_ID);
+	      $clause = $idSubject->equalsParameter(new \upro\db\sql\ParameterBox($entryId->getKey()));
+
+	      $query->where($clause);
+	   }
+
+	   $executor = $this->dataContext->getStatementExecutor($query);
+	   $executor->execute(new \upro\db\executor\NullResultSetHandler());
+	   $executor->close();
 	}
 
 	/**

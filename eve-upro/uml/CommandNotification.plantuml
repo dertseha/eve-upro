@@ -1,0 +1,42 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+package dataModel {
+
+interface Command {
+   + decode(initData: map)
+   + getEntryIdsForControl(): DataEntryId[]
+   + getEntryIdsForAccess(): DataEntryId[]
+   + execute(dataAccess: CommandDataAccess)
+}
+
+interface CommandFactory {
+   + getCommand(name: string): Command)
+}
+
+interface CommandDataAccess {
+   + retrieveDataEntry(entryId: DataEntryId): DataEntry
+   + notifyDataEntry(entryId: DataEntryId, data: map, contextId: DataEntryId)
+   + createDataEntry(entryId: DataEntryId, data: map, contextId: DataEntryId)
+   + updateDataEntry(entryId: DataEntryId, data: map, contextId: DataEntryId)
+   + deleteDataEntry(entryId: DataEntryId, contextId: DataEntryId)
+}
+
+interface NotificationConverter {
+   + getCreateDataEntry(entryId: DataEntryId, data: map): string
+   + getUpdateDataEntry(entryId: DataEntryId, data: map): string
+   + getDeleteDataEntry(entryId: DataEntryId): string
+}
+
+class NotifyingCommandDataAccess {
+   - writeAccess: WriteAcces
+   - converter: NotificationConverter
+}
+
+CommandDataAccess <|-- NotifyingCommandDataAccess
+
+}
+
+@enduml

@@ -1,33 +1,25 @@
 <?php
-namespace upro\dataModel
+namespace upro\dataModel\cmd
 {
 /**
- * A write access is for writing data to the model.
- * Accessing the model or the history is only allowed between the calls to start()
- * and one of the stopping methods: stop() or cancel()  from the WriteContext
+ * Provides access to the data model for commands
  */
-interface WriteAccess
+interface CommandDataAccess
 {
-   /**
-    * Returns the next data model instance value
-    * @return int the next instance number
-    */
-   function getNextInstanceValue();
-
    /**
     * Retrieves a data entry from the model
     * @param \upro\dataModel\DataEntryId $entryId identifying the entry to retrieve
-    * @return \upro\dataModel\DataEntry the properties of requested entry or null if not found
+    * @return \upro\dataModel\DataEntry the retrieved data entry or null if not existing
     */
    function retrieveDataEntry(\upro\dataModel\DataEntryId $entryId);
 
    /**
-    * Stores one data model event in the history
-    * @param string $message the modifying message
-    * @param \upro\dataModel\DataEntryId $contextId entry ID information for filtering
-    * @return int the new instance number
+    * Creates a notification about a data entry
+    * @param \upro\dataModel\DataEntryId $entryId identifying the data entry
+    * @param string:mixed $data the data map of the new entry
+    * @param \upro\dataModel\DataEntryId $contextId identifying the context
     */
-	function addHistoryEntry($message, $contextId);
+   function notifyDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId);
 
    /**
     * Creates a new data entry
@@ -41,14 +33,16 @@ interface WriteAccess
     * Updates an existing data entry
     * @param \upro\dataModel\DataEntryId $entryId identifying the data entry
     * @param string:mixed $data the data map with the properties to modify
+    * @param \upro\dataModel\DataEntryId $contextId identifying the context
     */
-	function updateDataEntry(\upro\dataModel\DataEntryId $entryId, $data);
+	function updateDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId);
 
    /**
     * Deletes an existing data entry
     * @param \upro\dataModel\DataEntryId $entryId identifying the data entry to remove
+    * @param \upro\dataModel\DataEntryId $contextId identifying the context
     */
-	function deleteDataEntry(\upro\dataModel\DataEntryId $entryId);
+	function deleteDataEntry(\upro\dataModel\DataEntryId $entryId, \upro\dataModel\DataEntryId $contextId);
 }
 
 }

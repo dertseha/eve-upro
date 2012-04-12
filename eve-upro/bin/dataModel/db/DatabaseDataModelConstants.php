@@ -19,6 +19,18 @@ class DatabaseDataModelConstants
     */
    const COLUMN_NAME_ID = 'id';
 
+   /**
+    * Typical context entry type column
+    * @var string
+    */
+   const COLUMN_NAME_CONTEXT_ENTRY_TYPE = 'contextEntryType';
+
+   /**
+    * Typical context ID column
+    * @var string
+    */
+   const COLUMN_NAME_CONTEXT_ID = 'contextId';
+
    const TABLE_NAME_DATA_MODEL = 'DataModels';
    const COLUMN_NAME_DATA_MODEL_NAME = 'name';
    const COLUMN_NAME_DATA_MODEL_INSTANCE = 'instance';
