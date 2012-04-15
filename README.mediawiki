@@ -14,4 +14,5 @@ I'm using
 *** for PHP development
 *** MakeGood for PHP unit tests: http://redmine.piece-framework.com/
 *** JsTestDriver for JavaScript unit tests: http://code.google.com/p/js-test-driver/
+*** PlantUML: http://plantuml.sourceforge.net/eclipse.html
 * XAMPP 1.7.7

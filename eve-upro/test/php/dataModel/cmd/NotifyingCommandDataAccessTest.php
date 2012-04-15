@@ -15,9 +15,12 @@ class NotifyingCommandDataAccessContextTest extends PHPUnit_Framework_TestCase
 
    protected function givenANotifyingCommandDataAccess()
    {
+      $dataAccessFactory = $this->getMock('\upro\dataModel\cmd\GroupAccessFactory');
+
       $this->writeAccess = $this->getMock('\upro\dataModel\WriteAccess');
       $this->converter = $this->getMock('\upro\dataModel\cmd\NotificationConverter');
-      $this->dataAccess = new \upro\dataModel\cmd\NotifyingCommandDataAccess($this->writeAccess, $this->converter);
+      $this->dataAccess = new \upro\dataModel\cmd\NotifyingCommandDataAccess($this->writeAccess,
+            $this->converter, $dataAccessFactory);
    }
 
    protected function expectingHistoryToBeWritten($message, $contextId)

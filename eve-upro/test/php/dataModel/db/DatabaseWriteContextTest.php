@@ -197,6 +197,17 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->assertEquals($expected, $result);
    }
 
+   protected function whenFindingEntries($entryType, \upro\dataModel\DataEntryId $contextId, $filter)
+   {
+      {   // SELECT query preparation
+      $resultSet = new BufferResultSet();
+      $executor = new TestStatementExecutor($resultSet);
+
+      $this->executorFactory->setExecutor(2, $executor);
+      }
+      $this->access->findDataEntries($entryType, $contextId, $filter);
+   }
+
    public function setUp()
    {
       parent::setUp();
@@ -692,5 +703,26 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
 
       $this->thenTheNextInstanceValueShouldBe($instance + 1);
+   }
+
+   public function testProperSelectQuery_WhenFindingEntries()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryType = 'SearchType';
+      $contextId = new \upro\dataModel\DataEntryId('TestContext', \Uuid::v4());
+      $filter = array('Prop1' => 'Value1', 'Prop2' => 'Value2');
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenFindingEntries($entryType, $contextId, $filter);
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'SELECT * FROM SearchType WHERE'
+            . ' (((contextId = ?) AND (contextEntryType = ?)) AND (Prop1 = ?)) AND (Prop2 = ?)',
+            array($contextId->getKey(), $contextId->getEntryType(), 'Value1', 'Value2'));
    }
 }

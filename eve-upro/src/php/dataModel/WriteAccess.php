@@ -22,6 +22,15 @@ interface WriteAccess
    function retrieveDataEntry(\upro\dataModel\DataEntryId $entryId);
 
    /**
+    * Searches for data entries from the model with specific data
+    * @param string $entryType the entry type to look for
+    * @param \upro\dataModel\DataEntryId $contextId identifying the context to search the limit in
+    * @param string:mixed $filter a map of at least one property value to look for
+    * @return array of \upro\dataModel\DataEntry the matching list of data entries
+    */
+   function findDataEntries($entryType, \upro\dataModel\DataEntryId $contextId, $filter);
+
+   /**
     * Stores one data model event in the history
     * @param string $message the modifying message
     * @param \upro\dataModel\DataEntryId $contextId entry ID information for filtering

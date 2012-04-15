@@ -1,17 +1,41 @@
 <?php
 namespace upro\dataModel\cmd
 {
+require_once realpath(dirname(__FILE__)) . '/../DataEntryId.php';
+require_once realpath(dirname(__FILE__)) . '/../GroupAccess.php';
+
 /**
  * Provides access to the data model for commands
  */
 interface CommandDataAccess
 {
    /**
-    * Retrieves a data entry from the model
+    * Returns an access interface to group control
+    * @return \upro\dataModel\GroupAccess the requested group access
+    */
+   function getGroupAccess();
+
+   /**
+    * Returns the next data model instance value
+    * @return int the next instance number
+    */
+   function getNextInstanceValue();
+
+   /**
+    * Retrieves a specific data entry from the model
     * @param \upro\dataModel\DataEntryId $entryId identifying the entry to retrieve
     * @return \upro\dataModel\DataEntry the retrieved data entry or null if not existing
     */
    function retrieveDataEntry(\upro\dataModel\DataEntryId $entryId);
+
+   /**
+    * Searches for data entries from the model with specific data
+    * @param string $entryType the entry type to look for
+    * @param \upro\dataModel\DataEntryId $contextId identifying the context to search the limit in
+    * @param string:mixed $filter a map of at least one property value to look for
+    * @return array of \upro\dataModel\DataEntry the matching list of data entries
+    */
+   function findDataEntries($entryType, \upro\dataModel\DataEntryId $contextId, $filter);
 
    /**
     * Creates a notification about a data entry

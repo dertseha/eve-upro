@@ -22,6 +22,14 @@ class DataModelChangeHistory {
    + message: string
 }
 
+class DataModelList {
+   + id: UUID
+   + contextEntryType: string -- "DataModel"   
+   + contextId: UUID
+   
+   + entryType: string -- "User" | "Corporation" | ...
+}
+
 }
 
 package UserManagement {
@@ -57,6 +65,8 @@ package GroupManagment {
 
 class Group {
    + id: UUID [primaryKey]
+   + contextId: UUID [Group.id]
+   + contextEntryType: string -- "Group"
    
    + type: string -- just for tracing
    
@@ -68,21 +78,13 @@ class GroupInterest {
    + id: UUID
    + contextId: UUID [Group.id]
    + contextEntryType: string -- "Group"
-   
+
+   + controlled: boolean   
    + interestId: UUID
    + interestEntryType: string
    
    + validFromInstance: int
    + validToInstance: int
-}
-
-class GroupProperty {
-   + id: UUID
-   + contextId: UUID [Group.id]
-   + contextEntryType: string -- "Group"
-
-   + propertyId: UUID
-   + propertyEntryType: string
 }
 
 class GroupMembership {

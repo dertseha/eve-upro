@@ -1,0 +1,45 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+interface GroupControl {
+   + hasMember(userId: UUID)   
+   + addMember(userId: UUID)
+   + removeMember(userId: UUID)
+   
+   + hasInterest(entryId: DataEntry)
+   + addInterest(entryId: DataEntry)
+   + addControl(entryId: DataEntry)
+   + removeInterest(entryId: DataEntry)
+}
+
+class StandardGroupControl {
+   - groupId: DataEntryId
+   - dataAccess: CommandDataAccess
+   - definition: DataModelDefinition
+}
+
+interface GroupAccess {
+   + getGroupControl(groupId: UUID): GroupControl
+   + createGroup(groupId: UUID, groupType: string): GroupControl
+}
+
+GroupControl <|-right- StandardGroupControl
+
+note as Notes
+- interest is something the group receives notifications about
+- control is over something members of the group can change/delete
+- A group has interest in itself. Any change within the group is thus always forwarded to all members
+- validFrom is excluded from the notification check (for the specific receiver); When added,
+  the member will see himself in the list of members anyway as all group tables are notified
+- validTo is included in the notification check (for the specific receiver); Sees his removal
+- To be able to modify a group, a group over a group is needed (the group is the other groups property).
+  But this might also be controlled by data entry specific behavior 
+- user admin: is in a group that has interest & property of a System Entry -> row: Users; every user has this context
+
+- closing a group shall set the validTo to the same value for all. (-> no notification spam)
+- Will a dedicated 'closed' flag be necessary? Or do clients know from a non-null validTo, that it's over?
+end note
+
+@enduml

@@ -5,6 +5,7 @@ require_once realpath(dirname(__FILE__)) . '/../DataEntryId.php';
 require_once realpath(dirname(__FILE__)) . '/../WriteAccess.php';
 require_once realpath(dirname(__FILE__)) . '/NotificationConverter.php';
 require_once realpath(dirname(__FILE__)) . '/CommandDataAccess.php';
+require_once realpath(dirname(__FILE__)) . '/GroupAccessFactory.php';
 
 /**
  * A CommandDataAccess adapter, binding WriteAccess and a NotificationConverter.
@@ -25,24 +26,51 @@ class NotifyingCommandDataAccess implements CommandDataAccess
    private $converter;
 
    /**
+    * The factory to create group access
+    * @var \upro\dataModel\cmd\GroupAccessFactory
+    */
+   private $groupAccessFactory;
+
+   /**
     * Constructor
     * @param \upro\dataModel\WriteAccess $writeAccess the write access to use for data modifications
     * @param \upro\dataModel\cmd\NotificationConverter $converter the converter to use for history entries
     */
-   function __construct(\upro\dataModel\WriteAccess $writeAccess, \upro\dataModel\cmd\NotificationConverter $converter)
+   function __construct(\upro\dataModel\WriteAccess $writeAccess,
+         \upro\dataModel\cmd\NotificationConverter $converter,
+         \upro\dataModel\cmd\GroupAccessFactory $groupAccessFactory)
    {
       $this->writeAccess = $writeAccess;
       $this->converter = $converter;
+      $this->groupAccessFactory = $groupAccessFactory;
    }
 
    /** {@inheritDoc} */
-   function retrieveDataEntry(\upro\dataModel\DataEntryId $entryId)
+   public function getGroupAccess()
+   {
+      return $this->groupAccessFactory->getGroupAccess($this);
+   }
+
+   /** {@inheritDoc} */
+   public function getNextInstanceValue()
+   {
+      return $this->writeAccess->getNextInstanceValue();
+   }
+
+   /** {@inheritDoc} */
+   public function retrieveDataEntry(\upro\dataModel\DataEntryId $entryId)
    {
       return $this->writeAccess->retrieveDataEntry($entryId);
    }
 
    /** {@inheritDoc} */
-   function notifyDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
+   function findDataEntries($entryType, \upro\dataModel\DataEntryId $contextId, $filter)
+   {
+      return $this->writeAccess->findDataEntries($entryType, $contextId, $filter);
+   }
+
+   /** {@inheritDoc} */
+   public function notifyDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
    {
       $message = $this->converter->getCreateDataEntry($entryId, $data);
 
@@ -50,7 +78,7 @@ class NotifyingCommandDataAccess implements CommandDataAccess
    }
 
    /** {@inheritDoc} */
-	function createDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
+	public function createDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
 	{
 	   $message = $this->converter->getCreateDataEntry($entryId, $data);
 
@@ -59,7 +87,7 @@ class NotifyingCommandDataAccess implements CommandDataAccess
 	}
 
    /** {@inheritDoc} */
-	function updateDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
+	public function updateDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
 	{
 	   $message = $this->converter->getUpdateDataEntry($entryId, $data);
 
@@ -68,7 +96,7 @@ class NotifyingCommandDataAccess implements CommandDataAccess
 	}
 
 	/** {@inheritDoc} */
-	function deleteDataEntry(\upro\dataModel\DataEntryId $entryId, \upro\dataModel\DataEntryId $contextId)
+	public function deleteDataEntry(\upro\dataModel\DataEntryId $entryId, \upro\dataModel\DataEntryId $contextId)
 	{
 	   $message = $this->converter->getDeleteDataEntry($entryId);
 

@@ -52,7 +52,7 @@ class DataEntry
     */
    public function getContextId()
    {
-      return $this->id;
+      return $this->contextId;
    }
 
    /**

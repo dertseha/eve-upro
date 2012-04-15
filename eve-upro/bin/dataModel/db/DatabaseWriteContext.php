@@ -166,6 +166,42 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 	}
 
    /** {@inheritDoc} */
+	function findDataEntries($entryType, \upro\dataModel\DataEntryId $contextId, $filter)
+	{
+	   $handler = new \upro\db\executor\KeyedBufferResultSetHandler();
+	   $query = new \upro\db\sql\SelectQuery();
+	   $entries = array();
+
+	   $query->selectAll()->fromTable($entryType);
+	   {
+	      $idSubject = new \upro\db\sql\clause\ColumnClauseSubject(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID);
+	      $clause = $idSubject->equalsParameter(new \upro\db\sql\ParameterBox($contextId->getKey()));
+	      $idSubject = new \upro\db\sql\clause\ColumnClauseSubject(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE);
+	      $clause = $clause->andThat($idSubject->equalsParameter(new \upro\db\sql\ParameterBox($contextId->getEntryType())));
+
+	      foreach ($filter as $filterKey => $filterValue)
+	      {
+	         $idSubject = new \upro\db\sql\clause\ColumnClauseSubject($filterKey);
+	         $clause = $clause->andThat($idSubject->equalsParameter(new \upro\db\sql\ParameterBox($filterValue)));
+	      }
+
+	      $query->where($clause);
+	   }
+
+	   $executor = $this->dataContext->getStatementExecutor($query);
+	   $executor->execute($handler);
+	   $executor->close();
+
+	   $reader = $handler->getReader();
+	   for ($i = 0; $i < $reader->getRowCount(); $i++)
+	   {
+	      $entries[] = DatabaseDataModelHelper::extractDataEntry($reader, $i);
+	   }
+
+	   return $entries;
+	}
+
+   /** {@inheritDoc} */
 	function createDataEntry(\upro\dataModel\DataEntryId $entryId, $data, \upro\dataModel\DataEntryId $contextId)
 	{
 	   $query = new \upro\db\sql\InsertQuery();
