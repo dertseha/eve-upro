@@ -11,6 +11,10 @@ require_once 'BufferResultSet.php';
 
 class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 {
+   const EXECUTOR_SELECT_HISTORY = 0;
+   const EXECUTOR_SELECT_INSTANCE = 1;
+   const EXECUTOR_SELECT_INTERESTS = 2;
+
    /**
     * @var \upro\dataModel\db\DatabaseReadContext
     */
@@ -28,6 +32,8 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
    private $dataModelHistory;
 
+   private $interestResultSet;
+
    protected function givenAModel($tableNames, $id)
    {
       $this->tableNames = $tableNames;
@@ -43,7 +49,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
    {
       $this->transactionControl = $this->getMock('\upro\db\TransactionControl');
       $dataContext = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-            $this->executorFactory, $this->tableNames, $this->modelId);
+            $this->executorFactory, $this->tableNames, $this->modelId, \Uuid::v4());
       $this->context = new \upro\dataModel\db\DatabaseReadContext($dataContext);
    }
 
@@ -85,7 +91,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       {   // SELECT query preparation
          $executor = new TestStatementExecutor($this->dataModelHistory);
 
-         $this->executorFactory->setExecutor(0, $executor);
+         $this->executorFactory->setExecutor(DatabaseReadContextTest::EXECUTOR_SELECT_HISTORY, $executor);
       }
       $this->context->prepare();
    }
@@ -97,11 +103,22 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
    protected function whenHistoryIsRead($lastInstance)
    {
+      {   // SELECT query preparation
+         $executor = new TestStatementExecutor($this->interestResultSet);
+
+         $this->executorFactory->setExecutor(DatabaseReadContextTest::EXECUTOR_SELECT_INTERESTS, $executor);
+      }
       $this->context->readHistoryEntries($lastInstance, $this->historyReader);
    }
 
    protected function thenReadHistoryEntriesShouldReturn($instance)
    {
+      {   // SELECT query preparation
+         $executor = new TestStatementExecutor($this->interestResultSet);
+
+         $this->executorFactory->setExecutor(DatabaseReadContextTest::EXECUTOR_SELECT_INTERESTS, $executor);
+      }
+
       $result = $this->context->readHistoryEntries($instance, $this->historyReader);
 
       $this->assertEquals($instance, $result);
@@ -144,6 +161,18 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ENTRY_TYPE,
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ID,
             \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_MESSAGE));
+
+      $this->interestResultSet = new BufferResultSet(array(
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_ID,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_FROM,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_CONTROLLED,
+            \upro\dataModel\db\DatabaseDataContext::ALIAS_NAME_MEMBERSHIP_VALID_FROM,
+            \upro\dataModel\db\DatabaseDataContext::ALIAS_NAME_MEMBERSHIP_VALID_TO));
    }
 
    public function testSelectQueryForHistoryEntryIsPrepared_WhenCallingPrepare()
@@ -158,7 +187,8 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
       $this->whenContextIsPrepared();
 
-      $this->thenTheQueryShouldHaveBeen(0, 'SELECT * FROM DataModelChangeHistory WHERE'
+      $this->thenTheQueryShouldHaveBeen(DatabaseReadContextTest::EXECUTOR_SELECT_HISTORY,
+            'SELECT * FROM DataModelChangeHistory WHERE'
             . ' (dataModelId = ?) AND (dataModelInstance > ?)'
             . ' ORDER BY dataModelInstance ASC');
    }
@@ -211,7 +241,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsPrepared();
       $this->whenHistoryIsRead(5);
 
-      $this->thenTheQueryShouldHaveParameter(0, 0, $modelId);
+      $this->thenTheQueryShouldHaveParameter(DatabaseReadContextTest::EXECUTOR_SELECT_HISTORY, 0, $modelId);
    }
 
    public function testHistorySelectQueryShouldHaveProperModelInstance_WhenReadingHistory()
@@ -228,7 +258,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsPrepared();
       $this->whenHistoryIsRead(5);
 
-      $this->thenTheQueryShouldHaveParameter(0, 1, 5);
+      $this->thenTheQueryShouldHaveParameter(DatabaseReadContextTest::EXECUTOR_SELECT_HISTORY, 1, 5);
    }
 
    public function testHistoryReaderShouldBeProvidedWithEntry_WhenReadingHistory()

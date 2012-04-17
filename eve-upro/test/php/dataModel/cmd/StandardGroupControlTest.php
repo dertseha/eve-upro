@@ -41,6 +41,7 @@ class StandardGroupControlTest extends PHPUnit_Framework_TestCase
       $memberData = array();
       $memberData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_VALID_FROM] = $this->dataAccess->getNextInstanceValue() - 100;
       $memberData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_VALID_TO] = null;
+      $memberData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
       $memberData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_USER_ID] = $userId;
 
       $this->dataAccess->createDataEntry(
@@ -82,6 +83,7 @@ class StandardGroupControlTest extends PHPUnit_Framework_TestCase
       $interestData = array();
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_FROM] = $validFrom;
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO] = $validTo;
+      $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_CONTROLLED] = false;
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID] = $interestId->getKey();
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE] = $interestId->getEntryType();
@@ -171,6 +173,7 @@ class StandardGroupControlTest extends PHPUnit_Framework_TestCase
       $data[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_USER_ID] = $userId;
       $data[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_VALID_FROM] = $fromInstance;
       $data[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_VALID_TO] = null;
+      $data[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
 
       $result = $this->dataAccess->findDataEntries(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_MEMBERSHIP,
             $this->groupId, $data);
@@ -226,6 +229,7 @@ class StandardGroupControlTest extends PHPUnit_Framework_TestCase
       $data[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO] = null;
       $data[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_FROM] = $fromInstance;
       $data[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_CONTROLLED] = $controlled;
+      $data[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
 
       $result = $this->dataAccess->findDataEntries(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_INTEREST,
             $this->groupId, $data);
@@ -283,6 +287,7 @@ class StandardGroupControlTest extends PHPUnit_Framework_TestCase
       $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_GROUP_TYPE] = 'Test';
       $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_VALID_FROM] = $this->dataAccess->getNextInstanceValue() - 500;
       $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_VALID_TO] = null;
+      $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_VALID_TO] = $this->dataAccess->getModelId();
       $this->dataAccess->createDataEntry($this->groupId, $groupData, $this->groupId);
 
       $this->control = new \upro\dataModel\cmd\StandardGroupControl($this->groupId, $this->definition, $this->dataAccess);

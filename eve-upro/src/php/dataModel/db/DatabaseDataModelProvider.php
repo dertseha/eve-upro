@@ -79,28 +79,28 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
    }
 
    /** {@inheritDoc} */
-   public function getWriteContext($name)
+   public function getWriteContext($name, $userId)
    {
       $modelId = $this->getDataModelId($name);
       $context = null;
 
       if (DatabaseDataModelProvider::isDataModelIdValid($modelId))
       {
-         $context = new \upro\dataModel\db\DatabaseWriteContext($this->getDataContext($modelId));
+         $context = new \upro\dataModel\db\DatabaseWriteContext($this->getDataContext($modelId, $userId));
       }
 
       return $context;
    }
 
    /** {@inheritDoc} */
-   public function getReadContext($name)
+   public function getReadContext($name, $userId)
    {
       $modelId = $this->getDataModelId($name);
       $context = null;
 
       if (DatabaseDataModelProvider::isDataModelIdValid($modelId))
       {
-         $context = new \upro\dataModel\db\DatabaseReadContext($this->getDataContext($modelId));
+         $context = new \upro\dataModel\db\DatabaseReadContext($this->getDataContext($modelId, $userId));
       }
 
       return $context;
@@ -131,12 +131,13 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
    /**
     * Creates a data context instance
     * @param string $modelId the model ID to use
+    * @param string $userId the user ID to use
     * @return \upro\dataModel\db\DatabaseDataContext data context instance
     */
-   private function getDataContext($modelId)
+   private function getDataContext($modelId, $userId)
    {
       return new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-               $this->statementExecutorFactory, $this->tableNames, $modelId);
+               $this->statementExecutorFactory, $this->tableNames, $modelId, $userId);
    }
 
    /**

@@ -69,6 +69,6 @@ class OrClauseTest extends PHPUnit_Framework_TestCase
       $this->whenCreatingTheOrClause();
       $this->whenStackingOrWithLeft();
 
-      $this->thenTheSqlTextShouldBe('((col1 = col1) OR (col2 = col2)) OR (col1 = col1)');
+      $this->thenTheSqlTextShouldBe('(col1 = col1) OR (col2 = col2) OR (col1 = col1)');
    }
 }

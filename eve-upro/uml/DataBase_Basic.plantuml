@@ -72,6 +72,7 @@ class Group {
    
    + validFromInstance: int
    + validToInstance: int
+   + dataModelId: UUID
 }
 
 class GroupInterest {
@@ -85,6 +86,7 @@ class GroupInterest {
    
    + validFromInstance: int
    + validToInstance: int
+   + dataModelId: UUID
 }
 
 class GroupMembership {
@@ -95,6 +97,7 @@ class GroupMembership {
    + userId: UUID
    + validFromInstance: int
    + validToInstance: int
+   + dataModelId: UUID
 }
 
 

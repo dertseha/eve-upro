@@ -102,6 +102,16 @@ interface SqlDictionary
     * @return string DESC string
     */
    function getDescending();
+
+   /**
+    * @return string IS NULL string
+    */
+   function getIsNull();
+
+   /**
+    * @return string AS string
+    */
+   function getAs();
 }
 
 }

@@ -16,6 +16,8 @@ class BufferCommandDataAccess implements \upro\dataModel\cmd\CommandDataAccess
 
    private $notifications;
 
+   private $modelId;
+
    function __construct(\upro\dataModel\DataModelDefinition $definition)
    {
       $this->groupAccessFactory = new \upro\dataModel\cmd\StandardGroupAccessFactory($definition);
@@ -23,6 +25,7 @@ class BufferCommandDataAccess implements \upro\dataModel\cmd\CommandDataAccess
       $this->nextInstance = 10000;
       $this->entryTypes = array();
       $this->notifications = array();
+      $this->modelId = \Uuid::v4();
    }
 
    /**
@@ -47,6 +50,12 @@ class BufferCommandDataAccess implements \upro\dataModel\cmd\CommandDataAccess
    public function getGroupAccess()
    {
       return $this->groupAccessFactory->getGroupAccess($this);
+   }
+
+   /** {@inheritDoc} */
+   public function getModelId()
+   {
+      return $this->modelId;
    }
 
    /** {@inheritDoc} */

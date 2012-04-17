@@ -6,6 +6,7 @@ require_once realpath(dirname(__FILE__)) . '/ClauseSubject.php';
 require_once realpath(dirname(__FILE__)) . '/EqualsClause.php';
 require_once realpath(dirname(__FILE__)) . '/GreaterClause.php';
 require_once realpath(dirname(__FILE__)) . '/SmallerClause.php';
+require_once realpath(dirname(__FILE__)) . '/IsNullClause.php';
 
 /**
  * Abstract SQL clause subject implementation, providing standard implementation
@@ -13,6 +14,12 @@ require_once realpath(dirname(__FILE__)) . '/SmallerClause.php';
  */
 abstract class AbstractClauseSubject implements \upro\db\sql\clause\ClauseSubject
 {
+   /** {@inheritDoc} */
+   public function isNull()
+   {
+      return new \upro\db\sql\clause\IsNullClause($this);
+   }
+
    /** {@inheritDoc} */
    public function equals(\upro\db\sql\clause\ClauseSubject $other)
    {

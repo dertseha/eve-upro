@@ -4,19 +4,15 @@ namespace upro\db\sql\clause
 require_once realpath(dirname(__FILE__)) . '/AbstractClause.php';
 
 /**
- * AND operator; Takes two subclauses, puts them in brackets and combines them with AND
+ * AND operator; Takes at least two subclauses, puts them in brackets and combines them with AND
  */
 class AndClause extends \upro\db\sql\clause\AbstractClause
 {
    /**
-    * @var \upro\db\sql\clause\Clause the left clause
+    * The subclauses
+    * @var array of \upro\db\sql\clause\Clause
     */
-   private $left;
-
-   /**
-    * @var \upro\db\sql\clause\Clause the right clause
-    */
-   private $right;
+   private $subClauses;
 
    /**
     * Constructor
@@ -25,8 +21,7 @@ class AndClause extends \upro\db\sql\clause\AbstractClause
     */
    function __construct(\upro\db\sql\clause\Clause $left, \upro\db\sql\clause\Clause $right)
    {
-      $this->left = $left;
-      $this->right = $right;
+      $this->subClauses = array($left, $right);
    }
 
    /** {@inheritDoc} */
@@ -34,9 +29,21 @@ class AndClause extends \upro\db\sql\clause\AbstractClause
    {
       $result = new \upro\db\sql\ParameterizedSqlText('(');
 
-      $result = $result->append($this->left->toSqlText($dict));
+      $result = $result->append($this->subClauses[0]->toSqlText($dict));
+      for ($i = 1; $i < count($this->subClauses); $i++)
+      {
+         $result = $result->append($this->subClauses[$i]->toSqlText($dict), ')' . $dict->getAnd() . '(');
+      }
 
-      return $result->append($this->right->toSqlText($dict), ')' . $dict->getAnd() . '(', ')');
+      return $result->append(new \upro\db\sql\ParameterizedSqlText(')'));
+   }
+
+   /** {@inheritDoc} */
+   public function andThat(\upro\db\sql\clause\Clause $clause)
+   {
+      $this->subClauses[] = $clause;
+
+      return $this;
    }
 }
 

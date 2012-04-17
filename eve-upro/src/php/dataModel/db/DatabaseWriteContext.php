@@ -1,18 +1,19 @@
 <?php
 namespace upro\dataModel\db
 {
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelHelper.php';
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
-
 require_once realpath(dirname(__FILE__)) . '/../../Uuid.php';
-require_once realpath(dirname(__FILE__)) . '/../WriteContext.php';
-require_once realpath(dirname(__FILE__)) . '/../WriteAccess.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/InsertQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/DeleteQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/UpdateQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/executor/NullResultSetHandler.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/executor/KeyedBufferResultSetHandler.php';
+require_once realpath(dirname(__FILE__)) . '/../WriteContext.php';
+require_once realpath(dirname(__FILE__)) . '/../WriteAccess.php';
+require_once realpath(dirname(__FILE__)) . '/../DataModelConstants.php';
+
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelHelper.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
 
 /**
  * A write context for a database
@@ -78,6 +79,7 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
          $this->prepareHistoryInsertQuery();
 
          $this->newInstance = $this->dataContext->startTransaction(true);
+         $this->dataContext->readCurrentInterest($this->newInstance);
       }
 
       return $this;
@@ -91,6 +93,7 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
          $this->newInstance++; // ensures any undocumented change is also covered
          $this->updateNewInstanceValue();
          $this->deleteOldHistoryEntries();
+         $this->deleteOldGroupEntries();
 
          $this->dataContext->commitTransaction();
 
@@ -129,6 +132,44 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 	   }
 
 	   return $result;
+	}
+
+	/** {@inheritDoc} */
+	public function isAccessGranted($entryIds)
+	{
+	   $result = true;
+
+	   foreach ($entryIds as $entryId)
+	   {
+	      if (!$this->dataContext->isAccessGranted($entryId, $this->newInstance + 1))
+	      {
+	         $result = false;
+	      }
+	   }
+
+	   return $result;
+	}
+
+	/** {@inheritDoc} */
+	public function isControlGranted($entryIds)
+	{
+	   $result = true;
+
+	   foreach ($entryIds as $entryId)
+	   {
+         if (!$this->dataContext->isControlGranted($entryId, $this->newInstance + 1))
+	      {
+	         $result = false;
+	      }
+	   }
+
+	   return $result;
+	}
+
+	/** {@inheritDoc} */
+	public function getModelId()
+	{
+	   return $this->dataContext->getModelId();
 	}
 
 	/** {@inheritDoc} */
@@ -353,7 +394,53 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 
 	      $dataModelInstanceBox = new \upro\db\sql\ParameterBox($this->newInstance - DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
 	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->dataContext->getModelId()))
-	         ->andThat($dataModelInstanceSubject->isSmallerThanParameter($dataModelInstanceBox));
+	            ->andThat($dataModelInstanceSubject->isSmallerThanParameter($dataModelInstanceBox));
+
+	      $query->where($clause);
+	   }
+
+	   $executor = $this->dataContext->getStatementExecutor($query);
+	   $executor->execute(new \upro\db\executor\NullResultSetHandler());
+	   $executor->close();
+	}
+
+	/**
+	 * Deletes the old group entries
+	 */
+	private function deleteOldGroupEntries()
+	{
+	   $this->deleteFromGroupTable(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_MEMBERSHIP,
+	         \upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_DATA_MODEL_ID,
+	         \upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_VALID_TO);
+	   $this->deleteFromGroupTable(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_INTEREST,
+	         \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID,
+	         \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO);
+	   $this->deleteFromGroupTable(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP,
+	         \upro\dataModel\DataModelConstants::GROUP_DATA_DATA_MODEL_ID,
+	         \upro\dataModel\DataModelConstants::GROUP_DATA_VALID_TO);
+	}
+
+	/**
+	 * Deletes old entries from a group related table
+	 * @param unknown_type $tableName the name of the table to delete from
+	 * @param unknown_type $columnDataModelId the column name for the data model ID
+	 * @param unknown_type $columnValidTo the column name storing the validTo value
+	 */
+	private function deleteFromGroupTable($tableName, $columnDataModelId, $columnValidTo)
+	{
+	   $query = new \upro\db\sql\DeleteQuery();
+	   $query->deleteFromTable($tableName);
+
+	   {
+	      $dataModelIdSubject = new \upro\db\sql\clause\ColumnClauseSubject($columnDataModelId);
+	      $validToSubject = new \upro\db\sql\clause\ColumnClauseSubject($columnValidTo);
+
+	      $dataModelInstanceBox = new \upro\db\sql\ParameterBox($this->newInstance - DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
+
+	      $clause = $dataModelIdSubject->equalsParameter(new \upro\db\sql\ParameterBox($this->dataContext->getModelId()));
+	      $clause = $clause->andThat($validToSubject->isNull()->isFalse());
+	      $clause = $clause->andThat($validToSubject->isSmallerThanParameter($dataModelInstanceBox));
+
 	      $query->where($clause);
 	   }
 

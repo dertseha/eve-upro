@@ -129,6 +129,18 @@ class StandardSqlDictionary implements \upro\db\sql\SqlDictionary
    {
       return 'DESC';
    }
+
+   /** {@inheritDoc} */
+   public function getIsNull()
+   {
+      return ' IS NULL';
+   }
+
+   /** {@inheritDoc} */
+   public function getAs()
+   {
+      return ' AS ';
+   }
 }
 
 }

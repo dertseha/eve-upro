@@ -10,6 +10,16 @@ require_once 'BufferResultSet.php';
 
 class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 {
+   const EXECUTOR_INSERT_HISTORY = 0;
+   const EXECUTOR_SELECT_INSTANCE = 1;
+   const EXECUTOR_SELECT_INTERESTS = 2;
+   const EXECUTOR_AFTER_START = 3;
+   const EXECUTOR_UPDATE_INSTANCE = 3;
+   const EXECUTOR_DELETE_HISTORY = 4;
+   const EXECUTOR_DELETE_MEMBERSHIP = 5;
+   const EXECUTOR_DELETE_INTEREST = 6;
+   const EXECUTOR_DELETE_GROUP = 7;
+
    /**
     * @var \upro\dataModel\db\DatabaseWriteContext
     */
@@ -28,6 +38,8 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
     */
    private $access;
 
+   private $interestResultSet;
+
    protected function givenAModel($tableNames, $id)
    {
       $this->tableNames = $tableNames;
@@ -38,8 +50,14 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    {
       $this->transactionControl = $this->getMock('\upro\db\TransactionControl');
       $dataContext = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-            $this->executorFactory, $this->tableNames, $this->modelId);
+            $this->executorFactory, $this->tableNames, $this->modelId, \Uuid::v4());
       $this->context = new \upro\dataModel\db\DatabaseWriteContext($dataContext);
+   }
+
+   protected function givenAnInterest($interestId, $interestFrom, $interestTo, $controlled, $membershipFrom, $membershipTo)
+   {
+      $this->interestResultSet->addRow(array(\Uuid::v4(), 'Group', \Uuid::v4(),
+            'Test', $interestId, $interestFrom, $interestTo, $controlled, $membershipFrom, $membershipTo));
    }
 
    protected function expectingTransactionToBeStarted($lockedTablesForWrite, $lockedTablesForRead)
@@ -64,7 +82,12 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(0, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, $executor);
+      }
+      {   // SELECT query preparation
+         $executor = new TestStatementExecutor($this->interestResultSet);
+
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_SELECT_INTERESTS, $executor);
       }
       $this->access = $this->context->start();
    }
@@ -75,13 +98,31 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(2, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_UPDATE_INSTANCE, $executor);
       }
       {   // DELETE query preparation
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(3, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_DELETE_HISTORY, $executor);
+      }
+      {   // DELETE query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_DELETE_MEMBERSHIP, $executor);
+      }
+      {   // DELETE query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_DELETE_INTEREST, $executor);
+      }
+      {   // DELETE query preparation
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
+
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_DELETE_GROUP, $executor);
       }
       $this->context->stop();
    }
@@ -97,7 +138,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $resultSet->addRow(array($instance));
       $executor = new TestStatementExecutor($resultSet);
 
-      $this->executorFactory->setExecutor(1, $executor);
+      $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_SELECT_INSTANCE, $executor);
    }
 
    protected function whenAddingHistoryEntry($message, $contextId)
@@ -111,7 +152,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(2, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_AFTER_START, $executor);
       }
       $this->access->retrieveDataEntry($entryId);
    }
@@ -122,7 +163,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(2, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_AFTER_START, $executor);
       }
       $this->access->createDataEntry($entryId, $data, $contextId);
    }
@@ -133,7 +174,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(2, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_AFTER_START, $executor);
       }
       $this->access->updateDataEntry($entryId, $data);
    }
@@ -144,7 +185,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
          $resultSet = new BufferResultSet();
          $executor = new TestStatementExecutor($resultSet);
 
-         $this->executorFactory->setExecutor(2, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_AFTER_START, $executor);
       }
       $this->access->deleteDataEntry($entryId);
    }
@@ -200,12 +241,40 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    protected function whenFindingEntries($entryType, \upro\dataModel\DataEntryId $contextId, $filter)
    {
       {   // SELECT query preparation
-      $resultSet = new BufferResultSet();
-      $executor = new TestStatementExecutor($resultSet);
+         $resultSet = new BufferResultSet();
+         $executor = new TestStatementExecutor($resultSet);
 
-      $this->executorFactory->setExecutor(2, $executor);
+         $this->executorFactory->setExecutor(DatabaseWriteContextTest::EXECUTOR_AFTER_START, $executor);
       }
       $this->access->findDataEntries($entryType, $contextId, $filter);
+   }
+
+   protected function thenAccessIsGranted($entryIds)
+   {
+      $result = $this->context->isAccessGranted($entryIds);
+
+      $this->assertTrue($result);
+   }
+
+   protected function thenAccessIsDenied($entryIds)
+   {
+      $result = $this->context->isAccessGranted($entryIds);
+
+      $this->assertFalse($result);
+   }
+
+   protected function thenControlIsGranted($entryIds)
+   {
+      $result = $this->context->isControlGranted($entryIds);
+
+      $this->assertTrue($result);
+   }
+
+   protected function thenControlIsDenied($entryIds)
+   {
+      $result = $this->context->isControlGranted($entryIds);
+
+      $this->assertFalse($result);
    }
 
    public function setUp()
@@ -213,6 +282,19 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       parent::setUp();
 
       $this->executorFactory = new TestStatementExecutorFactory();
+
+      $this->interestResultSet = new BufferResultSet(array(
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_ID,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_FROM,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO,
+            \upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_CONTROLLED,
+            \upro\dataModel\db\DatabaseDataContext::ALIAS_NAME_MEMBERSHIP_VALID_FROM,
+            \upro\dataModel\db\DatabaseDataContext::ALIAS_NAME_MEMBERSHIP_VALID_TO
+            ));
    }
 
    public function testTransactionIsStarted_WhenCallingStart()
@@ -318,7 +400,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
       $this->whenContextIsStarted();
 
-      $this->thenTheQueryShouldHaveBeen(1, 'SELECT instance FROM DataModels WHERE id = ?');
+      $this->thenTheQueryShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_SELECT_INSTANCE, 'SELECT instance FROM DataModels WHERE id = ?');
    }
 
    public function testDataModelInstanceSelectHasProperModelId_WhenCallingStart()
@@ -333,7 +415,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
       $this->whenContextIsStarted();
 
-      $this->thenTheQueryShouldHaveParameter(1, 0, $modelId);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_SELECT_INSTANCE, 0, $modelId);
    }
 
    public function testInsertQueryForHistoryEntryIsPrepared_WhenCallingStart()
@@ -348,7 +430,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
       $this->whenContextIsStarted();
 
-      $this->thenTheQueryShouldHaveBeen(0, 'INSERT INTO DataModelChangeHistory'
+      $this->thenTheQueryShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 'INSERT INTO DataModelChangeHistory'
             . ' (dataModelId, dataModelInstance, contextEntryType, contextId, message)'
             . ' VALUES (?, ?, ?, ?, ?)');
    }
@@ -368,7 +450,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 0, $modelId);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 0, $modelId);
    }
 
    public function testHistoryEntryHasProperInstance_WhenAddingHistoryEntry()
@@ -386,7 +468,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 1, $instance + 1);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 1, $instance + 1);
    }
 
    public function testHistoryEntryHasProperInstance_WhenAddingSecondHistoryEntry()
@@ -405,7 +487,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenAddingHistoryEntry($message, $contextId);
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 1, $instance + 2);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 1, $instance + 2);
    }
 
    public function testHistoryEntryHasProperInstance_WhenAddingThirdHistoryEntry()
@@ -425,7 +507,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenAddingHistoryEntry($message, $contextId);
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 1, $instance + 3);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 1, $instance + 3);
    }
 
    public function testHistoryEntryHasProperContextEntryType_WhenAddingHistoryEntry()
@@ -443,7 +525,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 2, $contextId->getEntryType());
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 2, $contextId->getEntryType());
    }
 
    public function testHistoryEntryHasProperContextId_WhenAddingHistoryEntry()
@@ -461,7 +543,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 3, $contextId->getKey());
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 3, $contextId->getKey());
    }
 
    public function testHistoryEntryHasProperMessage_WhenAddingHistoryEntry()
@@ -479,7 +561,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenAddingHistoryEntry($message, $contextId);
 
-      $this->thenTheQueryShouldHaveParameter(0, 4, $message);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_INSERT_HISTORY, 4, $message);
    }
 
    public function testAddHistoryEntryShouldReturnNextInstance_WhenStarted()
@@ -512,7 +594,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveBeen(2, 'UPDATE DataModels SET instance = ? WHERE id = ?');
+      $this->thenTheQueryShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_UPDATE_INSTANCE, 'UPDATE DataModels SET instance = ? WHERE id = ?');
    }
 
    public function testNewInstanceValueIsOneHigher_WhenCallingStopWithoutEntry()
@@ -528,7 +610,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveParameter(2, 0, $instance + 1);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_UPDATE_INSTANCE, 0, $instance + 1);
    }
 
    public function testNewInstanceValueIsSumOfHistoryEntriesPlusOne_WhenCallingStop()
@@ -547,7 +629,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenAddingHistoryEntry($message, $contextId);
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveParameter(2, 0, $instance + 2);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_UPDATE_INSTANCE, 0, $instance + 2);
    }
 
    public function testNewInstanceValueIsUpdatedWithProperDataModelId_WhenCallingStop()
@@ -563,7 +645,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveParameter(2, 1, $modelId);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_UPDATE_INSTANCE, 1, $modelId);
    }
 
    public function testDeleteFromHistoryQueryIsPrepared_WhenCallingStop()
@@ -579,7 +661,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveBeen(3, 'DELETE FROM DataModelChangeHistory'
+      $this->thenTheQueryShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_DELETE_HISTORY, 'DELETE FROM DataModelChangeHistory'
             . ' WHERE (dataModelId = ?) AND (dataModelInstance < ?)');
    }
 
@@ -596,7 +678,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveParameter(3, 0, $modelId);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_DELETE_HISTORY, 0, $modelId);
    }
 
    public function testDeleteFromHistoryQueryShouldHaveProperDataModelInstance_WhenCallingStop()
@@ -612,7 +694,8 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryShouldHaveParameter(3, 1, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
+      $this->thenTheQueryShouldHaveParameter(DatabaseWriteContextTest::EXECUTOR_DELETE_HISTORY,
+            1, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT);
    }
 
    public function testProperSelectQueryShouldBeSet_WhenCallingGetDataEntry()
@@ -629,7 +712,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenRetrievingADataEntry($entryId);
 
-      $this->thenTheQueryShouldHaveBeen(2, 'SELECT * FROM Table1 WHERE id = ?');
+      $this->thenTheQueryShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_AFTER_START, 'SELECT * FROM Table1 WHERE id = ?');
    }
 
    public function testProperInsertQuery_WhenCallingCreateDataEntry()
@@ -648,7 +731,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenCreatingADataEntry($entryId, $data, $contextId);
 
-      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'INSERT INTO Table1'
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_AFTER_START, 'INSERT INTO Table1'
             . ' (id, contextEntryType, contextId, Param1, Param2) VALUES (?, ?, ?, ?, ?)',
             array($entryId->getKey(), $contextId->getEntryType(), $contextId->getKey(), 'Value1', 'Value2'));
    }
@@ -668,7 +751,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenUpdatingADataEntry($entryId, $data);
 
-      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'UPDATE Table1'
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_AFTER_START, 'UPDATE Table1'
             . ' SET Param1 = ?, Param2 = ? WHERE id = ?',
             array('Value1', 'Value2', $entryId->getKey()));
    }
@@ -687,7 +770,8 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenDeletingADataEntry($entryId);
 
-      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'DELETE FROM Table1 WHERE id = ?', array($entryId->getKey()));
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_AFTER_START,
+            'DELETE FROM Table1 WHERE id = ?', array($entryId->getKey()));
    }
 
    public function testNextInstanceValueIsReported_WhenStarted()
@@ -721,8 +805,160 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenFindingEntries($entryType, $contextId, $filter);
 
-      $this->thenTheQueryWithParametersShouldHaveBeen(2, 'SELECT * FROM SearchType WHERE'
-            . ' (((contextId = ?) AND (contextEntryType = ?)) AND (Prop1 = ?)) AND (Prop2 = ?)',
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_AFTER_START,
+            'SELECT * FROM SearchType WHERE'
+            . ' (contextId = ?) AND (contextEntryType = ?) AND (Prop1 = ?) AND (Prop2 = ?)',
             array($contextId->getKey(), $contextId->getEntryType(), 'Value1', 'Value2'));
+   }
+
+   public function testAccessGranted_WhenQueriedForNothing()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->thenAccessIsGranted(array());
+   }
+
+   public function testAccessDenied_WhenNotStarted()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryIds = array(new \upro\dataModel\DataEntryId('Test', \Uuid::v4()), new \upro\dataModel\DataEntryId('Test', \Uuid::v4()));
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->thenAccessIsDenied($entryIds);
+   }
+
+   public function testAccessGranted_WhenValid()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryIds = array(new \upro\dataModel\DataEntryId('Test', \Uuid::v4()), new \upro\dataModel\DataEntryId('Test', \Uuid::v4()));
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+      $this->givenAnInterest($entryIds[0]->getKey(), 0, null, false, 0, null);
+      $this->givenAnInterest($entryIds[1]->getKey(), 0, null, false, 0, null);
+
+      $this->whenContextIsStarted();
+
+      $this->thenAccessIsGranted($entryIds);
+   }
+
+   public function testAccessDenied_WhenInvalid()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryIds = array(new \upro\dataModel\DataEntryId('Test', \Uuid::v4()), new \upro\dataModel\DataEntryId('Test', \Uuid::v4()));
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+      $this->givenAnInterest($entryIds[0]->getKey(), 0, null, false, 0, null);
+
+      $this->whenContextIsStarted();
+
+      $this->thenAccessIsDenied($entryIds);
+   }
+
+   public function testAccessDenied_WhenRevokedJustBefore()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryIds = array(new \upro\dataModel\DataEntryId('Test', \Uuid::v4()));
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+      $this->givenAnInterest($entryIds[0]->getKey(), 0, $instance, false, 0, null);
+
+      $this->whenContextIsStarted();
+
+      $this->thenAccessIsDenied($entryIds);
+   }
+
+   public function testControlDenied_WhenInvalid()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+      $entryIds = array(new \upro\dataModel\DataEntryId('Test', \Uuid::v4()), new \upro\dataModel\DataEntryId('Test', \Uuid::v4()));
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+      $this->givenAnInterest($entryIds[0]->getKey(), 0, null, false, 0, null);
+      $this->givenAnInterest($entryIds[1]->getKey(), 0, null, false, 0, null);
+
+      $this->whenContextIsStarted();
+
+      $this->thenControlIsDenied($entryIds);
+   }
+
+   public function testDeleteFromInterestQueryIsPrepared_WhenCallingStop()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenContextIsStopped();
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_DELETE_INTEREST, 'DELETE FROM GroupInterest'
+            . ' WHERE (dataModelId = ?) AND (NOT (validToInstance IS NULL)) AND (validToInstance < ?)',
+            array($this->modelId, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT));
+   }
+
+   public function testDeleteFromMembershipQueryIsPrepared_WhenCallingStop()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenContextIsStopped();
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_DELETE_MEMBERSHIP, 'DELETE FROM GroupMembership'
+            . ' WHERE (dataModelId = ?) AND (NOT (validToInstance IS NULL)) AND (validToInstance < ?)',
+            array($this->modelId, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT));
+   }
+
+   public function testDeleteFromGroupQueryIsPrepared_WhenCallingStop()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10000;
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseWriteContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+
+      $this->whenContextIsStarted();
+      $this->whenContextIsStopped();
+
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_DELETE_GROUP, 'DELETE FROM Group'
+            . ' WHERE (dataModelId = ?) AND (NOT (validToInstance IS NULL)) AND (validToInstance < ?)',
+            array($this->modelId, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT));
    }
 }

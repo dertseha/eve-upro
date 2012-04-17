@@ -7,6 +7,7 @@ require_once realpath(dirname(__FILE__)) . '/ParameterBox.php';
 require_once realpath(dirname(__FILE__)) . '/Query.php';
 
 require_once realpath(dirname(__FILE__)) . '/AllSelectExpression.php';
+require_once realpath(dirname(__FILE__)) . '/AliasSelectExpression.php';
 require_once realpath(dirname(__FILE__)) . '/ColumnSelectExpression.php';
 require_once realpath(dirname(__FILE__)) . '/ParameterSelectExpression.php';
 
@@ -26,9 +27,9 @@ class SelectQuery implements \upro\db\sql\Query
    private $selectExpressions;
 
    /**
-    * @var \upro\db\sql\SelectSource to select data from
+    * @var array of \upro\db\sql\SelectSource to select data from
     */
-   private $source;
+   private $sources;
 
    /**
     * @var \upro\db\sql\clause\Clause to use for WHERE
@@ -45,6 +46,7 @@ class SelectQuery implements \upro\db\sql\Query
     */
    function __construct()
    {
+      $this->sources = array();
       $this->selectExpressions = array();
       $this->orderExpressions = array();
    }
@@ -55,9 +57,9 @@ class SelectQuery implements \upro\db\sql\Query
       $result = new ParameterizedSqlText($dict->getSelect());
 
       $result = $result->append(\upro\db\sql\SqlBuildHelper::joinList($dict, $this->selectExpressions), ' ');
-      if ($this->source != null)
+      if (count($this->sources) > 0)
       {
-         $result = $result->append($this->source->toSqlText($dict), ' ' . $dict->getFrom() . ' ');
+         $result = $result->append(\upro\db\sql\SqlBuildHelper::joinList($dict, $this->sources), ' ' . $dict->getFrom() . ' ');
       }
       if ($this->clause != null)
       {
@@ -121,13 +123,27 @@ class SelectQuery implements \upro\db\sql\Query
    }
 
    /**
+    * Adds a column as select expression with an alias name
+    * @param string $columnName to select
+    * @param string $aliasName alias for the column
+    * @return \upro\db\sql\SelectQuery this
+    */
+   public function selectColumnAs($columnName, $aliasName)
+   {
+      $selectExpression = new \upro\db\sql\ColumnSelectExpression($columnName);
+      $this->selectExpressions[] = new \upro\db\sql\AliasSelectExpression($selectExpression, $aliasName);
+
+      return $this;
+   }
+
+   /**
     * Sets the select source explicitly
     * @param \upro\db\sql\SelectSource $source to use
     * @return \upro\db\sql\SelectQuery this
     */
    public function from(\upro\db\sql\SelectSource $source)
    {
-      $this->source = $source;
+      $this->sources[] = $source;
 
       return $this;
    }
@@ -139,7 +155,22 @@ class SelectQuery implements \upro\db\sql\Query
     */
    public function fromTable($tableName)
    {
-      $this->source = new \upro\db\sql\TableSelectSource($tableName);
+      $this->sources[] = new \upro\db\sql\TableSelectSource($tableName);
+
+      return $this;
+   }
+
+   /**
+    * Sets the source to be a list of tables, identified by an array of table names
+    * @param array $tableNames names of the tables
+    * @return \upro\db\sql\SelectQuery this
+    */
+   public function fromTables($tableNames)
+   {
+      foreach ($tableNames as $tableName)
+      {
+         $this->sources[] = new \upro\db\sql\TableSelectSource($tableName);
+      }
 
       return $this;
    }

@@ -12,6 +12,12 @@ require_once realpath(dirname(__FILE__)) . '/Clause.php';
 interface ClauseSubject extends \upro\db\sql\SqlTextable
 {
    /**
+    * Creates a clause to check for NULL of the subject
+    * @return \upro\db\sql\clause\Clause the resulting clause
+    */
+   function isNull();
+
+   /**
     * Creates an equals clause with given parameter
     * @param \upro\db\sql\clause\ClauseSubject $other to compare this subject to
     * @return \upro\db\sql\clause\Clause the resulting clause

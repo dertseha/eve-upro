@@ -1,12 +1,12 @@
 <?php
 namespace upro\db\sql
 {
-require_once realpath(dirname(__FILE__)) . '/SelectExpression.php';
+require_once realpath(dirname(__FILE__)) . '/AbstractNameableSelectExpression.php';
 
 /**
  * A column select expression queries a column
  */
-class ColumnSelectExpression implements \upro\db\sql\SelectExpression
+class ColumnSelectExpression extends \upro\db\sql\AbstractNameableSelectExpression
 {
    /**
     * @var string the column name

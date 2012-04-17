@@ -9,8 +9,8 @@ interface DataModelProvider {
    + isModelExisting(name: string): boolean
    + createDataModel(name: string)
 
-   + getWriteContext(name: string): WriteContext
-   + getReadContext(name: string): ReadContext
+   + getWriteContext(name: string, userId: UUID): WriteContext
+   + getReadContext(name: string, userId: UUID): ReadContext
 }
 
 class DataEntryId {
@@ -33,6 +33,7 @@ interface WriteAccess {
    + getNextInstanceValue(): int
    
    + retrieveDataEntry(entryId: DataEntryId): DataEntry
+   + findDataEntries(entryType: string, contextId: DataEntryId, filter: map): DataEntry[]
    + createDataEntry(entryId: DataEntryId, data: map, contextId: DataEntryId)
    + updateDataEntry(entryId: DataEntryId, data: map)
    + deleteDataEntry(entryId: DataEntryId)
@@ -64,7 +65,7 @@ ReadAccess -- ModelReader
 
 interface ReadAccess {
    + getCurrentInstanceId()
-   + isAccessAllowed(entryId: DataEntryId): boolean
+   + isAccessAllowed(entryId: DataEntryId, entryInstance: int): boolean
    + readModel(reader: ModelReader)
 }
 
@@ -91,6 +92,9 @@ class DatabaseDataContext {
    + commitTransaction()
    + rollbackTransaction()
    + getStatementExecutor(query: Query): StatementExecutor
+   + readCurrentInterest(fromInstance: int)
+   + isAccessGranted(interestId: DataEntryId, instance: int): boolean
+   + isControlGranted(interestId: DataEntryId, instance: int): boolean
 }
 
 class DatabaseWriteContext {

@@ -66,28 +66,28 @@ class DatabaseDataModelProviderTest extends PHPUnit_Framework_TestCase
 
    protected function thenGetWriteContextShouldReturnAnObject($name)
    {
-      $context = $this->provider->getWriteContext($name);
+      $context = $this->provider->getWriteContext($name, \Uuid::v4());
 
       $this->assertNotNull($context);
    }
 
    protected function thenGetWriteContextShouldReturnNull($name)
    {
-      $context = $this->provider->getWriteContext($name);
+      $context = $this->provider->getWriteContext($name, \Uuid::v4());
 
       $this->assertNull($context);
    }
 
    protected function thenGetReadContextShouldReturnAnObject($name)
    {
-      $context = $this->provider->getReadContext($name);
+      $context = $this->provider->getReadContext($name, \Uuid::v4());
 
       $this->assertNotNull($context);
    }
 
    protected function thenGetReadContextShouldReturnNull($name)
    {
-      $context = $this->provider->getReadContext($name);
+      $context = $this->provider->getReadContext($name, \Uuid::v4());
 
       $this->assertNull($context);
    }

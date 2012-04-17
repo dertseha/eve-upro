@@ -17,11 +17,11 @@ interface HistoryReader
    /**
     * Receives one data model event
     * @param \upro\dataModel\ReadAccess $readAccess read access to the model for permission checks
-    * @param int $instance the ID of the model this message has brought to
+    * @param int $instanceValue the ID of the model this message has brought to
     * @param string $message the modifying message
     * @param \upro\dataModel\DataEntryId $contextId context ID information for filtering
     */
-	function receive(\upro\dataModel\ReadAccess $readAccess, $instanceId, $message, $contextId);
+	function receive(\upro\dataModel\ReadAccess $readAccess, $instanceValue, $message, $contextId);
 }
 
 }

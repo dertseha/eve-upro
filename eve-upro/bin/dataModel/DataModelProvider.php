@@ -22,17 +22,19 @@ interface DataModelProvider
 
    /**
     * Retrieves a write context for given model
-    * @param string $name
+    * @param string $name name of the model
+    * @param string $userId name of the user for with to work
     * @return \upro\dataModel\WriteContext the context to use
     */
-   function getWriteContext($name);
+   function getWriteContext($name, $userId);
 
    /**
     * Retrieves a read context for given model
-    * @param string $name
+    * @param string $name name of the model
+    * @param string $userId name of the user for with to work
     * @return \upro\dataModel\ReadContext the context to use
     */
-   function getReadContext($name);
+   function getReadContext($name, $userId);
 
 }
 

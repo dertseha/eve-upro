@@ -9,6 +9,25 @@ namespace upro\dataModel
 interface WriteAccess
 {
    /**
+    * Determines whether access to all the given entry ID values is granted
+    * @param array $entryIds array of \upro\dataModel\DataEntryId values to check
+    * @return boolean true if access is granted to all given entries
+    */
+   function isAccessGranted($entryIds);
+
+   /**
+    * Determines whether control over all the given entry ID values is granted
+    * @param array $entryIds array of \upro\dataModel\DataEntryId values to check
+    * @return boolean true if control is granted over all given entries
+    */
+   function isControlGranted($entryIds);
+
+   /**
+    * @return string the data model ID
+    */
+   function getModelId();
+
+   /**
     * Returns the next data model instance value
     * @return int the next instance number
     */

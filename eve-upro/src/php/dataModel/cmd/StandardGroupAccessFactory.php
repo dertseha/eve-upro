@@ -2,6 +2,7 @@
 namespace upro\dataModel\cmd
 {
 require_once realpath(dirname(__FILE__)) . '/../GroupAccess.php';
+require_once realpath(dirname(__FILE__)) . '/GroupAccessFactory.php';
 require_once realpath(dirname(__FILE__)) . '/CommandDataAccess.php';
 require_once realpath(dirname(__FILE__)) . '/StandardGroupAccess.php';
 

@@ -25,6 +25,11 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
       $this->query->selectColumn($columnName);
    }
 
+   protected function whenSelectingColumnAs($columnName, $aliasName)
+   {
+      $this->query->selectColumnAs($columnName, $aliasName);
+   }
+
    protected function whenClauseIs($clause)
    {
       $this->query->where($clause);
@@ -38,6 +43,11 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
    protected function whenQueryingTable($tableName)
    {
       $this->query->fromTable($tableName);
+   }
+
+   protected function whenQueryingTables($tableNames)
+   {
+      $this->query->fromTables($tableNames);
    }
 
    protected function whenOrderingByColumn($columnName)
@@ -92,6 +102,16 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
       $this->thenTheSqlTextShouldBe('SELECT * FROM TestTable');
    }
 
+   public function testSelect_All_FromTables()
+   {
+      $this->givenASelectStatement();
+
+      $this->whenSelectingAll();
+      $this->whenQueryingTables(array("TestTable1", "TestTable2"));
+
+      $this->thenTheSqlTextShouldBe('SELECT * FROM TestTable1, TestTable2');
+   }
+
    public function testSelect_Column_FromTable()
    {
       $this->givenASelectStatement();
@@ -100,6 +120,16 @@ class SelectQueryTest extends PHPUnit_Framework_TestCase
       $this->whenQueryingTable("TestTable");
 
       $this->thenTheSqlTextShouldBe('SELECT TestColumn FROM TestTable');
+   }
+
+   public function testSelect_ColumnAsAlias_FromTable()
+   {
+      $this->givenASelectStatement();
+
+      $this->whenSelectingColumnAs("TestColumn", "ColumnAlias");
+      $this->whenQueryingTable("TestTable");
+
+      $this->thenTheSqlTextShouldBe('SELECT TestColumn AS ColumnAlias FROM TestTable');
    }
 
    public function testSelect_Column_FromTable_WithWhere()

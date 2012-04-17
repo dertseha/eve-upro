@@ -69,6 +69,6 @@ class AndClauseTest extends PHPUnit_Framework_TestCase
       $this->whenCreatingTheAndClause();
       $this->whenStackingAndWithLeft();
 
-      $this->thenTheSqlTextShouldBe('((col1 = col1) AND (col2 = col2)) AND (col1 = col1)');
+      $this->thenTheSqlTextShouldBe('(col1 = col1) AND (col2 = col2) AND (col1 = col1)');
    }
 }

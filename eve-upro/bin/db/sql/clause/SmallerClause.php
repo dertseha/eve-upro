@@ -20,7 +20,8 @@ class SmallerClause extends \upro\db\sql\clause\AbstractClause
 
    /**
     * Constructor
-    * @param \upro\db\sql\clause\Clause $clause the clause to invert
+    * @param \upro\db\sql\clause\ClauseSubject $left the left clause subject
+    * @param \upro\db\sql\clause\ClauseSubject $right the right clause subject
     */
    function __construct(\upro\db\sql\clause\ClauseSubject $left, \upro\db\sql\clause\ClauseSubject $right)
    {

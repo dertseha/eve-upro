@@ -16,6 +16,11 @@ interface CommandDataAccess
    function getGroupAccess();
 
    /**
+    * @return string the data model ID
+    */
+   function getModelId();
+
+   /**
     * Returns the next data model instance value
     * @return int the next instance number
     */

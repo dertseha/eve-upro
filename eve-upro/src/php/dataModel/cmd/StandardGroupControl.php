@@ -57,6 +57,7 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
 
       $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_VALID_FROM] = $validFrom;
       $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_VALID_TO] = null;
+      $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_DATA_MODEL_ID] = $dataAccess->getModelId();
       $groupData[\upro\dataModel\DataModelConstants::GROUP_DATA_GROUP_TYPE] = $groupType;
       $dataAccess->createDataEntry($groupId, $groupData, $groupId);
    }
@@ -97,6 +98,7 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
 
       $membershipData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_USER_ID] = $userId;
       $membershipData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_VALID_TO] = null;
+      $membershipData[\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
       if (count($this->dataAccess->findDataEntries($entryType, $this->groupId, $membershipData)) == 0)
       {
          $entryId = new \upro\dataModel\DataEntryId($entryType, \Uuid::v4());
@@ -132,6 +134,7 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE] = $contextId->getEntryType();
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID] = $contextId->getKey();
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO] = null;
+      $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
       if (count($this->dataAccess->findDataEntries($entryType, $this->groupId, $interestData)) == 0)
       {
          $this->createAndNotifyInterestEntry($interestData, false);
@@ -161,6 +164,7 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
          $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE] = $contextId->getEntryType();
          $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID] = $contextId->getKey();
          $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO] = null;
+         $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
          $this->createAndNotifyInterestEntry($interestData, true);
       }
    }

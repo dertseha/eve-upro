@@ -52,6 +52,12 @@ class NotifyingCommandDataAccess implements CommandDataAccess
    }
 
    /** {@inheritDoc} */
+   public function getModelId()
+   {
+      return $this->writeAccess->getModelId();
+   }
+
+   /** {@inheritDoc} */
    public function getNextInstanceValue()
    {
       return $this->writeAccess->getNextInstanceValue();

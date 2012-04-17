@@ -85,10 +85,12 @@ class DatabaseReadContext implements \upro\dataModel\ReadContext, \upro\dataMode
    	   if (($lastInstance <= 0) ||
    	         ($lastInstance <= ($this->currentInstance - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT)))
    	   {
+   	      $this->dataContext->readCurrentInterest($this->currentInstance);
    	      $reader->reset($this);
    	   }
    	   else
    	   {
+   	      $this->dataContext->readCurrentInterest($lastInstance);
    	      $this->historyEntryModelInstanceBox->setValue($lastInstance);
    	      $this->historySelectExecutor->execute(new \upro\dataModel\db\DataModelHistoryResultSetHandler($this, $reader));
    	   }
@@ -101,9 +103,15 @@ class DatabaseReadContext implements \upro\dataModel\ReadContext, \upro\dataMode
 	}
 
    /** {@inheritDoc} */
-	public function getCurrentInstanceId()
+	public function getCurrentInstanceValue()
 	{
 	   return $this->currentInstance;
+	}
+
+   /** {@inheritDoc} */
+	public function isAccessGranted(\upro\dataModel\DataEntryId $entryId, $instance)
+	{
+	   return $this->dataContext->isAccessGranted($entryId, $instance);
 	}
 
 	/**
