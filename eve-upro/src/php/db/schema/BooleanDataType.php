@@ -4,9 +4,9 @@ namespace upro\db\schema
 require_once realpath(dirname(__FILE__)) . '/DataType.php';
 
 /**
- * An integer data type
+ * A boolean data type
  */
-class IntegerDataType implements \upro\db\schema\DataType
+class BooleanDataType implements \upro\db\schema\DataType
 {
    /**
     * Constructor
@@ -19,7 +19,7 @@ class IntegerDataType implements \upro\db\schema\DataType
    /** {@inheritDoc} */
    public function getSqlText()
    {
-      return 'INT';
+      return 'BOOLEAN';
    }
 }
 

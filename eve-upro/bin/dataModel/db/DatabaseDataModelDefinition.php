@@ -10,10 +10,21 @@ require_once realpath(dirname(__FILE__)) . '/../../db/schema/TableControl.php';
 interface DatabaseDataModelDefinition
 {
    /**
-    * Adds given table to the definition
-    * @param \upro\db\schema\TableControl $control to add
+    * @return int the version number of this definition
     */
-   function addTable(\upro\db\schema\TableControl $control);
+   function getVersionNumber();
+
+   /**
+    * Returns the previous version of this definition
+    * @return \upro\dataModel\db\DatabaseDataModelDefintion the previous version or null if first
+    */
+   function getPreviousVersion();
+
+   /**
+    * Returns the abstract data model definition
+    * @return \upro\dataModel\DataModelDefinition the abstract data model definition
+    */
+   function getDataModelDefinition();
 
    /**
     * Retrieves the table control for given name

@@ -4,7 +4,7 @@ require_once 'dataModel/cmd/CommandDataAccess.php';
 require_once 'dataModel/DataEntryId.php';
 require_once 'dataModel/DataEntry.php';
 require_once 'dataModel/DataModelConstants.php';
-require_once 'dataModel/CoreDataModelDefinition.php';
+require_once 'dataModel/StandardDataModelDefinition.php';
 require_once 'Uuid.php';
 
 require_once 'BufferCommandDataAccess.php';
@@ -280,7 +280,7 @@ class StandardGroupControlTest extends PHPUnit_Framework_TestCase
       parent::setUp();
 
       $this->groupId = new \upro\dataModel\DataEntryId(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP, \Uuid::v4());
-      $this->definition = new \upro\dataModel\CoreDataModelDefinition();
+      $this->definition = new \upro\dataModel\StandardDataModelDefinition();
       $this->dataAccess = new BufferCommandDataAccess($this->definition);
 
       $groupData = array();

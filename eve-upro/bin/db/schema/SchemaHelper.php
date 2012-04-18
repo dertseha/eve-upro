@@ -6,6 +6,8 @@ require_once realpath(dirname(__FILE__)) . '/../DatabaseException.php';
 require_once realpath(dirname(__FILE__)) . '/DataType.php';
 require_once realpath(dirname(__FILE__)) . '/UnknownDataType.php';
 require_once realpath(dirname(__FILE__)) . '/StringDataType.php';
+require_once realpath(dirname(__FILE__)) . '/IntegerDataType.php';
+require_once realpath(dirname(__FILE__)) . '/BooleanDataType.php';
 
 /**
  * General helper for schema related stuff
@@ -25,6 +27,14 @@ class SchemaHelper
       if (strcasecmp($splitType[0], 'VARCHAR') == 0)
       {
          $dataType = new \upro\db\schema\StringDataType(0 + $splitType[1]);
+      }
+      else if (strcasecmp($splitType[0], 'INT') == 0)
+      {
+         $dataType = new \upro\db\schema\IntegerDataType();
+      }
+      else if (strcasecmp($splitType[0], 'BOOLEAN') == 0)
+      {
+         $dataType = new \upro\db\schema\BooleanDataType();
       }
       else
       {

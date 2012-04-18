@@ -17,25 +17,6 @@ require_once realpath(dirname(__FILE__)) . '/../../db/schema/UuidDataType.php';
 class DatabaseDataModelHelper
 {
    /**
-    * Creates a basic table control for given entry name
-    * @param string $entryName name of the entry
-    * @return \upro\db\schema\TableControl the created table control
-    */
-   public static function createDataEntryTableDefinition($entryName)
-   {
-      $table = new \upro\db\schema\TableControl($entryName);
-
-      $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_ID, new \upro\db\schema\UuidDataType())
-         ->setNullable(false);
-      $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID, new \upro\db\schema\UuidDataType())
-         ->setNullable(false);
-      $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE, new \upro\db\schema\StringDataType(32))
-         ->setNullable(false);
-
-      return $table;
-   }
-
-   /**
     *
     * @param string $entryType the type to use for the created data entry
     * @param \upro\db\KeyedBufferTableRowReader $reader from which to extract the data

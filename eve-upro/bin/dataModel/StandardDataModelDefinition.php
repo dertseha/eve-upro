@@ -5,9 +5,9 @@ require_once realpath(dirname(__FILE__)) . '/DataModelConstants.php';
 require_once realpath(dirname(__FILE__)) . '/DataModelDefinition.php';
 
 /**
- * The definition describes the properties (and relations) of a data model
+ * The standard implementation of a DataModel definition with helper methods
  */
-class CoreDataModelDefinition implements \upro\dataModel\DataModelDefinition
+class StandardDataModelDefinition implements \upro\dataModel\DataModelDefinition
 {
    /**
     * Map of entry types per context
@@ -21,11 +21,6 @@ class CoreDataModelDefinition implements \upro\dataModel\DataModelDefinition
    function __construct()
    {
       $this->entryTypesPerContext = array();
-
-      // group/permission system
-      $this->registerEntryType(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP, \upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP);
-      $this->registerEntryType(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_MEMBERSHIP, \upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP);
-      $this->registerEntryType(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_INTEREST, \upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP);
    }
 
    /** {@inheritDoc} */

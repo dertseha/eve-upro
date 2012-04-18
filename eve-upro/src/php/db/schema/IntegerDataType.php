@@ -11,7 +11,7 @@ class IntegerDataType implements \upro\db\schema\DataType
    /**
     * Constructor
     */
-   function __construct($length)
+   function __construct()
    {
 
    }

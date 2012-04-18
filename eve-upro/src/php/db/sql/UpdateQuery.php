@@ -93,6 +93,21 @@ class UpdateQuery implements \upro\db\sql\Query
    }
 
    /**
+    * Adds a constant to use as value for a column
+    * @param string $columnName name of the column
+    * @param mixed $value to set
+    * @return \upro\db\sql\UpdateQuery this
+    */
+   public function setConstant($columnName, $value)
+   {
+      $this->columnNames[] = $columnName;
+      $this->valuesByColumnName[$columnName] =
+            new \upro\db\sql\ParameterValueExpression(new \upro\db\sql\ParameterBox($value));
+
+      return $this;
+   }
+
+   /**
     * Sets the clause
     * @param \upro\db\sql\clause\Clause $clause to set
     * @return \upro\db\sql\UpdateQuery this

@@ -5,7 +5,7 @@ require_once 'dataModel/cmd/CommandDataAccess.php';
 require_once 'dataModel/DataEntryId.php';
 require_once 'dataModel/DataEntry.php';
 require_once 'dataModel/DataModelConstants.php';
-require_once 'dataModel/CoreDataModelDefinition.php';
+require_once 'dataModel/StandardDataModelDefinition.php';
 require_once 'Uuid.php';
 
 require_once 'BufferCommandDataAccess.php';
@@ -83,7 +83,7 @@ class StandardGroupAccessTest extends PHPUnit_Framework_TestCase
    {
       parent::setUp();
 
-      $this->definition = new \upro\dataModel\CoreDataModelDefinition();
+      $this->definition = new \upro\dataModel\StandardDataModelDefinition();
       $this->dataAccess = new BufferCommandDataAccess($this->definition);
       $this->groupAccess = new \upro\dataModel\cmd\StandardGroupAccess($this->definition, $this->dataAccess);
    }

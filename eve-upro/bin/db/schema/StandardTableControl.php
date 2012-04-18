@@ -50,6 +50,12 @@ class StandardTableControl implements \upro\db\schema\TableControl
    }
 
    /** {@inheritDoc */
+   public function hasColumn($columnName)
+   {
+      return array_key_exists($columnName, $this->columns);
+   }
+
+   /** {@inheritDoc */
    public function getColumn($columnName)
    {
       return $this->columns[$columnName];

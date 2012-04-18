@@ -13,6 +13,13 @@ interface TableDefinition
    function getTableName();
 
    /**
+    * Checks wheter a specific column exists
+    * @param string $columnName the name of the column to query
+    * @return boolean true if a column with given name exists
+    */
+   function hasColumn($columnName);
+
+   /**
     * @return array names of registered columns
     */
    function getColumnNames();
