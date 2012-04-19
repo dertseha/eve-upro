@@ -18,6 +18,7 @@ require_once realpath(dirname(__FILE__)) . '/../DataEntry.php';
 
 require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
 require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelHelper.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelDefinition.php';
 
 /**
  * A basic data context for a database
@@ -38,9 +39,10 @@ class DatabaseDataContext
    private $statementExecutorFactory;
 
    /**
-    * @var array list of table names the model consists of
+    * The definitoin of the data model
+    * @var \upro\dataModel\db\DatabaseDataModelDefinition
     */
-   private $tableNames;
+   private $definition;
 
    /**
     * @var string ID of the model
@@ -61,16 +63,17 @@ class DatabaseDataContext
     * Constructor
     * @param \upro\db\TransactionControl $transactionControl to use
     * @param \upro\db\executor\StatementExecutorFactory $statementExecutorFactory to use
-    * @param array $tableNames list of table names the model consists of
+    * @param \upro\dataModel\db\DatabaseDataModelDefinition $definition the definition of the data model
     * @param string $modelId UUID of the model
     * @param string $userId UUID of the user for which this context is running
     */
    function __construct(\upro\db\TransactionControl $transactionControl,
-         \upro\db\executor\StatementExecutorFactory $statementExecutorFactory, $tableNames, $modelId, $userId)
+         \upro\db\executor\StatementExecutorFactory $statementExecutorFactory,
+         \upro\dataModel\db\DatabaseDataModelDefinition $definition, $modelId, $userId)
    {
       $this->transactionControl = $transactionControl;
       $this->statementExecutorFactory = $statementExecutorFactory;
-      $this->tableNames = $tableNames;
+      $this->definition = $definition;
       $this->modelId = $modelId;
       $this->userId = $userId;
       $this->interests = array();
@@ -85,14 +88,23 @@ class DatabaseDataContext
    }
 
    /**
+    * @return \upro\dataModel\DataModelDefinition the abstract definition of the data model
+    */
+   public function getDataModelDefinition()
+   {
+      return $this->definition->getDataModelDefinition();
+   }
+
+   /**
     * Requests to start a transaction
     * @param boolean $forWrite true if the model shall be locked for writing
     * @return int the current model instance
     */
    public function startTransaction($forWrite)
    {
-      $tablesForReadLock = $forWrite ? array() : $this->tableNames;
-      $tablesForWriteLock = $forWrite ? $this->tableNames : array();
+      $tableNames = $this->definition->getTableNames();
+      $tablesForReadLock = $forWrite ? array() : $tableNames;
+      $tablesForWriteLock = $forWrite ? $tableNames : array();
 
       $this->transactionControl->start($tablesForWriteLock, $tablesForReadLock);
 

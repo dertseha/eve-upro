@@ -18,6 +18,13 @@ interface ReadAccess
     * @return boolean true if access is granted
     */
    function isAccessGranted(\upro\dataModel\DataEntryId $entryId, $instance);
+
+   /**
+    * Requests to read the entire data model. All entries of the entire model will be
+    * read and provided to the given reader.
+    * @param \upro\dataModel\DataModelReader $reader the reader to receive the entries
+    */
+   function readDataModel(\upro\dataModel\DataModelReader $reader);
 }
 
 }

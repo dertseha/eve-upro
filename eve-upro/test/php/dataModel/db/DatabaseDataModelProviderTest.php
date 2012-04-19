@@ -6,6 +6,7 @@ require_once 'dataModel/db/DatabaseDataModelProvider.php';
 require_once 'TestStatementExecutorFactory.php';
 require_once 'TestStatementExecutor.php';
 require_once 'BufferResultSet.php';
+require_once 'TestDatabaseDataModelDefinition.php';
 
 class DatabaseDataModelProviderTest extends PHPUnit_Framework_TestCase
 {
@@ -19,7 +20,9 @@ class DatabaseDataModelProviderTest extends PHPUnit_Framework_TestCase
    protected function givenADatabaseDataModelProvider()
    {
       $transactionControl = $this->getMock('\upro\db\TransactionControl');
-      $this->provider = new \upro\dataModel\db\DatabaseDataModelProvider($transactionControl, $this->executorFactory, array());
+      $definition = new TestDatabaseDataModelDefinition(1);
+
+      $this->provider = new \upro\dataModel\db\DatabaseDataModelProvider($transactionControl, $this->executorFactory, $definition);
    }
 
    protected function whenNoDataModelExists()

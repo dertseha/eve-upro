@@ -2,6 +2,7 @@
 namespace upro\dataModel\db
 {
 require_once realpath(dirname(__FILE__)) . '/../StandardDataModelDefinition.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelDefinition.php';
 
 /**
  * An abstract database data model definition, implementing the basic functions
@@ -31,7 +32,13 @@ abstract class AbstractDatabaseDataModelDefinition implements DatabaseDataModelD
    function __construct()
    {
       $this->tables = array();
-      $dataModelDefinition = new \upro\dataModel\StandardDataModelDefinition();
+      $this->dataModelDefinition = new \upro\dataModel\StandardDataModelDefinition();
+   }
+
+   /** {@inheritDoc} */
+   public function getDataModelDefinition()
+   {
+      return $this->dataModelDefinition;
    }
 
    /** {@inheritDoc} */

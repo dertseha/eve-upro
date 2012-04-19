@@ -1,16 +1,17 @@
 <?php
 namespace upro\dataModel\db
 {
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
-require_once realpath(dirname(__FILE__)) . '/DataModelHistoryResultSetHandler.php';
-
 require_once realpath(dirname(__FILE__)) . '/../../Uuid.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/sql/SelectQuery.php';
 require_once realpath(dirname(__FILE__)) . '/../ReadContext.php';
 require_once realpath(dirname(__FILE__)) . '/../ReadAccess.php';
 require_once realpath(dirname(__FILE__)) . '/../HistoryReader.php';
+require_once realpath(dirname(__FILE__)) . '/../DataModelReader.php';
 
-require_once realpath(dirname(__FILE__)) . '/../../db/sql/SelectQuery.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
+require_once realpath(dirname(__FILE__)) . '/DataModelHistoryResultSetHandler.php';
+require_once realpath(dirname(__FILE__)) . '/DataModelEntryResultSetHandler.php';
 
 /**
  * A read context for a database
@@ -112,6 +113,25 @@ class DatabaseReadContext implements \upro\dataModel\ReadContext, \upro\dataMode
 	public function isAccessGranted(\upro\dataModel\DataEntryId $entryId, $instance)
 	{
 	   return $this->dataContext->isAccessGranted($entryId, $instance);
+	}
+
+   /** {@inheritDoc} */
+	public function readDataModel(\upro\dataModel\DataModelReader $reader)
+	{
+	   $definition = $this->dataContext->getDataModelDefinition();
+	   $entryTypes = $definition->getEntryTypes();
+
+	   foreach ($entryTypes as $entryType)
+	   {
+	      $query = new \upro\db\sql\SelectQuery();
+	      $handler = new \upro\dataModel\db\DataModelEntryResultSetHandler($entryType, $reader);
+
+	      $query->selectAll()->fromTable($entryType);
+
+	      $executor = $this->dataContext->getStatementExecutor($query);
+	      $executor->execute($handler);
+	      $executor->close();
+	   }
 	}
 
 	/**

@@ -7,6 +7,7 @@ require_once 'dataModel/db/DatabaseDataContext.php';
 require_once 'TestStatementExecutorFactory.php';
 require_once 'TestStatementExecutor.php';
 require_once 'BufferResultSet.php';
+require_once 'TestDatabaseDataModelDefinition.php';
 
 class DatabaseDataContextTest extends PHPUnit_Framework_TestCase
 {
@@ -23,11 +24,11 @@ class DatabaseDataContextTest extends PHPUnit_Framework_TestCase
 
    protected function givenADatabaseDataContext($userId = \Uuid::EMPTY_UUID)
    {
-      $tableNames = array();
+      $definition = new TestDatabaseDataModelDefinition(1);
       $modelId = \Uuid::v4();
 
       $this->context = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-            $this->executorFactory, $tableNames, $modelId, $userId);
+            $this->executorFactory, $definition, $modelId, $userId);
    }
 
    protected function givenAnInterest($interestId, $interestFrom, $interestTo, $controlled, $membershipFrom, $membershipTo)

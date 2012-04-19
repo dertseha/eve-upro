@@ -37,12 +37,6 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
       $this->defineMembership();
    }
 
-   /** {@inheritDoc} */
-   public function getDataModelDefinition()
-   {
-      return $this->dataModelDefinition;
-   }
-
    /**
     * Creates a basic table control for given entry name
     * @param string $entryName name of the entry

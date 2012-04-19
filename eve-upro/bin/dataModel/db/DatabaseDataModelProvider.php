@@ -1,13 +1,7 @@
 <?php
 namespace upro\dataModel\db
 {
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
-require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
-require_once realpath(dirname(__FILE__)) . '/DatabaseWriteContext.php';
-require_once realpath(dirname(__FILE__)) . '/DatabaseReadContext.php';
-
 require_once realpath(dirname(__FILE__)) . '/../../Uuid.php';
-require_once realpath(dirname(__FILE__)) . '/../DataModelProvider.php';
 
 require_once realpath(dirname(__FILE__)) . '/../../db/SingleCellTableRowReader.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/sql/ParameterBox.php';
@@ -19,6 +13,14 @@ require_once realpath(dirname(__FILE__)) . '/../../db/sql/ParameterValueExpressi
 require_once realpath(dirname(__FILE__)) . '/../../db/executor/StatementExecutorFactory.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/executor/SimpleResultSetHandler.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/executor/NullResultSetHandler.php';
+
+require_once realpath(dirname(__FILE__)) . '/../DataModelProvider.php';
+
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelConstants.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataModelDefinition.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseDataContext.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseWriteContext.php';
+require_once realpath(dirname(__FILE__)) . '/DatabaseReadContext.php';
 
 /**
  * A DataModel provider based on database
@@ -36,22 +38,24 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
    private $statementExecutorFactory;
 
    /**
-    * @var array list of table names the model consists of
+    * The definition of the data model
+    * @var \upro\dataModel\db\DatabaseDataModelDefinition
     */
-   private $tableNames;
+   private $definition;
 
    /**
     * Constructor
     * @param \upro\db\TransactionControl $transactionControl to use
     * @param \upro\db\executor\StatementExecutorFactory $statementExecutorFactory to use
-    * @param array $tableNames list of table names the model consists of
+    * @param \upro\dataModel\db\DatabaseDataModelDefinition $definition the definition of the data model
     */
    function __construct(\upro\db\TransactionControl $transactionControl,
-         \upro\db\executor\StatementExecutorFactory $statementExecutorFactory, $tableNames)
+         \upro\db\executor\StatementExecutorFactory $statementExecutorFactory,
+         \upro\dataModel\db\DatabaseDataModelDefinition $definition)
    {
       $this->transactionControl = $transactionControl;
       $this->statementExecutorFactory = $statementExecutorFactory;
-      $this->tableNames = $tableNames;
+      $this->definition = $definition;
    }
 
    /** {@inheritDoc} */
@@ -137,7 +141,7 @@ class DatabaseDataModelProvider implements \upro\dataModel\DataModelProvider
    private function getDataContext($modelId, $userId)
    {
       return new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-               $this->statementExecutorFactory, $this->tableNames, $modelId, $userId);
+               $this->statementExecutorFactory, $this->definition, $modelId, $userId);
    }
 
    /**

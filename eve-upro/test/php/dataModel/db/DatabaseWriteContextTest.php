@@ -1,5 +1,6 @@
 <?php
 require_once 'db/sql/StandardSqlDictionary.php';
+require_once 'db/schema/StandardTableControl.php';
 
 require_once 'dataModel/DataEntryId.php';
 require_once 'dataModel/db/DatabaseWriteContext.php';
@@ -7,6 +8,7 @@ require_once 'dataModel/db/DatabaseWriteContext.php';
 require_once 'TestStatementExecutorFactory.php';
 require_once 'TestStatementExecutor.php';
 require_once 'BufferResultSet.php';
+require_once 'TestDatabaseDataModelDefinition.php';
 
 class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 {
@@ -25,7 +27,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
     */
    private $context;
 
-   private $tableNames;
+   private $definition;
 
    private $modelId;
 
@@ -42,7 +44,11 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
 
    protected function givenAModel($tableNames, $id)
    {
-      $this->tableNames = $tableNames;
+      $this->definition = new TestDatabaseDataModelDefinition(1);
+      foreach ($tableNames as $tableName)
+      {
+         $this->definition->addTable(new \upro\db\schema\StandardTableControl($tableName));
+      }
       $this->modelId = $id;
    }
 
@@ -50,7 +56,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
    {
       $this->transactionControl = $this->getMock('\upro\db\TransactionControl');
       $dataContext = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-            $this->executorFactory, $this->tableNames, $this->modelId, \Uuid::v4());
+            $this->executorFactory, $this->definition, $this->modelId, \Uuid::v4());
       $this->context = new \upro\dataModel\db\DatabaseWriteContext($dataContext);
    }
 

@@ -38,8 +38,8 @@ interface WriteAccess {
    + updateDataEntry(entryId: DataEntryId, data: map)
    + deleteDataEntry(entryId: DataEntryId)
 
-   + isAccessAllowed(entries: DataEntryId[]): boolean
-   + isControlAllowed(entries: DataEntryId[]): boolean
+   + isAccessGranted(entries: DataEntryId[]): boolean
+   + isControlGranted(entries: DataEntryId[]): boolean
    
    + addHistoryEntry(message: string, contextId: DataEntryId): int
 }
@@ -61,12 +61,12 @@ interface ReadContext {
 
 ReadContext -- HistoryReader
 HistoryReader --> ReadAccess
-ReadAccess -- ModelReader
+ReadAccess -- DataModelReader
 
 interface ReadAccess {
    + getCurrentInstanceId()
-   + isAccessAllowed(entryId: DataEntryId, entryInstance: int): boolean
-   + readModel(reader: ModelReader)
+   + isAccessGranted(entryId: DataEntryId, entryInstance: int): boolean
+   + readDataModel(reader: DataModelReader)
 }
 
 interface HistoryReader {
@@ -74,8 +74,8 @@ interface HistoryReader {
    + receive(access: ReadAccess, entryInstance: int, message: string, contextId: DataEntryId)
 }
 
-interface ModelReader {
-   + onEntry(entryId: EntryId, data: map)
+interface DataModelReader {
+   + receieDataEntry(entry: DataEntry)
 }
 
 }

@@ -27,9 +27,18 @@ class KeyedBufferTableRowReader extends \upro\db\BufferTableRowReader
    /**
     * @return array of key names
     */
-   public function getKeys()
+   public function getKeyNames()
    {
       return array_keys($this->cellIndexByKey);
+   }
+
+   /**
+    * Returns the key map for the cells
+    * @return mixed:int map to the index of a cell in a row by the key name
+    */
+   public function getKeyMap()
+   {
+      return array_merge($this->cellIndexByKey);
    }
 
    /**

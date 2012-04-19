@@ -1,5 +1,6 @@
 <?php
 require_once 'db/sql/StandardSqlDictionary.php';
+require_once 'db/schema/StandardTableControl.php';
 
 require_once 'dataModel/DataEntryId.php';
 require_once 'dataModel/db/DatabaseDataModelConstants.php';
@@ -8,6 +9,7 @@ require_once 'dataModel/db/DatabaseReadContext.php';
 require_once 'TestStatementExecutorFactory.php';
 require_once 'TestStatementExecutor.php';
 require_once 'BufferResultSet.php';
+require_once 'TestDatabaseDataModelDefinition.php';
 
 class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 {
@@ -20,7 +22,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
     */
    private $context;
 
-   private $tableNames;
+   private $definition;
 
    private $modelId;
 
@@ -36,7 +38,11 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
 
    protected function givenAModel($tableNames, $id)
    {
-      $this->tableNames = $tableNames;
+      $this->definition = new TestDatabaseDataModelDefinition(1);
+      foreach ($tableNames as $tableName)
+      {
+         $this->definition->addContextTable(new \upro\db\schema\StandardTableControl($tableName), 'TestContext');
+      }
       $this->modelId = $id;
    }
 
@@ -49,7 +55,7 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
    {
       $this->transactionControl = $this->getMock('\upro\db\TransactionControl');
       $dataContext = new \upro\dataModel\db\DatabaseDataContext($this->transactionControl,
-            $this->executorFactory, $this->tableNames, $this->modelId, \Uuid::v4());
+            $this->executorFactory, $this->definition, $this->modelId, \Uuid::v4());
       $this->context = new \upro\dataModel\db\DatabaseReadContext($dataContext);
    }
 
@@ -122,6 +128,34 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $result = $this->context->readHistoryEntries($instance, $this->historyReader);
 
       $this->assertEquals($instance, $result);
+   }
+
+   protected function whenDataModelIsRead()
+   {
+      $entryNames = $this->definition->getDataModelDefinition()->getEntryTypes();
+      $reader = $this->getMock('\upro\dataModel\DataModelReader');
+      $executorCount = 1;
+      $standardColumns = array(
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_ID,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID,
+            \upro\dataModel\db\DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE);
+
+      foreach ($entryNames as $entryName)
+      {
+         {   // SELECT query preparation
+            $resultSet = new BufferResultSet(array_merge($standardColumns, array('Col1', 'Col2')));
+            $executor = new TestStatementExecutor($resultSet);
+
+            $resultSet->addRow(array(\Uuid::v4(), \Uuid::v4(), 'TestContext', 100 + $executorCount, 'Test1'));
+            $resultSet->addRow(array(\Uuid::v4(), \Uuid::v4(), 'TestContext', 200 + $executorCount, 'Test2'));
+
+            $this->executorFactory->setExecutor($executorCount, $executor);
+            $executorCount++;
+         }
+      }
+      $reader->expects($this->atLeastOnce())->method('receiveDataEntry');
+
+      $this->context->readDataModel($reader);
    }
 
    protected function givenTheCurrentDataModelInstanceIs($instance)
@@ -369,5 +403,25 @@ class DatabaseReadContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsPrepared();
 
       $this->thenReadHistoryEntriesShouldReturn($instance);
+   }
+
+   public function testReadDataModelShouldQueryDataModel()
+   {
+      $tableNames = array('Table1', 'Table2');
+      $modelId = \Uuid::v4();
+      $instance = 10;
+      $contextId = new \upro\dataModel\DataEntryId('testType', \Uuid::v4());
+      $message = 'Test Message';
+
+      $this->givenAModel($tableNames, $modelId);
+      $this->givenADatabaseReadContext();
+      $this->givenTheCurrentDataModelInstanceIs($instance);
+      $this->givenAHistoryReader();
+      $this->givenAModelHistoryEntry($instance, $contextId, $message);
+
+      $this->whenContextIsPrepared();
+      $this->whenDataModelIsRead();
+
+      $this->thenTheQueryShouldHaveBeen(1, 'SELECT * FROM Table1');
    }
 }
