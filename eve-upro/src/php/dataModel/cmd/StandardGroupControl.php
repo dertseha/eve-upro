@@ -137,7 +137,7 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
       if (count($this->dataAccess->findDataEntries($entryType, $this->groupId, $interestData)) == 0)
       {
-         $this->createAndNotifyInterestEntry($interestData, false);
+         $this->createAndNotifyInterestEntry($interestData, false, $contextId);
       }
    }
 
@@ -165,7 +165,7 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
          $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID] = $contextId->getKey();
          $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO] = null;
          $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_DATA_MODEL_ID] = $this->dataAccess->getModelId();
-         $this->createAndNotifyInterestEntry($interestData, true);
+         $this->createAndNotifyInterestEntry($interestData, true, $contextId);
       }
    }
 
@@ -239,8 +239,9 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
     * Creates a new interest entry and notifies the group of its data
     * @param string:mixed $interestData initialized basic interest data
     * @param boolean $controlled whether the interest is controlled or not
+    * @param \upro\dataModel\DataEntryId $contextId The ID of the interest context
     */
-   private function createAndNotifyInterestEntry($interestData, $controlled)
+   private function createAndNotifyInterestEntry($interestData, $controlled, $contextId)
    {
       $entryId = new \upro\dataModel\DataEntryId(\upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP_INTEREST, \Uuid::v4());
 
@@ -249,11 +250,11 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
       $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_CONTROLLED] = $controlled;
       $this->dataAccess->createDataEntry($entryId, $interestData, $this->groupId);
 
-      $this->notifyActiveInterest($this->groupId);
+      $this->notifyContextData($contextId, $this->groupId);
    }
 
    /**
-    * Notifies the currently active interests and uses the given context ID
+    * Notifies all the currently active interests and uses the given context ID
     * @param \upro\dataModel\DataEntryId $contextId the context ID to use for the notifications
     */
    private function notifyActiveInterest(\upro\dataModel\DataEntryId $contextId)
@@ -270,16 +271,28 @@ class StandardGroupControl implements \upro\dataModel\GroupControl
          $interestId = new \upro\dataModel\DataEntryId(
                $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE],
                $interestData[\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID]);
-         $entryTypes = $this->definition->getEntryTypesForContext($interestId->getEntryType());
 
-         foreach ($entryTypes as $entryType)
+         $this->notifyContextData($interestId, $contextId);
+      }
+   }
+
+   /**
+    * Notifies all data that is related to a given context ID and notifies a specific notification context ID
+    * @param \upro\dataModel\DataEntryId $contextId the context ID to use to search data entries
+    * @param \upro\dataModel\DataEntryId $notificationContextId the ID to use as 'context' for notifications
+    */
+   private function notifyContextData(\upro\dataModel\DataEntryId $contextId,
+         \upro\dataModel\DataEntryId $notificationContextId)
+   {
+      $entryTypes = $this->definition->getEntryTypesForContext($contextId->getEntryType());
+
+      foreach ($entryTypes as $entryType)
+      {
+         $references = $this->dataAccess->findDataEntries($entryType, $contextId, array());
+
+         foreach ($references as $reference)
          {
-            $references = $this->dataAccess->findDataEntries($entryType, $interestId, array());
-
-            foreach ($references as $reference)
-            {
-               $this->dataAccess->notifyDataEntry($reference->getId(), $reference->getData(), $contextId);
-            }
+            $this->dataAccess->notifyDataEntry($reference->getId(), $reference->getData(), $notificationContextId);
          }
       }
    }

@@ -4,7 +4,7 @@ namespace upro\db\mysql
 require_once realpath(dirname(__FILE__)) . '/../DatabaseException.php';
 
 /**
- * A helper for MySql things
+ * A helper for MySQL things
  */
 class MySqlHelper
 {
@@ -28,7 +28,7 @@ class MySqlHelper
       {  // Catching exceptions from PHP unit test framework (?)
          throw new \upro\db\DatabaseException($ex->getMessage(), mysql_errno(), $ex);
       }
-      if ($result == FALSE)
+      if ($result === FALSE)
       {  // Production runtime case
          throw new \upro\db\DatabaseException(mysql_error(), mysql_errno());
       }

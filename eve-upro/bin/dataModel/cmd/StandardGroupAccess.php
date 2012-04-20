@@ -1,12 +1,13 @@
 <?php
 namespace upro\dataModel\cmd
 {
-require_once realpath(dirname(__FILE__)) . '/CommandDataAccess.php';
-require_once realpath(dirname(__FILE__)) . '/StandardGroupControl.php';
 require_once realpath(dirname(__FILE__)) . '/../DataModelConstants.php';
 require_once realpath(dirname(__FILE__)) . '/../DataModelDefinition.php';
 require_once realpath(dirname(__FILE__)) . '/../DataEntryId.php';
 require_once realpath(dirname(__FILE__)) . '/../GroupAccess.php';
+
+require_once realpath(dirname(__FILE__)) . '/CommandDataAccess.php';
+require_once realpath(dirname(__FILE__)) . '/StandardGroupControl.php';
 
 /**
  * An standard access interface for group control

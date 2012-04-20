@@ -1,21 +1,18 @@
 <?php
 namespace upro\dataModel\db
 {
+require_once realpath(dirname(__FILE__)) . '/../../db/KeyedBufferTableRowReader.php';
+
 require_once realpath(dirname(__FILE__)) . '/../DataEntryId.php';
 require_once realpath(dirname(__FILE__)) . '/../DataEntry.php';
 
-require_once realpath(dirname(__FILE__)) . '/../../db/KeyedBufferTableRowReader.php';
-
-require_once realpath(dirname(__FILE__)) . '/../../db/schema/TableControl.php';
-require_once realpath(dirname(__FILE__)) . '/../../db/schema/StringDataType.php';
-require_once realpath(dirname(__FILE__)) . '/../../db/schema/IntegerDataType.php';
-require_once realpath(dirname(__FILE__)) . '/../../db/schema/UuidDataType.php';
 
 /**
  * A helper class
  */
 class DatabaseDataModelHelper
 {
+
    /**
     * Extracts a data entry from a specific row from a KeyedBufferTableRowReader
     * @param string $entryType the type to use for the created data entry

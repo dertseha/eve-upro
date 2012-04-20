@@ -63,10 +63,10 @@ class SessionClient {
 
 package GroupManagment {
 
-class Group {
+class DataModelGroup {
    + id: UUID [primaryKey]
    + contextId: UUID [Group.id]
-   + contextEntryType: string -- "Group"
+   + contextEntryType: string -- "DataModelGroup"
    
    + type: string -- just for tracing
    
@@ -78,7 +78,7 @@ class Group {
 class GroupInterest {
    + id: UUID
    + contextId: UUID [Group.id]
-   + contextEntryType: string -- "Group"
+   + contextEntryType: string -- "DataModelGroup"
 
    + controlled: boolean   
    + interestId: UUID
@@ -92,7 +92,7 @@ class GroupInterest {
 class GroupMembership {
    + id: UUID
    + contextId: UUID [Group.id]
-   + contextEntryType: string -- "Group"
+   + contextEntryType: string -- "DataModelGroup"
    
    + userId: UUID
    + validFromInstance: int

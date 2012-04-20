@@ -11,7 +11,7 @@ require_once realpath(dirname(__FILE__)) . '/../sql/Query.php';
 /**
  * A standard factory for statement executors
  */
-class StatementExecutorFactory implements StatementExecutorFactory
+class StandardStatementExecutorFactory implements StatementExecutorFactory
 {
    /**
     * @var \upro\db\Connection the connection to work with

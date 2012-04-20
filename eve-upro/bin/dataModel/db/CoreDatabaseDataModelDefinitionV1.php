@@ -1,7 +1,7 @@
 <?php
 namespace upro\dataModel\db
 {
-require_once realpath(dirname(__FILE__)) . '/../../db/schema/TableControl.php';
+require_once realpath(dirname(__FILE__)) . '/../../db/schema/StandardTableControl.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/schema/StringDataType.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/schema/IntegerDataType.php';
 require_once realpath(dirname(__FILE__)) . '/../../db/schema/BooleanDataType.php';
@@ -33,8 +33,8 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
       $this->defineDataModelChangeHistory();
 
       $this->defineGroup();
-      $this->defineInterest();
-      $this->defineMembership();
+      $this->defineGroupInterest();
+      $this->defineGroupMembership();
    }
 
    /**
@@ -44,14 +44,14 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
     */
    protected function createDataEntryTableDefinition($entryName)
    {
-      $table = new \upro\db\schema\TableControl($entryName);
+      $table = new \upro\db\schema\StandardTableControl($entryName);
 
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_ID, new \upro\db\schema\UuidDataType())
             ->setNullable(false);
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ID, new \upro\db\schema\UuidDataType())
             ->setNullable(false);
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_CONTEXT_ENTRY_TYPE,
-            new \upro\db\schema\StringDataType(\upro\dataModel\db\CoreDatabaseDataModelDefinition::ENTRY_TYPE_LENGTH))
+            new \upro\db\schema\StringDataType(\upro\dataModel\db\CoreDatabaseDataModelDefinitionV1::ENTRY_TYPE_LENGTH))
             ->setNullable(false);
 
       return $table;
@@ -62,7 +62,7 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
     */
    private function defineDataModel()
    {
-      $table = new \upro\db\schema\TableControl(DatabaseDataModelConstants::TABLE_NAME_DATA_MODEL);
+      $table = new \upro\db\schema\StandardTableControl(DatabaseDataModelConstants::TABLE_NAME_DATA_MODEL);
 
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_ID, new \upro\db\schema\UuidDataType());
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_NAME, new \upro\db\schema\StringDataType(40));
@@ -76,7 +76,7 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
     */
    private function defineDataModelChangeHistory()
    {
-      $table = new \upro\db\schema\TableControl(DatabaseDataModelConstants::TABLE_NAME_DATA_MODEL_CHANGE_HISTORY);
+      $table = new \upro\db\schema\StandardTableControl(DatabaseDataModelConstants::TABLE_NAME_DATA_MODEL_CHANGE_HISTORY);
 
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_ID, new \upro\db\schema\UuidDataType());
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE, new \upro\db\schema\IntegerDataType());
@@ -115,7 +115,7 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
       $table->addColumn(\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_VALID_TO, new \upro\db\schema\IntegerDataType());
       $table->addColumn(\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_CONTROLLED, new \upro\db\schema\BooleanDataType());
       $table->addColumn(\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ENTRY_TYPE,
-            new \upro\db\schema\StringDataType(\upro\dataModel\db\CoreDatabaseDataModelDefinition::ENTRY_TYPE_LENGTH));
+            new \upro\db\schema\StringDataType(\upro\dataModel\db\CoreDatabaseDataModelDefinitionV1::ENTRY_TYPE_LENGTH));
       $table->addColumn(\upro\dataModel\DataModelConstants::GROUP_INTEREST_DATA_INTEREST_ID, new \upro\db\schema\UuidDataType());
 
       $this->addContextTable($table, \upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP);

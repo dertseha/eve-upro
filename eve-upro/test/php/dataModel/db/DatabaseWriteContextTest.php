@@ -963,7 +963,7 @@ class DatabaseWriteContextTest extends PHPUnit_Framework_TestCase
       $this->whenContextIsStarted();
       $this->whenContextIsStopped();
 
-      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_DELETE_GROUP, 'DELETE FROM Group'
+      $this->thenTheQueryWithParametersShouldHaveBeen(DatabaseWriteContextTest::EXECUTOR_DELETE_GROUP, 'DELETE FROM DataModelGroup'
             . ' WHERE (dataModelId = ?) AND (NOT (validToInstance IS NULL)) AND (validToInstance < ?)',
             array($this->modelId, $instance + 1 - \upro\dataModel\db\DatabaseDataModelConstants::CHANGE_HISTORY_ENTRY_LIMIT));
    }

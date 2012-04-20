@@ -200,7 +200,7 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 	   $reader = $handler->getReader();
 	   if ($reader->getRowCount() == 1)
 	   {
-	      $entry = DatabaseDataModelHelper::extractDataEntry($reader, 0);
+	      $entry = \upro\dataModel\db\DatabaseDataModelHelper::extractDataEntry($entryId->getEntryType(), $reader, 0);
 	   }
 
 	   return $entry;
@@ -223,7 +223,17 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 	      foreach ($filter as $filterKey => $filterValue)
 	      {
 	         $idSubject = new \upro\db\sql\clause\ColumnClauseSubject($filterKey);
-	         $clause = $clause->andThat($idSubject->equalsParameter(new \upro\db\sql\ParameterBox($filterValue)));
+	         $nextClause = null;
+
+	         if (is_null($filterValue))
+	         {
+	            $nextClause = $idSubject->isNull();
+	         }
+	         else
+	         {
+	            $nextClause = $idSubject->equalsParameter(new \upro\db\sql\ParameterBox($filterValue));
+	         }
+	         $clause = $clause->andThat($nextClause);
 	      }
 
 	      $query->where($clause);
@@ -236,7 +246,7 @@ class DatabaseWriteContext implements \upro\dataModel\WriteContext, \upro\dataMo
 	   $reader = $handler->getReader();
 	   for ($i = 0; $i < $reader->getRowCount(); $i++)
 	   {
-	      $entries[] = DatabaseDataModelHelper::extractDataEntry($reader, $i);
+	      $entries[] = \upro\dataModel\db\DatabaseDataModelHelper::extractDataEntry($entryType, $reader, $i);
 	   }
 
 	   return $entries;

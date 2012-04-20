@@ -1,7 +1,6 @@
 <?php
 namespace upro\dataModel\cmd
 {
-require_once realpath(dirname(__FILE__)) . '/../GroupAccess.php';
 require_once realpath(dirname(__FILE__)) . '/GroupAccessFactory.php';
 require_once realpath(dirname(__FILE__)) . '/CommandDataAccess.php';
 require_once realpath(dirname(__FILE__)) . '/StandardGroupAccess.php';
@@ -9,7 +8,7 @@ require_once realpath(dirname(__FILE__)) . '/StandardGroupAccess.php';
 /**
  * A standard implementation of the group access factory
  */
-class StandardGroupAccessFactory implements GroupAccessFactory
+class StandardGroupAccessFactory implements \upro\dataModel\cmd\GroupAccessFactory
 {
    /**
     * @var \upro\dataModel\DataModelDefinition
@@ -28,7 +27,7 @@ class StandardGroupAccessFactory implements GroupAccessFactory
    /** {@inheritDoc} */
    public function getGroupAccess(\upro\dataModel\cmd\CommandDataAccess $dataAccess)
    {
-      return new \upro\dataModel\cmd\StandardGroupAccess($this->defintion, $dataAccess);
+      return new \upro\dataModel\cmd\StandardGroupAccess($this->definition, $dataAccess);
    }
 }
 

@@ -7,7 +7,7 @@ namespace upro\dataModel
  */
 class DataModelConstants
 {
-   const ENTRY_TYPE_GROUP = 'Group';
+   const ENTRY_TYPE_GROUP = 'DataModelGroup';
    const GROUP_DATA_GROUP_TYPE = 'groupType';
    const GROUP_DATA_DATA_MODEL_ID = 'dataModelId';
    const GROUP_DATA_VALID_FROM = 'validFromInstance';
