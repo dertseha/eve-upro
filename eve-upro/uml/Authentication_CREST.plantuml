@@ -1,0 +1,29 @@
+@startuml
+
+Client -> Upro: GET public site
+Upro -> Client: OK public site(callbackUrl)
+
+== Start ==
+-> Client: login request
+Client -> Client: redirect(crestUrl)
+
+== Remote authentication ==
+Client -> CREST: GET login page(callbackUrl)
+CREST -> Client: OK login page
+-> Client: secret
+Client -> CREST: authenticate(secret)
+CREST -> Client: success(token, callbackUrl)
+Client -> Client: redirect(callbackUrl)
+
+== Access ==
+Client -> Upro: GET callbackUrl(token)
+Upro -> CREST: GET getCharacter(token)
+CREST -> Upro: OK data(charData)
+note right : character name\nmatched with DB entry
+ 
+Upro -> Upro: setClientAuthenticated()
+activate Upro
+Upro -> Client: OK result(ref)
+note right: ref might be stored in _SESSION\nfurther requests will reuse ref
+
+@enduml

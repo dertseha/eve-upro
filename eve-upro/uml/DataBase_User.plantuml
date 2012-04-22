@@ -1,0 +1,39 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+package UserManagement {
+
+class User {
+   + id: UUID [primaryKey]
+   + contextId: UUID [DataModelList.id]
+   + contextEntryType: string -- "DataModelList"
+
+   + name: string
+   + state: int -- { new, active }
+   
+   + openIdHash: string
+}
+
+class ClientSession {
+   + id: UUID [primaryKey] -- based on session fingerprint
+   + contextId: UUID [User.id]
+   + contextEntryType: string -- "User"
+
+   + lastAliveTime: timestamp -- server time
+   + crestToken: string -- when implemented
+}
+
+}
+
+note as note1
+   - A ClientSession entry is created when client is authenticated
+   - session fingerprint := hash(session.id & client IP & user agent )
+   
+   - To register: Request a login with destination URL a registration page; Admin confirms (if necessary)
+   - Kickstart: to create a new model, the first user has to provide the open ID; authenticated with DB password
+     This first user will then receive control rights over model lists 
+end note
+
+@enduml

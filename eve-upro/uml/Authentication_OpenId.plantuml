@@ -1,0 +1,32 @@
+@startuml
+
+Client -> Upro: GET public site
+Upro -> Client: OK public site
+
+== Start ==
+-> Client: user request
+Client -> Upro: GET authRequest(userName, openIdUrl)
+Upro -> Upro: OpenId::begin()
+activate Upro
+Upro -> Client: OK redirect(ref, destUrl, callbackUrl)
+note right : ref might be stored in _SESSION 
+
+== Remote authentication ==
+Client -> Provider: GET login page(callbackUrl)
+Provider -> Client: OK login page
+-> Client: secret
+Client -> Provider: authenticate(secret)
+Provider -> Client: success(certificate, callbackUrl)
+Client -> Client: redirect(callbackUrl)
+
+== Access ==
+Client -> Upro: GET callbackUrl(ref, certificate)
+Upro -> Upro: OpenId::complete()
+deactivate Upro
+ 
+Upro -> Upro: setClientAuthenticated()
+activate Upro
+Upro -> Client: OK result
+note right: further requests will reuse ref
+
+@enduml

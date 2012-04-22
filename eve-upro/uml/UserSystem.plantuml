@@ -1,0 +1,27 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+package UserControl {
+
+class CreateUserCommand {
+   - userId: UUID
+   - userName: string
+   - openIdHash: string
+}
+
+class CreateUserSessionCommand {
+   - userId: UUID
+   - clientSessionId: UUID
+   
+   - openIdHash: string
+}
+
+class ActivateUserCommand {
+   - userId: UUID
+}
+
+}
+
+@enduml

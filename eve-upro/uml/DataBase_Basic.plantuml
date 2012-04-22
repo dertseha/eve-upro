@@ -25,38 +25,9 @@ class DataModelChangeHistory {
 class DataModelList {
    + id: UUID
    + contextEntryType: string -- "DataModel"   
-   + contextId: UUID
+   + contextId: UUID -- DataModel.id
    
    + entryType: string -- "User" | "Corporation" | ...
-}
-
-}
-
-package UserManagement {
-
-class User {
-   + id: UUID [primaryKey]
-   + contextId: UUID [DataModel.id]
-   + contextEntryType: string -- "DataModel"
-
-   + name: string
-}
-
-class Session {
-   + id: UUID [primaryKey]
-   + contextId: UUID [User.id]
-   + contextEntryType: string -- "User"
-}
-
-class SessionClient {
-   + id: UUID [primaryKey]
-   + contextId: UUID [Session.id]
-   + contextEntryType: string -- "Session"
-
-   + lastAliveTime: timestamp
-   + clientData -- identifying the client
-   
-   + userId: UUID -- for quicker reference
 }
 
 }
