@@ -22,12 +22,12 @@ class DataModelChangeHistory {
    + message: string
 }
 
-class DataModelList {
+class DataModelPermission {
    + id: UUID
    + contextEntryType: string -- "DataModel"   
    + contextId: UUID -- DataModel.id
    
-   + entryType: string -- "User" | "Corporation" | ...
+   + permission: string
 }
 
 }

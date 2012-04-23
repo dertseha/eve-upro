@@ -7,8 +7,8 @@ package UserManagement {
 
 class User {
    + id: UUID [primaryKey]
-   + contextId: UUID [DataModelList.id]
-   + contextEntryType: string -- "DataModelList"
+   + contextId: UUID [User.id]
+   + contextEntryType: string -- "User"
 
    + name: string
    + state: int -- { new, active }
@@ -22,7 +22,6 @@ class ClientSession {
    + contextEntryType: string -- "User"
 
    + lastAliveTime: timestamp -- server time
-   + crestToken: string -- when implemented
 }
 
 }
