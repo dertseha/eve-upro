@@ -28,6 +28,12 @@ class DataModelConstants
    const GROUP_MEMBERSHIP_DATA_USER_ID = 'userId';
 
    const ENTRY_TYPE_USER = 'User';
+   const USER_DATA_NAME = 'name';
+   const USER_DATA_STATE = 'state';
+   const USER_DATA_OPEN_ID_HASH = 'openIdHash';
+
+   const ENTRY_TYPE_CLIENT_SESSION = 'ClientSession';
+   const CLIENT_SESSION_DATA_LAST_ALIVE_TIME = 'lastAliveTime';
 }
 
 }

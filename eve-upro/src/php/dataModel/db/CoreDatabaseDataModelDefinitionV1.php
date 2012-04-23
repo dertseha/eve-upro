@@ -35,6 +35,9 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
       $this->defineGroup();
       $this->defineGroupInterest();
       $this->defineGroupMembership();
+
+      $this->defineUser();
+      $this->defineClientSession();
    }
 
    /**
@@ -81,7 +84,8 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_ID, new \upro\db\schema\UuidDataType());
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_DATA_MODEL_INSTANCE, new \upro\db\schema\IntegerDataType());
 
-      $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ENTRY_TYPE, new \upro\db\schema\StringDataType(32));
+      $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ENTRY_TYPE,
+            new \upro\db\schema\StringDataType(\upro\dataModel\db\CoreDatabaseDataModelDefinitionV1::ENTRY_TYPE_LENGTH));
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_CONTEXT_ID, new \upro\db\schema\UuidDataType());
       $table->addColumn(DatabaseDataModelConstants::COLUMN_NAME_DATA_MODEL_CHANGE_HISTORY_MESSAGE, new \upro\db\schema\StringDataType(1024));
 
@@ -134,6 +138,33 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
       $table->addColumn(\upro\dataModel\DataModelConstants::GROUP_MEMBERSHIP_DATA_USER_ID, new \upro\db\schema\UuidDataType());
 
       $this->addContextTable($table, \upro\dataModel\DataModelConstants::ENTRY_TYPE_GROUP);
+   }
+
+   /**
+    * Defines user table
+    */
+   private function defineUser()
+   {
+      $table = $this->createDataEntryTableDefinition(\upro\dataModel\DataModelConstants::ENTRY_TYPE_USER);
+
+      $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_NAME, new \upro\db\schema\StringDataType(50));
+      $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_STATE, new \upro\db\schema\IntegerDataType());
+      $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_OPEN_ID_HASH, new \upro\db\schema\StringDataType(128));
+
+      $this->addContextTable($table, \upro\dataModel\DataModelConstants::ENTRY_TYPE_USER);
+   }
+
+   /**
+    * Defines client session table
+    */
+   private function defineClientSession()
+   {
+      $table = $this->createDataEntryTableDefinition(\upro\dataModel\DataModelConstants::ENTRY_TYPE_CLIENT_SESSION);
+
+      // Y2K38 potential
+      $table->addColumn(\upro\dataModel\DataModelConstants::CLIENT_SESSION_DATA_LAST_ALIVE_TIME, new \upro\db\schema\IntegerDataType());
+
+      $this->addContextTable($table, \upro\dataModel\DataModelConstants::ENTRY_TYPE_USER);
    }
 }
 
