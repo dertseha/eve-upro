@@ -21,7 +21,7 @@ class ClientSession {
    + contextId: UUID [User.id]
    + contextEntryType: string -- "User"
 
-   + lastAliveTime: timestamp -- server time
+   + lastAliveTime: int -- unix time
 }
 
 }
