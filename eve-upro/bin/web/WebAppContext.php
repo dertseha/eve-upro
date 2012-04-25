@@ -9,7 +9,10 @@ require_once realpath(dirname(__FILE__)) . '/../app/AppContext.php';
  */
 interface WebAppContext extends \upro\app\AppContext
 {
-
+   /**
+    * @return \upro\web\RequestServerContext the server context the current request runs in
+    */
+   function getRequestServerContext();
 }
 
 }

@@ -1,5 +1,7 @@
 <?php
+require_once 'io/ArrayValueProvider.php';
 require_once 'web/WebAppContext.php';
+require_once 'web/StandardRequestServerContext.php';
 require_once 'TestFileResource.php';
 
 class TestWebAppContext implements \upro\web\WebAppContext
@@ -11,14 +13,24 @@ class TestWebAppContext implements \upro\web\WebAppContext
       $this->out = $out;
    }
 
-   function getOut()
+   /** {@inheritDoc} */
+   public function getOut()
    {
       return $this->out;
    }
 
    /** {@inheritDoc} */
-   function getFileResource($key)
+   public function getFileResource($key)
    {
       return new TestFileResource($key);
+   }
+
+   /** {@inheritDoc} */
+   public function getRequestServerContext()
+   {
+      $array = array();
+      $provider = new \upro\io\ArrayValueProvider($array);
+
+      return new \upro\web\StandardRequestServerContext($provider);
    }
 }
