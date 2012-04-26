@@ -3,6 +3,8 @@ require_once 'io/ArrayValueStore.php';
 require_once 'web/SessionHijackPreventer.php';
 require_once 'web/RequestServerContext.php';
 
+require_once 'TestEnvironment.php';
+
 class SessionHijackPreventerTest extends PHPUnit_Framework_TestCase
 {
    private $valueStoreArray;
@@ -73,6 +75,8 @@ class SessionHijackPreventerTest extends PHPUnit_Framework_TestCase
    {
       parent::setUp();
 
+      TestEnvironment::initLogging($this->getName());
+
       $this->valueStoreArray = array();
       $this->valueStore = new \upro\io\ArrayValueStore($this->valueStoreArray);
       $this->requestServerContext = $this->getMock('\upro\web\RequestServerContext');
@@ -116,7 +120,7 @@ class SessionHijackPreventerTest extends PHPUnit_Framework_TestCase
       $this->thenSessionShouldNotBeValid();
    }
 
-   public function testInitializedSessionShouldBeValid_WhenWrongIP()
+   public function testInitializedSessionShouldNotBeValid_WhenWrongIP()
    {
       $this->givenAClient('10.20.30.41', 'UberAgent Ver.9000');
       $this->givenASessionHijackPreventer();
@@ -126,7 +130,7 @@ class SessionHijackPreventerTest extends PHPUnit_Framework_TestCase
       $this->thenSessionShouldNotBeValid();
    }
 
-   public function testInitializedSessionShouldBeValid_WhenWrongUserAgent()
+   public function testInitializedSessionShouldNotBeValid_WhenWrongUserAgent()
    {
       $this->givenAClient('10.20.30.40', 'UberAgent Ver.8000');
       $this->givenASessionHijackPreventer();

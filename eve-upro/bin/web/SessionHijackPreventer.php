@@ -3,6 +3,7 @@ namespace upro\web
 {
 require_once realpath(dirname(__FILE__)) . '/../Uuid.php';
 require_once realpath(dirname(__FILE__)) . '/../io/ValueStore.php';
+require_once realpath(dirname(__FILE__)) . '/../util/logging/LoggerProvider.php';
 require_once realpath(dirname(__FILE__)) . '/RequestServerContext.php';
 
 /**
@@ -59,6 +60,15 @@ class SessionHijackPreventer
    }
 
    /**
+    * Returns the logger for this class
+    * @return \upro\util\logging\Logger
+    */
+   private function getLogger()
+   {
+      return \upro\util\logging\LoggerProvider::getLogger('\upro\web\SessionHijackPreventer');
+   }
+
+   /**
     * Validates the session against the server context.
     * If the session is unknown so far, it will be initialized and considered valid.
     * If it has been initialized, it is checked whether the session is coming from the expected client
@@ -82,6 +92,10 @@ class SessionHijackPreventer
          if (strcmp($reportedHash, $expectedHash) == 0)
          {
             $result = true;
+         }
+         else
+         {
+            $this->getLogger()->warn('Session is not valid from remote [%s]', $this->requestServerContext->getRemoteAddress());
          }
       }
 

@@ -238,6 +238,11 @@
          <include name="*.js"/>
       </fileset>
    </copy>
+   <copy todir="${basedir}/bin/lib/php/log4php">
+      <fileset dir="${basedir}/lib/php/log4php/src/main/php">
+         <include name="**/*"/>
+      </fileset>
+   </copy>
 
    <!-- resources -->
    <copy todir="${basedir}/bin/res/eve">

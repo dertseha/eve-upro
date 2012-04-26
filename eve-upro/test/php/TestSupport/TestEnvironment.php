@@ -1,5 +1,6 @@
 <?php
 require_once 'db/mysql/MySqlDataSource.php';
+require_once 'util/logging/LoggingSystem.php';
 
 class TestEnvironment
 {
@@ -55,5 +56,34 @@ class TestEnvironment
    public static function getIntegrationTestUrl()
    {
       return 'http://localhost/upro-test/php/IntegrationTests/';
+   }
+
+   /**
+    * Initializes the logging for testing; Will result in console output
+    * @param string $testCaseName name of the test case to use
+    */
+   public static function initLogging($testCaseName)
+   {
+      $configData = array();
+
+      $configData['logging.log4php.configuration'] = array(
+            'rootLogger' => array(
+                  'appenders' => array('default'),
+            ),
+            'appenders' => array(
+                  'default' => array(
+                        'class' => 'LoggerAppenderConsole',
+                        'layout' => array(
+                              'class' => 'LoggerLayoutPattern',
+                              'params' => array(
+                                    'conversionPattern' => '%n%-60X{testCase} %c %p %m'
+                                    )
+                        )
+                  )
+            )
+         );
+
+      \upro\util\logging\LoggingSystem::initialize(new \upro\io\ArrayValueStore($configData));
+      \LoggerMDC::put('testCase', $testCaseName);
    }
 }
