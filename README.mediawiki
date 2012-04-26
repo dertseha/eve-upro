@@ -16,3 +16,28 @@ I'm using
 *** JsTestDriver for JavaScript unit tests: http://code.google.com/p/js-test-driver/
 *** PlantUML: http://plantuml.sourceforge.net/eclipse.html
 * XAMPP 1.7.7
+* Selenium RC 2.21.0
+
+== Test Environment ==
+Integration tests and MySQL tests depend on some system setup that must be provided.
+All configurable parameter (such as addresses) are collected in the TestEnvironment class
+(test/php/TestSupport/TestEnvironment.php)
+
+This class also has master kill-switches for MySQL based or Selenium based tests. If these report the respective
+component not available, the dependent tests will be marked as skipped (instead of blocking for connect timeout).
+
+The default values are given here:
+=== Database ===
+* server: localhost
+* user: upro_test
+* password: test
+* database: upro_unittests
+
+The user must have all rights (creating/deleting tables, ...) on the database and the database should be empty.    
+
+=== Selenium ===
+* browser: googlechrome
+* base URL: http://localhost/upro-test/php/IntegrationTests/
+
+At best, configure the web server to have <server>/upro-test resolve to the <project-dir>/test directory.
+Selenium must be started manually.
