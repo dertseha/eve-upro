@@ -243,6 +243,11 @@
          <include name="**/*"/>
       </fileset>
    </copy>
+   <copy todir="${basedir}/bin/lib/php/lightopenid">
+      <fileset dir="${basedir}/lib/php/lightopenid">
+         <include name="openid.php"/>
+      </fileset>
+   </copy>
 
    <!-- resources -->
    <copy todir="${basedir}/bin/res/eve">

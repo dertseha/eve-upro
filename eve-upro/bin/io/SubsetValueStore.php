@@ -38,9 +38,9 @@ class SubsetValueStore implements \upro\io\ValueStore
    }
 
    /** {@inheritDoc} */
-   public function get($key)
+   public function get($key, $default = null)
    {
-      return $this->store->get($this->prefix . $key);
+      return $this->store->get($this->prefix . $key, $default);
    }
 
    /** {@inheritDoc} */

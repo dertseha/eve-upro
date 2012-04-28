@@ -57,12 +57,8 @@ class Log4PhpLogger implements \upro\util\logging\Logger
    public static function initialize(\upro\io\ValueStore $config)
    {
       $loggerConfig = $config->subset(\upro\util\logging\Log4PhpLogger::CONFIG_SUBSET_NAME);
-      $log4phpConfig = null;
+      $log4phpConfig = $log4phpConfig = $loggerConfig->get(\upro\util\logging\Log4PhpLogger::CONFIG_KEY_CONFIGURATION);
 
-      if ($loggerConfig->has(\upro\util\logging\Log4PhpLogger::CONFIG_KEY_CONFIGURATION))
-      {
-         $log4phpConfig = $loggerConfig->get(\upro\util\logging\Log4PhpLogger::CONFIG_KEY_CONFIGURATION);
-      }
       \Logger::configure($log4phpConfig);
 
       \upro\util\logging\LoggerProvider::setLoggerFactory(\upro\util\logging\Log4PhpLogger::getFactory());

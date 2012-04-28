@@ -43,4 +43,21 @@ class ArrayValueProviderTest extends PHPUnit_Framework_TestCase
 
       $this->assertEquals(5678, $provider->get('Test'));
    }
+
+   public function testGetShouldReturnDefault_WhenUnknowKeyQueried()
+   {
+      $default = 1234;
+      $array = array();
+      $provider = new \upro\io\ArrayValueProvider($array);
+
+      $this->assertEquals($default, $provider->get('NotExisting', $default));
+   }
+
+   public function testGetShouldReturnNull_WhenUnknowKeyQueriedWithoutDefault()
+   {
+      $array = array();
+      $provider = new \upro\io\ArrayValueProvider($array);
+
+      $this->assertNull($provider->get('NotExisting'));
+   }
 }

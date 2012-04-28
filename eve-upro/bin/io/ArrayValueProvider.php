@@ -30,9 +30,16 @@ class ArrayValueProvider implements \upro\io\ValueProvider
    }
 
    /** {@inheritDoc} */
-   public function get($key)
+   public function get($key, $default = null)
    {
-      return $this->array[$key];
+      $value = $default;
+
+      if ($this->has($key))
+      {
+         $value = $this->array[$key];
+      }
+
+      return $value;
    }
 
    /**

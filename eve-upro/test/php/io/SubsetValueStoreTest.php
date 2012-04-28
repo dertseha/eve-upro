@@ -29,6 +29,15 @@ class SubsetValueStoreTest extends PHPUnit_Framework_TestCase
       $this->assertEquals(1234, $store->get('Key'));
    }
 
+   public function testGetShouldWorkWithDefault()
+   {
+      $array = array();
+      $store = new \upro\io\ArrayValueStore($array);
+      $store = new \upro\io\SubsetValueStore($store, 'Test_');
+
+      $this->assertEquals(1234, $store->get('Key', 1234));
+   }
+
    public function testSetShouldWork()
    {
       $array = array('Test_Key' => 1234);

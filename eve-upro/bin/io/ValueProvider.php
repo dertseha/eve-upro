@@ -17,9 +17,10 @@ interface ValueProvider
 
    /**
     * @param string $key identifying the value to retrieve
+    * @param mixed $default the value to return if has() would return false for given $key
     * @return mixed the value for given key
     */
-   function get($key);
+   function get($key, $default = null);
 }
 
 }
