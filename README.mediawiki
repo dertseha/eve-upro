@@ -18,6 +18,12 @@ I'm using
 * XAMPP 1.7.7
 * Selenium RC 2.21.0
 
+== Submodules ==
+* log4php: https://github.com/apache/log4php - bound to tag 2.2.1
+** Under /eve-upro/lib/php/log4php
+* LightOpenID: http://gitorious.org/lightopenid
+** Under /eve-upro/lib/php/lightopenid
+
 == Test Environment ==
 Integration tests and MySQL tests depend on some system setup that must be provided.
 All configurable parameter (such as addresses) are collected in the TestEnvironment class
