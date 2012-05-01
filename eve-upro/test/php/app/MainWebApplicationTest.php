@@ -14,12 +14,12 @@ class MainWebApplicationTest extends PHPUnit_Framework_TestCase
 
    protected function givenAnApplication()
    {
-      $this->app = new \upro\app\MainWebApplication();
+      $this->app = new \upro\app\MainWebApplication($this->context);
    }
 
    protected function whenRunningTheApp()
    {
-      $this->app->run($this->context);
+      $this->app->run();
    }
 
    protected function thenTheOutputShouldContain($expected)

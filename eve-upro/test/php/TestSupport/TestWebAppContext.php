@@ -1,5 +1,6 @@
 <?php
 require_once 'io/ArrayValueProvider.php';
+require_once 'io/SimpleValueStore.php';
 require_once 'web/WebAppContext.php';
 require_once 'web/StandardRequestServerContext.php';
 require_once 'TestFileResource.php';
@@ -26,11 +27,29 @@ class TestWebAppContext implements \upro\web\WebAppContext
    }
 
    /** {@inheritDoc} */
+   function setRedirection($url)
+   {
+
+   }
+
+   /** {@inheritDoc} */
    public function getRequestServerContext()
    {
       $array = array();
       $provider = new \upro\io\ArrayValueProvider($array);
 
       return new \upro\web\StandardRequestServerContext($provider);
+   }
+
+   /** {@inheritDoc} */
+   public function getRequestData()
+   {
+      return new \upro\io\SimpleValueStore();
+   }
+
+   /** {@inheritDoc} */
+   public function getSessionControl()
+   {
+      return null;
    }
 }

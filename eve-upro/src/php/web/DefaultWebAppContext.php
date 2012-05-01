@@ -3,9 +3,11 @@ namespace upro\web
 {
 require_once realpath(dirname(__FILE__)) . '/../sys/OutputPrintStream.php';
 require_once realpath(dirname(__FILE__)) . '/../sys/StandardFileResource.php';
+require_once realpath(dirname(__FILE__)) . '/../io/ArrayValueProvider.php';
 require_once realpath(dirname(__FILE__)) . '/WebAppContext.php';
 require_once realpath(dirname(__FILE__)) . '/RelativeFileResource.php';
 require_once realpath(dirname(__FILE__)) . '/StandardRequestServerContext.php';
+require_once realpath(dirname(__FILE__)) . '/StandardSessionControl.php';
 
 class DefaultWebAppContext implements WebAppContext
 {
@@ -26,6 +28,12 @@ class DefaultWebAppContext implements WebAppContext
     * @var \upro\web\RequestServerContext
     */
    private $requestServerContext;
+
+   /**
+    * The session control of this context
+    * @var \upro\web\SessionControl
+    */
+   private $sessionControl;
 
    /** Constructor */
    function __construct($basePath)
@@ -51,9 +59,44 @@ class DefaultWebAppContext implements WebAppContext
    }
 
    /** {@inheritDoc} */
+   public function setRedirection($url)
+   {
+      header('Location: ' . $url);
+   }
+
+   /** {@inheritDoc} */
    public function getRequestServerContext()
    {
       return $this->requestServerContext;
+   }
+
+   /** {@inheritDoc} */
+   public function getRequestData()
+   {
+      $array = $_REQUEST;
+
+      if ($this->requestServerContext->isRequestPost())
+      {
+         $array = $_POST;
+      }
+      else if ($this->requestServerContext->isRequestGet())
+      {
+         $array = $_GET;
+      }
+
+      return new \upro\io\ArrayValueProvider($array);
+   }
+
+   /** {@inheritDoc} */
+   public function getSessionControl()
+   {
+      if (is_null($this->sessionControl))
+      {
+         $this->sessionControl = new \upro\web\StandardSessionControl(
+               \upro\web\StandardSessionControl::getDefaultStartStrategy());
+      }
+
+      return $this->sessionControl;
    }
 }
 

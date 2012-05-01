@@ -47,6 +47,18 @@ class StandardRequestServerContext implements \upro\web\RequestServerContext
    {
       return $this->provider->get('HTTP_USER_AGENT');
    }
+
+   /** {@inheritDoc} */
+   public function isRequestPost()
+   {
+      return $this->provider->get('REQUEST_METHOD') === 'POST';
+   }
+
+   /** {@inheritDoc} */
+   public function isRequestGet()
+   {
+      return $this->provider->get('REQUEST_METHOD') === 'GET';
+   }
 }
 
 }

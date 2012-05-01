@@ -16,6 +16,16 @@ interface RequestServerContext
     * @return string the agent identification from the user. Might be empty.
     */
    function getUserAgent();
+
+   /**
+    * @return boolean true if the request is a POST request
+    */
+   function isRequestPost();
+
+   /**
+    * @return boolean true if the request is a GET request
+    */
+   function isRequestGet();
 }
 
 }

@@ -6,9 +6,9 @@ function main()
 {
    $basePath = realpath(dirname(__FILE__));
    $context = new \upro\web\DefaultWebAppContext($basePath);
-   $app = new \upro\app\MainWebApplication();
+   $app = new \upro\app\MainWebApplication($context);
 
-   $app->run($context);
+   $app->run();
 }
 
 main();

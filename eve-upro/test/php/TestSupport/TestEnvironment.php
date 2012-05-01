@@ -1,5 +1,6 @@
 <?php
 require_once 'db/mysql/MySqlDataSource.php';
+require_once 'io/ArrayValueStore.php';
 require_once 'util/logging/LoggingSystem.php';
 
 class TestEnvironment
