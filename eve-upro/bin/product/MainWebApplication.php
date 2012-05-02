@@ -1,5 +1,5 @@
 <?php
-namespace upro\app
+namespace upro\product
 {
 require_once realpath(dirname(__FILE__)) . '/../web/WebApplication.php';
 require_once realpath(dirname(__FILE__)) . '/../web/WebAppContext.php';

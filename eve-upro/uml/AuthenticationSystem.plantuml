@@ -14,7 +14,6 @@ interface AuthenticationMethod {
 note as Note1
 The user of WebAuthenticationSystem calls handleRequest() for each request
 as long as no user has been logged in. Log-In is notified via the callback.
-The  
 end note
 
 class WebAuthenticationSystem {

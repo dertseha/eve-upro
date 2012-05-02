@@ -1,0 +1,17 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+
+interface AdminControl {
+   + isDatabaseUpToDate(): boolean
+   + updateDatabaseSchema()
+   
+   + createDataModel(name: string)
+   
+   + setUserState(userName: string, state: int)
+   + setUserAdmin(userName: string, dataModelName: string)
+}
+
+@enduml
