@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="http://logging.apache.org/log4php/">
+   <appender name="default" class="LoggerAppenderEcho">
+      <layout class="LoggerLayoutPattern">
+         <param name="conversionPattern" value="%d %-21X{remoteEndPoint} %-5p %m" />
+      </layout>
+   </appender>
+   <root>
+      <appender_ref ref="default" />
+   </root>
+</configuration>

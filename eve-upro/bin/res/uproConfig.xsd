@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="upro.config" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="upro.config">
+    <element name="uproConfig" type="tns:UproConfig"></element>
+    
+
+    <complexType name="ConfigEntry">
+        <annotation>
+        	<documentation>A configuration entry is bound to a specific (unique) name and has a value assigned.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="description" minOccurs="0">
+    			<annotation>
+    				<documentation>A description of the parameter
+    				</documentation>
+    			</annotation>
+    			<simpleType>
+    				<restriction base="string">
+    					<whiteSpace value="collapse"></whiteSpace>
+    				</restriction>
+    			</simpleType>
+    		</element>
+    		<element name="value" type="tns:ConfigValue" minOccurs="0" maxOccurs="1">
+    			<annotation>
+    				<documentation>The configuration value to set. If none is given, a default might be used by the software. See description for details.</documentation>
+    			</annotation></element>
+    	</sequence>
+    	<attribute name="name" use="required">
+            <annotation>
+            	<documentation>The name of the configuration entry. The name is the string used as the 'key' parameters of \upro\io\ValueProvider.
+It is constrained by a pattern that only allows lower camel case naming with dot separation. </documentation>
+            </annotation>
+            <simpleType>
+            	<restriction base="string">
+            		<minLength value="1"></minLength>
+            		<pattern value="[a-z]+\w*(\.[a-z]+\w*)*"></pattern>
+            	</restriction>
+            </simpleType>
+    	</attribute>
+    </complexType>
+    
+    <complexType name="ConfigValue">
+        <annotation>
+        	<documentation>The string value is returned when the value is queried from the configuration by the key. Dependent on the type, the value in the XML is interpreted differently.</documentation>
+        </annotation>
+        <simpleContent>
+    		<extension base="string">
+    			<attribute name="type" default="rawValue">
+    				<simpleType>
+                        <annotation>
+                        	<documentation>The type attribute specifies how the configured value shall be parsed and returned when queried.
+"rawValue": (default) The value is not parsed and provided as-is.
+"configDir": The value is the relative file/path to the directory the XML file is in
+"baseDir": The value is the relative file/path to the base directory of the application</documentation>
+                        </annotation>
+                  <restriction base="string">
+    						<enumeration value="baseDir"></enumeration>
+    						<enumeration value="configDir"></enumeration>
+    						<enumeration value="rawValue"></enumeration>
+    					</restriction>
+    				</simpleType>
+    			</attribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+
+    <complexType name="UproConfig">
+        <annotation>
+        	<documentation></documentation>
+        </annotation>
+        <sequence>
+    		<element name="configEntry" type="tns:ConfigEntry" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+</schema>

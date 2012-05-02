@@ -57,9 +57,15 @@ class Log4PhpLogger implements \upro\util\logging\Logger
    public static function initialize(\upro\io\ValueStore $config)
    {
       $loggerConfig = $config->subset(\upro\util\logging\Log4PhpLogger::CONFIG_SUBSET_NAME);
-      $log4phpConfig = $log4phpConfig = $loggerConfig->get(\upro\util\logging\Log4PhpLogger::CONFIG_KEY_CONFIGURATION);
+      $log4phpConfig = $loggerConfig->get(\upro\util\logging\Log4PhpLogger::CONFIG_KEY_CONFIGURATION);
 
       \Logger::configure($log4phpConfig);
+      if (isset($_SERVER['REMOTE_ADDR']))
+      {   // acceptable hack around any abstraction to log the reference point
+         $remoteEndPoint = $_SERVER['REMOTE_ADDR'] . ':' . $_SERVER['REMOTE_PORT'];
+
+         \LoggerMDC::put('remoteEndPoint', $remoteEndPoint);
+      }
 
       \upro\util\logging\LoggerProvider::setLoggerFactory(\upro\util\logging\Log4PhpLogger::getFactory());
    }

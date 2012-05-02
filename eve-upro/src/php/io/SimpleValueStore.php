@@ -3,6 +3,7 @@ namespace upro\io
 {
 require_once realpath(dirname(__FILE__)) . '/ValueStore.php';
 require_once realpath(dirname(__FILE__)) . '/ArrayValueStore.php';
+require_once realpath(dirname(__FILE__)) . '/SubsetValueStore.php';
 
 /**
  * A simple value store implementation, containing its own data
