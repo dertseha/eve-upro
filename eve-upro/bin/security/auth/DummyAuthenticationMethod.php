@@ -89,10 +89,11 @@ class DummyAuthenticationMethod implements \upro\security\auth\AuthenticationMet
     */
    private function getUserTag($secret)
    {
-      $rawText = \upro\security\auth\DummyAuthenticationMethod::METHOD_NAME . '|';
+      $rawText = '';
+
       $rawText .= $secret . '|';
 
-      return md5($rawText);
+      return \upro\security\auth\DummyAuthenticationMethod::METHOD_NAME . '|' . md5($rawText);
    }
 }
 

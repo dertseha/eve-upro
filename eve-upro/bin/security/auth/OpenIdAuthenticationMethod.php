@@ -209,10 +209,11 @@ class OpenIdAuthenticationMethod implements \upro\security\auth\AuthenticationMe
    private function getUserTag(\LightOpenID $openId)
    {
       $attributes = $openId->getAttributes();
-      $rawText = \upro\security\auth\OpenIdAuthenticationMethod::METHOD_NAME . '|';
+      $rawText = '';
+
       $rawText .= $attributes[\upro\security\auth\OpenIdAuthenticationMethod::ATTRIBUTE_NAME_CONTACT_EMAIL] . '|';
 
-      return md5($rawText);
+      return \upro\security\auth\OpenIdAuthenticationMethod::METHOD_NAME . '|' . md5($rawText);
    }
 }
 
