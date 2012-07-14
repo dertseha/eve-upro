@@ -13,7 +13,7 @@ class User {
    + name: string
    + state: int -- { new, active }
    
-   + openIdHash: string
+   + tag: string
 }
 
 class ClientSession {
