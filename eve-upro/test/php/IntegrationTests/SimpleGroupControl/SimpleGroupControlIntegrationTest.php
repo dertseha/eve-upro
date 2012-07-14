@@ -79,11 +79,13 @@ class SimpleGroupControlIntegrationTest extends PHPUnit_Framework_TestCase
       $writeContext = $dataModelProvider->getWriteContext(\SimpleGroupControlIntegrationTest::MODEL_NAME, $userId);
       $writeAccess = $writeContext->start();
 
-      if ($writeContext->isControlGranted($command->getEntriesForControl()) && $writeContext->isAccessGranted($command->getEntriesForAccess()))
+      $groupAccessFactory = new \upro\dataModel\cmd\StandardGroupAccessFactory($this->dataModelDefinition->getDataModelDefinition());
+      $converter = new TestNotificationConverter();
+      $commandDataAccess = new \upro\dataModel\cmd\NotifyingCommandDataAccess($writeAccess, $converter, $groupAccessFactory);
+
+      if ($writeContext->isControlGranted($command->getEntriesForControl($commandDataAccess)) &&
+            $writeContext->isAccessGranted($command->getEntriesForAccess($commandDataAccess)))
       {
-         $groupAccessFactory = new \upro\dataModel\cmd\StandardGroupAccessFactory($this->dataModelDefinition->getDataModelDefinition());
-         $converter = new TestNotificationConverter();
-         $commandDataAccess = new \upro\dataModel\cmd\NotifyingCommandDataAccess($writeAccess, $converter, $groupAccessFactory);
 
          try
          {

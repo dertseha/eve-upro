@@ -13,14 +13,16 @@ interface Command
    function decode($data);
 
    /**
+    * @param \upro\dataModel\cmd\CommandDataAccess $dataAccess for accessing the data model
     * @return array of \upro\dataModel\DataEntryId values of entries for which control is required
     */
-   function getEntriesForControl();
+   function getEntriesForControl(\upro\dataModel\cmd\CommandDataAccess $dataAccess);
 
    /**
+    * @param \upro\dataModel\cmd\CommandDataAccess $dataAccess for accessing the data model
     * @return array of \upro\dataModel\DataEntryId values of entries for which access is required
     */
-   function getEntriesForAccess();
+   function getEntriesForAccess(\upro\dataModel\cmd\CommandDataAccess $dataAccess);
 
    /**
     * Executes the command and modifies the data model

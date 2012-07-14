@@ -30,10 +30,40 @@ class DataModelConstants
    const ENTRY_TYPE_USER = 'User';
    const USER_DATA_NAME = 'name';
    const USER_DATA_STATE = 'state';
-   const USER_DATA_OPEN_ID_HASH = 'openIdHash';
+   const USER_DATA_TAG = 'tag';
 
    const ENTRY_TYPE_CLIENT_SESSION = 'ClientSession';
    const CLIENT_SESSION_DATA_LAST_ALIVE_TIME = 'lastAliveTime';
+
+   const ENTRY_TYPE_ROLE = 'Role';
+   const ROLE_DATA_NAME = 'name';
+
+   const ENTRY_TYPE_TITLE = 'Title';
+   const TITLE_DATA_NAME = 'name';
+
+   const GROUP_TYPE_TITLE = 'Title';
+
+   const ROLE_NAME_CREATE_TITLE = 'CreateTitle';
+
+   /**
+    * @return array an array of all role names the system knows
+    */
+   public static function getRoleNames()
+   {
+      $class = new \ReflectionClass('\upro\dataModel\DataModelConstants');
+      $roleNames = array();
+      $roleKeyPrefix = 'ROLE_NAME_';
+
+      foreach ($class->getConstants() as $key => $value)
+      {
+         if (strcmp(substr($key, 0, strlen($roleKeyPrefix)), $roleKeyPrefix) === 0)
+         {
+            $roleNames[] = $value;
+         }
+      }
+
+      return $roleNames;
+   }
 }
 
 }

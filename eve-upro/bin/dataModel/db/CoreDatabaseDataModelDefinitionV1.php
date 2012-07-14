@@ -149,7 +149,7 @@ abstract class CoreDatabaseDataModelDefinitionV1 extends AbstractDatabaseDataMod
 
       $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_NAME, new \upro\db\schema\StringDataType(50));
       $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_STATE, new \upro\db\schema\IntegerDataType());
-      $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_OPEN_ID_HASH, new \upro\db\schema\StringDataType(128));
+      $table->addColumn(\upro\dataModel\DataModelConstants::USER_DATA_TAG, new \upro\db\schema\StringDataType(128));
 
       $this->addContextTable($table, \upro\dataModel\DataModelConstants::ENTRY_TYPE_USER);
    }

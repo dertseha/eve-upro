@@ -25,7 +25,7 @@ abstract class AbstractGroupCommand implements \upro\dataModel\cmd\Command
    }
 
    /** {@inheritDoc} */
-   public function getEntriesForControl()
+   public function getEntriesForControl(\upro\dataModel\cmd\CommandDataAccess $dataAccess)
    {
       $entries = array();
 
@@ -38,7 +38,7 @@ abstract class AbstractGroupCommand implements \upro\dataModel\cmd\Command
    }
 
    /** {@inheritDoc} */
-   public function getEntriesForAccess()
+   public function getEntriesForAccess(\upro\dataModel\cmd\CommandDataAccess $dataAccess)
    {
       return array();
    }

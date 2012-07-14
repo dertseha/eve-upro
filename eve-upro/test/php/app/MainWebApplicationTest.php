@@ -2,7 +2,7 @@
 require_once 'BufferPrintStream.php';
 require_once 'TestWebAppContext.php';
 
-require_once 'app/MainWebApplication.php';
+require_once 'product/MainWebApplication.php';
 
 class MainWebApplicationTest extends PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class MainWebApplicationTest extends PHPUnit_Framework_TestCase
 
    protected function givenAnApplication()
    {
-      $this->app = new \upro\app\MainWebApplication($this->context);
+      $this->app = new \upro\product\MainWebApplication($this->context);
    }
 
    protected function whenRunningTheApp()

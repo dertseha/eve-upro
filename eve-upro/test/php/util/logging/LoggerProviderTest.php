@@ -11,6 +11,7 @@ class LoggerProviderTest extends PHPUnit_Framework_TestCase
 
 	public function testGetLoggerShouldUseNullLoggerFactory_WhenCalledWithoutSet()
 	{
+	   \upro\util\logging\LoggerProvider::setLoggerFactory(null);
 	   $logger = \upro\util\logging\LoggerProvider::getLogger('test');
 
 	   $this->assertSame(\upro\util\logging\NullLogger::getInstance(), $logger);
