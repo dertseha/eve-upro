@@ -1,0 +1,22 @@
+title= "upro"
+
+extends layout
+
+block title
+   title="upro :: login"
+
+block pre-scripts
+   link(rel='stylesheet', href='/stylesheets/style.css')
+
+block content
+   div(class="login")
+      h2 EVE API Key
+      form(method='post', action='/login')
+         p
+            label(for="keyId") keyID:
+               input(type='text', name='keyId', required=true)
+         p
+            label(for="vCode") vCode:
+               input(type='password', name='vCode', required=true)
+         p
+            input(type='submit', value='Log In')

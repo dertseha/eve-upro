@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.tp23.eclipse.launching.nodeApplication">
+<stringAttribute key="Executor" value="C:\Program Files\nodejs\node.exe"/>
+<stringAttribute key="MainTypeName" value="src/app.js"/>
+<stringAttribute key="NodeDebugPort" value="8888"/>
+<stringAttribute key="ProjectName" value="eve-upro"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/eve-upro/src/app.js"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+</launchConfiguration>
