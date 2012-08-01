@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2012-07-16 15:20:09</currentTime>
+  <result>
+    <key accessMask="0" type="Character" expires="">
+      <rowset name="characters" key="characterID" columns="characterID,characterName,corporationID,corporationName">
+        <row characterID="149226614" characterName="Liu Ellens" corporationID="264653893" corporationName="Blame The Bunny" />
+      </rowset>
+    </key>
+  </result>
+  <cachedUntil>2012-07-16 15:25:09</cachedUntil>
+</eveapi>

@@ -15,35 +15,39 @@ I'm using
 *** MakeGood for PHP unit tests: http://redmine.piece-framework.com/
 *** JsTestDriver for JavaScript unit tests: http://code.google.com/p/js-test-driver/
 *** PlantUML: http://plantuml.sourceforge.net/eclipse.html
+* Node.js 0.8.2 (Live Runtime: 0.6.X)
 * XAMPP 1.7.7
 * Selenium RC 2.21.0
 
 == Submodules ==
-* log4php: https://github.com/apache/log4php - bound to tag 2.2.1
-** Under /eve-upro/lib/php/log4php
-* LightOpenID: http://gitorious.org/lightopenid
-** Under /eve-upro/lib/php/lightopenid
+* See package.json
 
 == Test Environment ==
-Integration tests and MySQL tests depend on some system setup that must be provided.
-All configurable parameter (such as addresses) are collected in the TestEnvironment class
-(test/php/TestSupport/TestEnvironment.php)
+* RabbitMQ, default setup
+* MongoDB, default setup
+* Node.js 0.8.X
 
-This class also has master kill-switches for MySQL based or Selenium based tests. If these report the respective
-component not available, the dependent tests will be marked as skipped (instead of blocking for connect timeout).
+=== Testing folder structure(s) ===
+==== eve-upro\test\** ====
+These folder contain the external tests - i.e., they require the application running and available to provide
+any dependent scripts.
+ 
+===== eve-upro\test\js\** =====
+Containing all the tests for the client scripts, based on the compressed export from the main application.
+jsTestDriver is configured (see jsTestDriver.conf) to take the upro.js file from localhost.
 
-The default values are given here:
-=== Database ===
-* server: localhost
-* user: upro_test
-* password: test
-* database: upro_unittests
+Note: some tests are under a folder named 'longRunning'. These are taking more than a second to complete
+and are thus also not listed in the jsTestDriver.conf file. When trying to execute them, test driver will
+not continue and halt there.
 
-The user must have all rights (creating/deleting tables, ...) on the database and the database should be empty.    
+===== eve-upro\test\php\** =====
+This folder is meant to hold selenium based tests in PHP as I haven't found a working selenium driver for node yet.
 
-=== Selenium ===
-* browser: googlechrome
-* base URL: http://localhost/upro-test/php/IntegrationTests/
+===== eve-upro\test\manual\** =====
+Holding various tests with visual interaction, prototypes and 
 
-At best, configure the web server to have <server>/upro-test resolve to the <project-dir>/test directory.
-Selenium must be started manually.
+==== eve-upro\src\**\test\** ====
+Tests based on nodeunit for the server side units.
+
+eve-api has dedicated tests to be prepared as a dedicated package perhaps in the future.
+
