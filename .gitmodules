@@ -1,6 +1,0 @@
-[submodule "eve-upro/lib/php/log4php"]
-	path = eve-upro/lib/php/log4php
-	url = git://github.com/apache/log4php.git
-[submodule "eve-upro/lib/php/lightopenid"]
-	path = eve-upro/lib/php/lightopenid
-	url = git://gitorious.org/lightopenid/lightopenid.git

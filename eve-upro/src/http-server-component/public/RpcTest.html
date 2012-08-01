@@ -1,0 +1,46 @@
+<html>
+<head>
+   <meta "http-equiv='X-UA-Compatible' content='IE=9'" />
+   <title>DataPort Test</title>
+   <script type="text/javascript" charset="utf-8" src="/javascripts/release/prototype.js"></script>
+</head>
+<body>
+   Hello there!
+   <div id='test'></div>
+
+
+   <script language="JavaScript">
+// https://github.com/visionmedia/connect-jsonrpc
+// http://www.jsonrpc.org/specification
+// https://github.com/sstephenson/prototype/blob/1fb9728/src/ajax/request.js#L159
+// http://api.prototypejs.org/ajax/Ajax/Request/
+
+var request = new Ajax.Request("http://localhost:3000/requestSink/", {
+        method: "post",
+        overrideMimeType: true,
+        //parameters: JSON.stringify({ jsonrpc: "2.0", method: "clientRequest", id: 1}),
+        postBody: JSON.stringify({ jsonrpc: "2.0", method: "clientRequest", params:
+        {
+           header: { headerEntry: "asdf" }, body: { bodyEntry: 12 }
+        }, id: 1}),
+        contentType: 'application/json',
+//        encoding: 'UTF-8',
+//        asynchronous: false,
+        onSuccess: function(response)
+        {
+            console.log('success: ' + JSON.stringify(response));
+      var elem = document.getElementById("test");
+
+   elem.innerHTML += JSON.stringify(response.responseJSON);
+
+        },
+        onFailure: function(response)
+        {
+            console.log('failure: ' + JSON.stringify(response));
+        }
+});
+
+   </script>
+
+</body>
+</html>
