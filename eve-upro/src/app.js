@@ -1,4 +1,10 @@
+var path = require('path');
+
+var log4js = require('log4js');
+var logger = log4js.getLogger();
 var nconf = require('nconf');
+
+logger.info('Initializing application...');
 
 var ServiceControl = require('./components/ServiceControl.js');
 var ComponentBuilder = require("./components/ComponentBuilder.js");
@@ -24,6 +30,13 @@ function extractCloudConfiguration()
 
       cloudMongo = env['mongodb-1.8'][0]['credentials'];
       cloudRabbit = env['rabbitmq-2.4'][0]['credentials'];
+
+      logger.setLevel(log4js.levels.INFO);
+      log4js.loadAppender('file');
+      log4js.clearAppenders();
+      log4js.addAppender(log4js.appenders.file(path.normalize(__dirname + '/../logs/upro.log'), null, 1024 * 1024 * 2));
+      // log4js.addAppender(log4js.appenders.console(log4js.layouts.basicLayout));
+      log4js.replaceConsole(logger);
    }
 }
 extractCloudConfiguration();
@@ -141,7 +154,9 @@ var serviceControl = new ServiceControl();
 
 serviceControl.on('started', function()
 {
-   console.log("started!!!!");
+   logger.debug('some debug trace');
+   logger.info('Started.');
 });
 
+logger.info('Starting components...');
 serviceControl.start();

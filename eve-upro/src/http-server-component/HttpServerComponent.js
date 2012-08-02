@@ -2,6 +2,8 @@ var util = require('util');
 var http = require('http');
 var path = require('path');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
 var express = require('express');
 var MongoStore = require('connect-mongodb');
 var passport = require('passport');
@@ -18,7 +20,6 @@ passport.serializeUser(function(user, done)
 {
    var data = user ? JSON.stringify(user) : null;
 
-   // console.log('encode: ' + data);
    done(null, data);
 });
 
@@ -26,7 +27,6 @@ passport.deserializeUser(function(data, done)
 {
    var user = data ? JSON.parse(data) : null;
 
-   // console.log('decode: ' + data);
    done(null, user);
 });
 
@@ -124,7 +124,10 @@ function HttpServerComponent(services, options)
 
          expressServer.use(express.limit('100kb'));
          expressServer.use(express.favicon(path.normalize(__dirname + '/public/images/favicon.ico')));
-         expressServer.use(express.logger('dev'));
+         expressServer.use(log4js.connectLogger(logger,
+         {
+            level: log4js.levels.DEBUG
+         }));
          expressServer.use(express.bodyParser());
          expressServer.use(express.methodOverride());
          expressServer.use(express.cookieParser(self.options.cookieSecret || 'Some special secret'));
@@ -186,7 +189,7 @@ function HttpServerComponent(services, options)
 
       httpServer.listen(usedPort, this.options.host, function()
       {
-         // console.log('HTTP started on port ' + usedPort);
+         logger.info('HTTP server started on port ' + usedPort);
          self.onServerStarted(httpServer);
       });
    };
@@ -262,8 +265,7 @@ function HttpServerComponent(services, options)
          {
             if (!clientEvents.EventNames[event])
             {
-               // TODO: log
-               console.log('WARN: unregistered client event [' + event + ']');
+               logger.warn('WARN: unregistered client event [' + event + ']');
             }
             block += 'event: ' + event + '\n';
          }
@@ -298,8 +300,7 @@ function HttpServerComponent(services, options)
    this.onRequestRequestSink = function(req, res, next)
    {
       /*
-       * if (req.user) {
-       *  } else { res.send(403); }
+       * if (req.user) { } else { res.send(403); }
        */
       var contentType = req.headers['content-type'] || '';
 

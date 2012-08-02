@@ -1,6 +1,9 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 /**
  * ServiceControl is a dependency injection system for components with service characteristics (which need to be started
  * asynchronously). Components are registered directly or via their builders. Dependency problems as reported from the
@@ -202,6 +205,7 @@ function ServiceControl()
          {
             self.onComponentStarted(name, component);
          });
+         logger.info('Starting [' + name + ']');
          component.start();
       }
    };
@@ -216,6 +220,7 @@ function ServiceControl()
    {
       if (this.components[name])
       {
+         logger.info('Component started [' + name + ']');
          this.setService(name, component);
          this.buildAndStartSatisfiedComponents();
       }

@@ -1,5 +1,8 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var Component = require('../components/Component.js');
 
 function EveApiMsgComponent(services)
@@ -68,7 +71,7 @@ function EveApiMsgComponent(services)
       });
       q.on('error', function(err)
       {
-         console.log('failed queue!\n' + err);
+         logger.error('failed queue! ' + err);
       }); // TODO: we're lost right now
    };
 

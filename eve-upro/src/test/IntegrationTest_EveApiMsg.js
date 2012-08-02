@@ -95,7 +95,6 @@ exports.setUp = function(callback)
 
    this.fixture.serviceControl.on('started', function()
    {
-      // console.log("started!!!!");
       callback();
    });
    this.fixture.serviceControl.start();

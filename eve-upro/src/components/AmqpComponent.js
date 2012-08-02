@@ -1,10 +1,13 @@
 var amqp = require('amqp');
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var Component = require('./Component.js');
 var busMessages = require('../model/BusMessages.js');
 
-/*
+/**
  * 
  * API info: https://github.com/postwait/node-amqp
  */
@@ -51,9 +54,6 @@ function AmqpComponent(options)
 
       var connection = amqp.createConnection(this.options);
 
-      /*
-       * connection.on('error', function(message) { console.log('AMQP error: ' + message); });
-       */
       connection.on('ready', function()
       {
          self.connection = connection;
@@ -129,7 +129,7 @@ function AmqpComponent(options)
       });
       q.on('error', function(err)
       {
-         console.log('failed queue!\n' + err);
+         logger.error('failed queue! ' + err);
       }); // TODO: we're lost right now
    };
 
@@ -149,8 +149,7 @@ function AmqpComponent(options)
 
       if (!busMessages.Broadcasts[header.type])
       {
-         // TODO: log
-         console.log('WARN: unregistered broadcast [' + header.type + ']');
+         logger.warn('Unregistered broadcast [' + header.type + ']');
       }
 
       this.exchange.publish(routingKey, JSON.stringify(data),
@@ -163,7 +162,7 @@ function AmqpComponent(options)
    {
       var data = JSON.parse(message.data);
 
-      // console.log('MSG: ' + message.data);
+      // logger.trace('MSG: ' + message.data);
       this.emit('broadcast', data.header, data.body);
       this.emit('broadcast:' + data.header.type, data.header, data.body);
    };

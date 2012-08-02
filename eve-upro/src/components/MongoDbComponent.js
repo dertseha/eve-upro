@@ -35,11 +35,8 @@ function MongoDbComponent(options)
 
       this.server = new mongodb.Server(this.options.hostname, port, this.options.serverOptions);
 
-      // this.server.on('error', function(message) { console.log('not - server!'); });
-
       var dbConnector = new mongodb.Db(this.options.db, this.server, dbOptions);
 
-      // dbConnector.on('error', function(message) { console.log('not - dbconn!'); });
       dbConnector.open(function(err, db)
       {
          if (err)

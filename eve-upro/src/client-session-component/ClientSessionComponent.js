@@ -1,5 +1,8 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var Component = require('../components/Component.js');
 var UuidFactory = require('../util/UuidFactory.js');
 var clientEvents = require('../model/ClientEvents');
@@ -170,11 +173,10 @@ function ClientSessionComponent(services)
       var struct = JSON.parse(message.data);
 
       delete this.logInRequests[correlationId];
-      console.log('got a reply: ' + message.data);
 
       if (struct.err)
       {
-         // TODO - should log error here
+         logger.error('Failed to request data: ' + JSON.stringify(struct.err));
          request.done('Request Error', null);
       }
       else if ((struct.response.key.accessMask === 0) && (struct.response.key.type == "Character")
@@ -284,7 +286,6 @@ function ClientSessionComponent(services)
    {
       var rCode = 'OK';
 
-      // console.log('Client request: ' + JSON.stringify(header) + ' / ' + JSON.stringify(body));
       if (clientRequests.RequestNames[clientRequest.header.type])
       {
          var handler = this['onClientRequest' + clientRequest.header.type];
@@ -295,8 +296,7 @@ function ClientSessionComponent(services)
          }
          else
          {
-            // TODO log
-            console.log('WARN: Unhandled, registered request: ' + clientRequest.header.type);
+            logger.warn('Unhandled, registered request: ' + clientRequest.header.type);
             rCode = 'Unhandled Request';
          }
       }

@@ -48,7 +48,6 @@ function Fixture()
       this.started++;
       if (this.started == this.controls.length)
       {
-         // console.log('started');
          callback();
       }
    };
