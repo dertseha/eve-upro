@@ -248,94 +248,102 @@ function HttpServerComponent(services, options)
 
    this.onRequestEventSource = function(req, res)
    {
-      res.charset = 'UTF-8';
-      res.header('Content-Type', 'text/event-stream');
-      res.header('Cache-Control', 'no-cache');
-      res.header('Access-Control-Allow-Origin', '*');
-
-      function sendFunction(data, event, comment)
+      if (req.user)
       {
-         var block = '';
+         res.charset = 'UTF-8';
+         res.header('Content-Type', 'text/event-stream');
+         res.header('Cache-Control', 'no-cache');
+         res.header('Access-Control-Allow-Origin', '*');
 
-         if (comment)
+         function sendFunction(data, event, comment)
          {
-            block += ': ' + comment + '\n';
-         }
-         if (event)
-         {
-            if (!clientEvents.EventNames[event])
+            var block = '';
+
+            if (comment)
             {
-               logger.warn('WARN: unregistered client event [' + event + ']');
+               block += ': ' + comment + '\n';
             }
-            block += 'event: ' + event + '\n';
+            if (event)
+            {
+               if (!clientEvents.EventNames[event])
+               {
+                  logger.warn('WARN: unregistered client event [' + event + ']');
+               }
+               block += 'event: ' + event + '\n';
+            }
+            if (data)
+            {
+               block += 'data: ' + data + '\n';
+            }
+
+            res.write(block + '\n');
          }
-         if (data)
-         {
-            block += 'data: ' + data + '\n';
+
+         // send first message, including a 2KB padding comment for IE
+         sendFunction(new Date().getTime(), clientEvents.EventNames.Timer, Array(2049).join(' '));
+
+         { // start keep-alive timer
+            var timer = setInterval(function()
+            {
+               sendFunction(new Date().getTime(), clientEvents.EventNames.Timer, 'timer');
+            }, 10000);
+            res.on('close', function()
+            {
+               clearInterval(timer);
+            });
          }
 
-         res.write(block + '\n');
+         this.sessionHandler.onDataPortOpened(req.user, res, sendFunction);
       }
-
-      // send first message, including a 2KB padding comment for IE
-      sendFunction(new Date().getTime(), clientEvents.EventNames.Timer, Array(2049).join(' '));
-
-      { // start keep-alive timer
-         var timer = setInterval(function()
-         {
-            sendFunction(new Date().getTime(), clientEvents.EventNames.Timer, 'timer');
-         }, 10000);
-         res.on('close', function()
-         {
-            clearInterval(timer);
-         });
+      else
+      {
+         res.send(401);
       }
-
-      this.sessionHandler.onDataPortOpened(req.user, res, sendFunction);
-      /*
-       * if (req.user) { res.redirect('/'); } else { res.send(403); }
-       */
    };
 
    this.onRequestRequestSink = function(req, res, next)
    {
-      /*
-       * if (req.user) { } else { res.send(403); }
-       */
-      var contentType = req.headers['content-type'] || '';
-
-      if (req.method === 'POST' && (contentType.indexOf('application/json') >= 0) && req.body
-            && (req.body.jsonrpc === '2.0') && (req.body.method === 'clientRequest') && (req.body.params))
+      if (req.user)
       {
-         var clientRequest =
+         var contentType = req.headers['content-type'] || '';
+
+         if (req.method === 'POST' && (contentType.indexOf('application/json') >= 0) && req.body
+               && (req.body.jsonrpc === '2.0') && (req.body.method === 'clientRequest') && (req.body.params))
          {
-            eveHeaders: req.eveHeaders,
-            header: req.body.params.header,
-            body: req.body.params.body
-         };
-         var resultObj =
-         {
-            jsonrpc: '2.0',
-            id: req.body.id,
-            result: null
-         };
-
-         resultObj.result = this.sessionHandler.onClientRequest(clientRequest);
-
-         { // send result
-            var body = JSON.stringify(resultObj);
-
-            res.writeHead(200,
+            var clientRequest =
             {
-               'Content-Type': 'application/json',
-               'Content-Length': Buffer.byteLength(body)
-            });
-            res.end(body);
+               eveHeaders: req.eveHeaders,
+               header: req.body.params.header,
+               body: req.body.params.body
+            };
+            var resultObj =
+            {
+               jsonrpc: '2.0',
+               id: req.body.id,
+               result: null
+            };
+
+            resultObj.result = this.sessionHandler.onClientRequest(clientRequest);
+
+            { // send result
+               var body = JSON.stringify(resultObj);
+
+               res.writeHead(200,
+               {
+                  'Content-Type': 'application/json',
+                  'Content-Length': Buffer.byteLength(body)
+               });
+               res.end(body);
+            }
+         }
+         else
+         {
+            next();
          }
       }
       else
       {
-         next();
+         res.send(401);
       }
    };
 

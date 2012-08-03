@@ -154,7 +154,6 @@ var serviceControl = new ServiceControl();
 
 serviceControl.on('started', function()
 {
-   logger.debug('some debug trace');
    logger.info('Started.');
 });
 
