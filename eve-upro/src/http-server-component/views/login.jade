@@ -9,14 +9,41 @@ block pre-scripts
    link(rel='stylesheet', href='/stylesheets/style.css')
 
 block content
+   if message
+      div(class="message")
+         if (message == 'loginFailed')
+            p Login request failed. Please verify your credentials and try again.
+         else
+            p #{message}
+
    div(class="login")
       h2 EVE API Key
       form(method='post', action='/login')
-         p
-            label(for="keyId") keyID:
-               input(type='text', name='keyId', required=true)
-         p
-            label(for="vCode") vCode:
-               input(type='password', name='vCode', required=true)
-         p
-            input(type='submit', value='Log In')
+         table
+            tr
+               td(class="label")
+                  label(for="keyId")
+                     a(href="http://support.eveonline.com/api/Key/Create", title="Create one here") keyID:
+               td(class="input")
+                  input(type='text', name='keyId', required=true, class="keyId")
+            tr
+               td(class="label")
+                  label(for="vCode") vCode:
+               td(class="input")
+                  input(type='password', name='vCode', required=true, class="vCode")
+            tr
+               td(class="label")
+               td(class="input")
+                  input(type='submit', value='Log In', class="submit")
+   div(class="disclaimer")
+      p
+         | This service is provided free of charge to pilots of 
+         a(href="http://www.eveonline.com/") New Eden
+         |. It is using cookies to provide its functionality.
+      p
+         | THE SERVICE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+         | INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+         | PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+         | FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+         | ARISING FROM, OUT OF OR IN CONNECTION WITH THE SERVICE OR THE USE OR OTHER DEALINGS IN THE SERVICE.
+      p  This is a Minmatar production.

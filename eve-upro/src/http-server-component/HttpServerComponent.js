@@ -167,8 +167,7 @@ function HttpServerComponent(services, options)
       expressServer.post('/login', passport.authenticate('local',
       {
          successRedirect: '/',
-         failureRedirect: '/login',
-         failureFlash: true
+         failureRedirect: '/login?message=loginFailed'
       }));
 
       expressServer.get('/eventSource', function(req, res)
@@ -242,7 +241,12 @@ function HttpServerComponent(services, options)
       }
       else
       {
-         res.render('login.jade');
+         var message = req.query.message;
+
+         res.render('login.jade',
+         {
+            message: message
+         });
       }
    };
 

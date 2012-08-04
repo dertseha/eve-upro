@@ -2,13 +2,90 @@ body
 {
 margin:0;
 padding:0;
+background-color:#000000;
+font-family:"Verdana", "Arial", "sans-serif";
 }
-div.login
+
+div.message
 {
+color:#FFFFFF;
 border-style:solid;
 border-width:5px;
 margin:auto;
 width:70%;
-background-color:#C0C0C0;
-border-color:#A0A0A0;
+background-color:#623f22;
+border-color:#941;
+position:fixed;
+top:5%;
+left:15%;
+}
+
+div.login
+{
+color:#FFFFFF;
+border-style:solid;
+border-width:5px;
+margin:auto;
+width:70%;
+background-color:#423f22;
+border-color:#741;
+position:fixed;
+top:30%;
+left:15%;
+}
+div.login h2
+{
+position:relative;
+left:10%;
+}
+div.login table
+{
+width:100%;
+padding:2px;
+}
+div.login table td
+{
+}
+div.login table td.label
+{
+width:10%;
+max-width:10%;
+}
+div.login table td.label a:link     { color:#FFFFFF; }
+div.login table td.label a:visited  { color:#FFFFFF; }
+div.login table td.label a:hover    { color:#E0E0E0; }
+div.login table td.label a:active   { color:#D0D0D0; }
+
+div.login table td.input
+{
+width:100%;
+}
+div.login table td input.vCode
+{
+width:99%;
+}
+div.login table td input.keyId
+{
+width:20%;
+max-width:150px;
+}
+div.login table td input.submit
+{
+width:20%;
+max-width:150px;
+}
+
+div.disclaimer
+{
+color:#FFFFFF;
+border-style:solid;
+border-width:5px;
+margin:auto;
+width:70%;
+background-color:#423f22;
+border-color:#741;
+font-size:8px;
+position:fixed;
+top:80%;
+left:15%;
 }

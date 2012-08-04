@@ -179,6 +179,10 @@ function ClientSessionComponent(services)
          logger.error('Failed to request data: ' + JSON.stringify(struct.err));
          request.done('Request Error', null);
       }
+      else if (struct.response.err)
+      {
+         request.done(null, false);
+      }
       else if ((struct.response.key.accessMask === 0) && (struct.response.key.type == "Character")
             && (struct.response.characters.length == 1))
       {
