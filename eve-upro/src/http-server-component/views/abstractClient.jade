@@ -16,8 +16,11 @@ block post-scripts
    script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/puremvc-multicore-prototypejs-1.0.js')
    script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/raphael.js')
    script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/scale.raphael.js')
-   
-   script(type='text/javascript', charset='utf-8', src='/javascripts/upro-full.js')
+
+   if runtime == 'debug'   
+      script(type='text/javascript', charset='utf-8', src='/javascripts/upro-full.js')
+   else
+      script(type='text/javascript', charset='utf-8', src='/javascripts/upro.js')
 
    script(type='text/javascript', charset='utf-8', src='/javascripts/eve/kRegionData.js')
    script(type='text/javascript', charset='utf-8', src='/javascripts/eve/kConstellationData.js')

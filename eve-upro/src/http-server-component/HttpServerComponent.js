@@ -298,7 +298,7 @@ function HttpServerComponent(services, options)
          res.render('mainClient.jade',
          {
             user: req.user,
-            runtime: 'debug',
+            runtime: 'release',
             shaders: [ getShaderInfo('vertex', 'basic-vertex-shader', 'basicVertexShader.c'),
                   getShaderInfo('fragment', 'basic-fragment-shader', 'basicFragmentShader.c'),
                   getShaderInfo('vertex', 'system-vertex-shader', 'solarSystemVertexShader.c'),
