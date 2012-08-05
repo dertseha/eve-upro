@@ -8,10 +8,12 @@ var express = require('express');
 var MongoStore = require('connect-mongodb');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var clientEvents = require('../model/ClientEvents.js');
+var RateLimiter = require('limiter').RateLimiter;
 
+var clientEvents = require('../model/ClientEvents.js');
 var Component = require('../components/Component.js');
 var eveHeaders = require('../util/connect-eveheaders.js');
+var ConnectRateLimiter = require('../util/connect-rate-limit.js');
 
 var uglify = require('../util/connect-uglify.js');
 var clientInfo = require('../client/ClientInfo.js');
@@ -31,6 +33,23 @@ passport.deserializeUser(function(data, done)
 });
 
 /**
+ * Creates a rate limiter info to be used for ConnectRateLimiter.
+ * 
+ * @param requestsPerSecond how many requests per second should be allowed
+ * @returns { queue: [], limiter: RateLimiter() }
+ */
+function createRateLimiterInfo(requestsPerSecond)
+{
+   var info =
+   {
+      queue: [],
+      limiter: new RateLimiter(requestsPerSecond, 'second')
+   };
+
+   return info;
+}
+
+/**
  * HTTP Server component
  * 
  * Using MongoDB as storage for session data.
@@ -38,7 +57,12 @@ passport.deserializeUser(function(data, done)
  * Note: connect-mongodb (which we are using here) is a bit better than connect-mongo: - It allows passing an existing
  * DB object, which can be opened already - When the database is closed, the internal reap interval is cleared
  * 
- * Info Links: - http://jade-lang.com/ - https://github.com/visionmedia/jade - http://expressjs.com/
+ * Info Links:
+ * <ul>
+ * <li>http://jade-lang.com/</li>
+ * <li>https://github.com/visionmedia/jade</li>
+ * <li>http://expressjs.com/</li>
+ * </ul>
  */
 function HttpServerComponent(services, options)
 {
@@ -51,6 +75,11 @@ function HttpServerComponent(services, options)
    this.sessionStore = null;
    this.httpServer = null;
    this.sessionHandler = null;
+
+   this.globalLimiter = createRateLimiterInfo(options.requestsPerSecondGlobalLimit || 10000);
+   this.loggedOffLimiter = createRateLimiterInfo(options.requestsPerSecondLoggedOff || 100);
+   this.corpLimiter = {};
+   this.corpLimiterRate = options.requestsPerSecondCorporation || 1000;
 
    this.setSessionHandler = function(handler)
    {
@@ -122,6 +151,13 @@ function HttpServerComponent(services, options)
             layout: false
          });
 
+         expressServer.use(new ConnectRateLimiter(function()
+         {
+            return self.globalLimiter;
+         },
+         {
+            hardLimit: 1
+         }));
          expressServer.use(express.limit('100kb'));
          expressServer.use(express.favicon(path.normalize(__dirname + '/public/images/favicon.ico')));
          expressServer.use(log4js.connectLogger(logger,
@@ -140,6 +176,10 @@ function HttpServerComponent(services, options)
          }));
          expressServer.use(passport.initialize());
          expressServer.use(passport.session());
+         expressServer.use(new ConnectRateLimiter(function(req)
+         {
+            return self.getSessionLimiter(req);
+         }));
          expressServer.use(new uglify('/javascripts/upro.js', clientInfo.sourceFiles, clientInfo.header));
          expressServer.use(new uglify('/javascripts/upro-full.js', clientInfo.sourceFiles, clientInfo.header,
          {
@@ -207,6 +247,28 @@ function HttpServerComponent(services, options)
       }
    };
 
+   /**
+    * Returns the rate limiter info for the session as identified by given request.
+    * 
+    * @param req the Request object
+    * @returns a limiter info object for ConnectRateLimiter
+    */
+   this.getSessionLimiter = function(req)
+   {
+      var limiter = this.loggedOffLimiter;
+
+      if (req.user)
+      {
+         limiter = this.corpLimiter[req.user.corporationId];
+         if (!limiter)
+         {
+            this.corpLimiter[req.user.corporationId] = limiter = createRateLimiterInfo(this.corpLimiterRate);
+         }
+      }
+
+      return limiter;
+   };
+
    this.onGetIndex = function(req, res)
    {
       if (req.user)
@@ -221,10 +283,7 @@ function HttpServerComponent(services, options)
 
          res.setHeader('Content-Type', 'text/html');
          res.write('<p>hi, views: ' + session.views + '</p>');
-         if (req.user)
-         {
-            res.write('<p>' + JSON.stringify(req.user) + '</p>');
-         }
+         res.write('<p>' + JSON.stringify(req.user) + '</p>');
          res.end();
       }
       else
@@ -356,7 +415,14 @@ function HttpServerComponent(services, options)
     */
    this.onApiUserAuthentication = function(req, keyId, vCode, done)
    {
-      this.sessionHandler.onLogInRequest(req.eveHeaders, keyId, vCode, done);
+      if (req.user)
+      {
+         done("Already logged in");
+      }
+      else
+      {
+         this.sessionHandler.onLogInRequest(req.eveHeaders, keyId, vCode, done);
+      }
    };
 }
 util.inherits(HttpServerComponent, Component);
