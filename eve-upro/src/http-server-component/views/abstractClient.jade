@@ -1,0 +1,36 @@
+extends layout
+
+block title
+   title="upro :: " + user.characterName + " (" + user.corporationName + ")"
+
+block pre-scripts
+   link(rel='stylesheet', href='/stylesheets/upro.css')
+
+block content
+   canvas(id='scene')
+   div(id='hud')
+
+block post-scripts
+   script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/glMatrix.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/release/prototype.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/puremvc-multicore-prototypejs-1.0.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/raphael.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/scale.raphael.js')
+   
+   script(type='text/javascript', charset='utf-8', src='/javascripts/upro-full.js')
+
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/kRegionData.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/kConstellationData.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/kSolarSystemData.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/kSolarSystemJumpData.js')
+
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/wRegionData.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/wConstellationData.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/wSolarSystemData.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/eve/wSolarSystemJumpData.js')
+   
+   each shader in shaders
+      script(type='x-shader/x-' + shader.type, id=shader.id, charset='utf-8')
+         !{shader.content}
+   
+   block startup

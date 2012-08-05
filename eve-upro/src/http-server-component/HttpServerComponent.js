@@ -1,6 +1,7 @@
 var util = require('util');
 var http = require('http');
 var path = require('path');
+var fs = require('fs');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger();
@@ -44,6 +45,27 @@ function createRateLimiterInfo(requestsPerSecond)
    {
       queue: [],
       limiter: new RateLimiter(requestsPerSecond, 'second')
+   };
+
+   return info;
+}
+
+/**
+ * Returns shader info object used for the abstract client render
+ * 
+ * @param type the shader type. Should be either 'vertex' or 'fragment'
+ * @param id ID of the shader - as referred by the client
+ * @param fileName name of the file containing the shader code
+ * @returns object used in absractClient.jade
+ */
+function getShaderInfo(type, id, fileName)
+{
+   var shaderPath = path.normalize(__dirname + '/../client/shader/' + fileName);
+   var info =
+   {
+      type: type,
+      id: id,
+      content: fs.readFileSync(shaderPath)
    };
 
    return info;
@@ -273,18 +295,15 @@ function HttpServerComponent(services, options)
    {
       if (req.user)
       {
-         var session = req.session;
-
-         if (!session.views)
+         res.render('mainClient.jade',
          {
-            session.views = 0;
-         }
-         session.views++;
-
-         res.setHeader('Content-Type', 'text/html');
-         res.write('<p>hi, views: ' + session.views + '</p>');
-         res.write('<p>' + JSON.stringify(req.user) + '</p>');
-         res.end();
+            user: req.user,
+            runtime: 'debug',
+            shaders: [ getShaderInfo('vertex', 'basic-vertex-shader', 'basicVertexShader.c'),
+                  getShaderInfo('fragment', 'basic-fragment-shader', 'basicFragmentShader.c'),
+                  getShaderInfo('vertex', 'system-vertex-shader', 'solarSystemVertexShader.c'),
+                  getShaderInfo('fragment', 'system-fragment-shader', 'solarSystemFragmentShader.c') ]
+         });
       }
       else
       {

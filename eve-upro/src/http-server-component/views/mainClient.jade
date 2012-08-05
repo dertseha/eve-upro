@@ -1,0 +1,9 @@
+extends abstractClient
+
+block startup
+   script
+      document.observe("dom:loaded", function()
+      {
+        theApp = new upro.app.ApplicationFacade();
+        theApp.start();
+      });
