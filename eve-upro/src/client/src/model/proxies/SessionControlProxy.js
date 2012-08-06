@@ -1,10 +1,22 @@
-
 upro.model.proxies.SessionControlProxy = Class.create(Proxy,
 {
    initialize: function($super)
    {
       $super(upro.model.proxies.SessionControlProxy.NAME, null);
 
+      this.uplink = new upro.data.CommunicationUplink(this);
+      this.broadcastHandler = {};
+   },
+
+   addBroadcastHandler: function(type, callback)
+   {
+      var handlerList = this.broadcastHandler[type];
+
+      if (!handlerList)
+      {
+         this.broadcastHandler[type] = handlerList = [];
+      }
+      handlerList.push(callback);
    },
 
    onRegister: function()
@@ -27,17 +39,19 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
    {
       this.shutdown();
 
+      this.uplink.start();
+
       var dataStore = new upro.data.MemoryDataStore();
 
       this.setData(dataStore);
       dataStore.createEntry(upro.data.InfoId.System);
 
-      {  // create basic system data structure
+      { // create basic system data structure
          var trans = dataStore.createWriteTransaction();
          var sessionId = new upro.data.InfoId(upro.model.UserSession.TYPE);
          var settingsId = new upro.data.InfoId(upro.model.UserSettings.TYPE);
 
-         trans.createInfo(upro.data.InfoId.System, sessionId, { });
+         trans.createInfo(upro.data.InfoId.System, sessionId, {});
          trans.createInfo(sessionId, settingsId,
          {
             "activeGalaxy": upro.model.proxies.UniverseProxy.GALAXY_ID_NEW_EDEN,
@@ -45,10 +59,13 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
             "routingCapJumpDriveInUse": "0",
             "routingCapJumpDriveRange": "5.0"
          });
-         {  // ignored solar systems
+         { // ignored solar systems
             var ignoredId = new upro.data.InfoId(upro.model.UserIgnoredSolarSystem.TYPE);
 
-            trans.createInfo(settingsId, ignoredId, { "solarSystemId": 30000142 }); // Jita
+            trans.createInfo(settingsId, ignoredId,
+            {
+               "solarSystemId": 30000142
+            }); // Jita
          }
          // routing rules
          this.createRoutingRule(trans, settingsId, 0, "MinSecurity", true, 5);
@@ -74,6 +91,25 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
    login: function(userName, password)
    {
 
+   },
+
+   onSessionEstablished: function()
+   {
+
+   },
+
+   onBroadcast: function(header, body)
+   {
+      // upro.sys.log("Broadcast: " + Object.toJSON(header) + "/" + Object.toJSON(body));
+      var handlerList = this.broadcastHandler[header.type];
+
+      if (handlerList)
+      {
+         handlerList.forEach(function(callback)
+         {
+            callback(body);
+         });
+      }
    }
 
 });
