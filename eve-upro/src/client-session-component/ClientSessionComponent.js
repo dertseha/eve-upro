@@ -195,6 +195,7 @@ function ClientSessionComponent(services)
             corporationName: character.corporationName
          };
 
+         logger.info('Successful login request for character ' + user.characterId + ' [' + user.characterName + ']');
          request.done(null, user);
       }
       else
@@ -283,6 +284,8 @@ function ClientSessionComponent(services)
          user: user
       };
 
+      logger.info('ConnectionStatus change: ' + type + '[' + sessionId + '] for character ' + user.characterId + ' ['
+            + user.characterName + ']');
       this.amqp.broadcast(header, body);
    };
 

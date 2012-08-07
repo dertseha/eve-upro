@@ -184,7 +184,7 @@ function HttpServerComponent(services, options)
          expressServer.use(express.favicon(path.normalize(__dirname + '/public/images/favicon.ico')));
          expressServer.use(log4js.connectLogger(logger,
          {
-            level: log4js.levels.DEBUG
+            level: log4js.levels.TRACE
          }));
          expressServer.use(express.bodyParser());
          expressServer.use(express.methodOverride());
@@ -298,7 +298,7 @@ function HttpServerComponent(services, options)
          res.render('mainClient.jade',
          {
             user: req.user,
-            runtime: 'release',
+            runtime: req.query.runtime ? req.query.runtime : 'release',
             shaders: [ getShaderInfo('vertex', 'basic-vertex-shader', 'basicVertexShader.c'),
                   getShaderInfo('fragment', 'basic-fragment-shader', 'basicFragmentShader.c'),
                   getShaderInfo('vertex', 'system-vertex-shader', 'solarSystemVertexShader.c'),

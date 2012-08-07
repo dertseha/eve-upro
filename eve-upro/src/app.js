@@ -22,6 +22,8 @@ var LocationServiceComponentBuilder = require('./location-service-component/Loca
 var cloudMongo = null;
 var cloudRabbit = null;
 
+logger.setLevel(log4js.levels.DEBUG);
+
 function extractCloudConfiguration()
 {
    if (process.env.VCAP_SERVICES)
