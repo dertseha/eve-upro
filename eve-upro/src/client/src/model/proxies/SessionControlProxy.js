@@ -6,6 +6,7 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
 
       this.uplink = new upro.data.CommunicationUplink(this);
       this.broadcastHandler = {};
+      this.characterInfo = null;
    },
 
    addBroadcastHandler: function(type, callback)
@@ -93,9 +94,28 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
 
    },
 
-   onSessionEstablished: function()
+   /**
+    * @returns the character information this session runs for
+    */
+   getCharacterInfo: function()
    {
+      return this.characterInfo;
+   },
 
+   /**
+    * @param charId The character id to check
+    * @returns {Boolean} true if the given character is the one this session is for
+    */
+   isForCharacter: function(charId)
+   {
+      return this.characterInfo && (this.characterInfo.characterId == charId);
+   },
+
+   onSessionEstablished: function(characterInfo)
+   {
+      upro.sys.log("Session Established for: " + characterInfo.characterName + " (" + characterInfo.corporationName
+            + ")");
+      this.characterInfo = characterInfo;
    },
 
    onBroadcast: function(header, body)

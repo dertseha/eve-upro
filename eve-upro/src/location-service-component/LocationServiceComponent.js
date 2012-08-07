@@ -15,9 +15,17 @@ function LocationServiceComponent(services)
    {
       var self = this;
 
+      this.characterAgent.on('CharacterOnline', function(character)
+      {
+         self.onCharacterOnline(character);
+      });
       this.characterAgent.on('SessionAdded', function(character, sessionId)
       {
          self.onCharacterSessionAdded(character, sessionId);
+      });
+      this.characterAgent.on('SessionRemoved', function(character, sessionId)
+      {
+         self.onCharacterSessionRemoved(character, sessionId);
       });
       this.characterAgent.on('CharacterOffline', function(character)
       {
@@ -51,8 +59,18 @@ function LocationServiceComponent(services)
       if (character && (character.lastKnownLocation != newLocation))
       {
          character.lastKnownLocation = newLocation;
+         character.locationsBySessionId[body.sessionId] = newLocation;
          this.broadcastLocationStatus(character, this.getLocationInterest(character));
       }
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterOnline = function(character)
+   {
+      character.lastKnownLocation = null;
+      character.locationsBySessionId = {};
    };
 
    /**
@@ -77,6 +95,31 @@ function LocationServiceComponent(services)
             self.broadcastLocationStatus(existingCharacter, interest, responseQueue);
          }
       });
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterSessionRemoved = function(character, sessionId)
+   {
+      if (character.lastKnownLocation)
+      {
+         if (character.locationsBySessionId[sessionId])
+         {
+            var amount = 0;
+
+            delete character.locationsBySessionId[sessionId];
+            for (existingId in character.locationsBySessionId)
+            {
+               amount++;
+            }
+            if (amount == 0)
+            {
+               delete character.lastKnownLocation;
+               this.broadcastLocationStatus(character, this.getLocationInterest(character));
+            }
+         }
+      }
    };
 
    /**

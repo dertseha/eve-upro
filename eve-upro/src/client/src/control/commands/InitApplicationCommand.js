@@ -1,6 +1,6 @@
 /**
- * This command initializes the application - lets it enter its
- * initial state. The model and view have been set up before.
+ * This command initializes the application - lets it enter its initial state. The model and view have been set up
+ * before.
  */
 upro.ctrl.cmd.InitApplicationCommand = Class.create(SimpleCommand,
 {

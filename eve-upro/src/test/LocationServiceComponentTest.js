@@ -23,18 +23,34 @@ function Fixture()
 
    this.givenExistingCharacterSession = function(charId, sessionId)
    {
-      var character = new Character(charId, 'name');
-
-      this.characterAgent.characters[charId] = character;
-      this.characterAgent.charactersBySession[sessionId] = character;
-      character.addClientSession(sessionId);
+      this.givenExistingCharacterSessions(charId, [ sessionId ]);
    };
 
-   this.givenCharacterIsAt = function(charId, solarSystemId)
+   this.givenExistingCharacterSessions = function(charId, sessionIds)
+   {
+      var character = new Character(charId, 'name');
+      var self = this;
+
+      character.lastKnownLocation = null;
+      character.locationsBySessionId = {};
+
+      this.characterAgent.characters[charId] = character;
+      sessionIds.forEach(function(sessionId)
+      {
+         self.characterAgent.charactersBySession[sessionId] = character;
+         character.addClientSession(sessionId);
+      });
+   };
+
+   this.givenCharacterIsAt = function(charId, solarSystemId, notifyingSessions)
    {
       var character = this.characterAgent.getCharacterById(charId);
 
       character.lastKnownLocation = solarSystemId;
+      notifyingSessions.forEach(function(sessionId)
+      {
+         character.locationsBySessionId[sessionId] = solarSystemId;
+      });
    };
 
    this.expectingCharacterLocationStatus = function(test, charId, solarSystemId, interest)
@@ -198,11 +214,12 @@ exports.testCharacterLocationStatusHasCharacterScope_WhenEveStatusReceived = fun
 exports.testCharacterLocationStatusHasSessionScope_WhenSecondSessionEstablished = function(test)
 {
    var charId = 1234;
+   var sessionIdExisting = UuidFactory.v4();
    var sessionId = UuidFactory.v4();
    var solarSystemId = 5678;
 
-   this.fixture.givenExistingCharacterSession(charId, UuidFactory.v4());
-   this.fixture.givenCharacterIsAt(charId, solarSystemId);
+   this.fixture.givenExistingCharacterSession(charId, sessionIdExisting);
+   this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionIdExisting ]);
 
    this.fixture.expectingCharacterLocationStatusScope(test, [
    {
@@ -243,7 +260,7 @@ exports.testCharacterLocationStatusEmittedForExisting_WhenSessionEstablished = f
    var solarSystemId = 1133;
 
    this.fixture.givenExistingCharacterSession(charIdA, sessionIdA);
-   this.fixture.givenCharacterIsAt(charIdA, solarSystemId);
+   this.fixture.givenCharacterIsAt(charIdA, solarSystemId, [ sessionIdA ]);
 
    this.fixture.expectingCharacterLocationStatus(test, charIdA, solarSystemId, [
    {
@@ -264,11 +281,29 @@ exports.testCharacterLocationStatusEmittedWithUnknownLocation_WhenOffline = func
    var solarSystemId = 1122;
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
-   this.fixture.givenCharacterIsAt(charId, solarSystemId);
+   this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionId ]);
 
    this.fixture.expectingCharacterLocationStatus(test, charId, undefined);
 
    this.fixture.whenClientDisconnected(charId, sessionId);
+
+   test.expect(2);
+   test.done();
+};
+
+exports.testCharacterLocationStatusEmittedWithUnknownLocation_WhenLastNotifyingSessionGone = function(test)
+{
+   var charId = 2244;
+   var sessionIdA = UuidFactory.v4();
+   var sessionIdB = UuidFactory.v4();
+   var solarSystemId = 1122;
+
+   this.fixture.givenExistingCharacterSessions(charId, [ sessionIdA, sessionIdB ]);
+   this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionIdA ]);
+
+   this.fixture.expectingCharacterLocationStatus(test, charId, undefined);
+
+   this.fixture.whenClientDisconnected(charId, sessionIdA);
 
    test.expect(2);
    test.done();

@@ -157,7 +157,7 @@ upro.data.CommunicationUplink = Class.create(
       this.sessionId = data.sessionId;
       upro.sys.log("Session Established: " + this.sessionId);
       this.sendStatus();
-      this.listener.onSessionEstablished();
+      this.listener.onSessionEstablished(data.user);
    },
 
    /**

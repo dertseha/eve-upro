@@ -15,6 +15,9 @@ upro.app.Notifications =
    /** The session has been dropped. Param: null */
    SessionLoggedOut: 0,
 
+   /** The location of a character has changed. Param: charId */
+   CharacterLocationStatus: 0,
+
    /** Requests to set the active galaxy. Param: galaxyId */
    SetActiveGalaxy: 0,
    /** The active galaxy has changed. Param: galaxyId */

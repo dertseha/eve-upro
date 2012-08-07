@@ -116,6 +116,7 @@ exports.sourceFiles = [];
 
    'model/model.js', //
    'model/AbstractProxiedDataStoreInfo.js', //
+   'model/LocationTracker.js', //
    'model/UserSession.js', //
    'model/UserSettings.js', //
    'model/UserIgnoredSolarSystem.js', //
@@ -125,6 +126,7 @@ exports.sourceFiles = [];
    'model/proxies/InfoTypeFactoryProxy.js', //
    'model/proxies/SessionControlProxy.js', //
    'model/proxies/AbstractDataStoreInfoProxy.js', //
+   'model/proxies/LocationTrackerProxy.js', //
    'model/proxies/UserSessionProxy.js', //
    'model/proxies/UserSettingsProxy.js', //
    'model/proxies/UniverseProxy.js', //
@@ -137,6 +139,7 @@ exports.sourceFiles = [];
    'control/commands/SetupModelCommand.js', //
    'control/commands/SetupViewCommand.js', //
    'control/commands/InitApplicationCommand.js', //
+   'control/commands/NotifiedCharacterLocationStatusCommand.js', //
    'control/commands/NotifiedSessionLoggedInCommand.js', //
    'control/commands/NotifiedSetActiveGalaxyCommand.js', //
    'control/commands/NotifiedSetHighlightedObjectCommand.js', //
@@ -170,6 +173,7 @@ exports.sourceFiles = [];
 
    'view/mediators/mediators.js', //
    'view/mediators/AbstractMediator.js', //
+   'view/mediators/CurrentLocationHighlightMediator.js', //
    'view/mediators/DocumentMouseMediator.js', //
    'view/mediators/HudMediator.js', //
    'view/mediators/SceneMediator.js', //
