@@ -289,6 +289,11 @@ function ClientSessionComponent(services)
       this.amqp.broadcast(header, body);
    };
 
+   /**
+    * This method is the generic handler of an incoming client request via the external interface
+    * 
+    * @param clientRequest the request object consisting of at least { header: { type: '' }, body: {...} }
+    */
    this.onClientRequest = function(clientRequest)
    {
       var rCode = 'OK';

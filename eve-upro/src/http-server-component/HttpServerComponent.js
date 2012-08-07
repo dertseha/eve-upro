@@ -394,7 +394,7 @@ function HttpServerComponent(services, options)
          {
             var clientRequest =
             {
-               eveHeaders: req.eveHeaders,
+               eveHeaders: this.getValidEveHeaders(req),
                header: req.body.params.header,
                body: req.body.params.body
             };
@@ -427,6 +427,25 @@ function HttpServerComponent(services, options)
       {
          res.send(401);
       }
+   };
+
+   /**
+    * Returns the eveHeaders construct from the request if the provided information (so far acceptable) matches to the
+    * logged in user.
+    * 
+    * @param req request object
+    * @returns an object containing the eve headers if valid, null otherwise
+    */
+   this.getValidEveHeaders = function(req)
+   {
+      var eveHeaders = null;
+
+      if (req.user && req.eveHeaders && (req.user.characterId == req.eveHeaders.characterId))
+      {
+         eveHeaders = req.eveHeaders;
+      }
+
+      return eveHeaders;
    };
 
    /**
