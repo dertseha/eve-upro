@@ -440,7 +440,7 @@ function HttpServerComponent(services, options)
    {
       var eveHeaders = null;
 
-      if (req.user && req.eveHeaders && (req.user.characterId == req.eveHeaders.characterId))
+      if (req.user && req.eveHeaders && (req.user.characterId == req.eveHeaders.charId))
       {
          eveHeaders = req.eveHeaders;
       }
@@ -459,7 +459,7 @@ function HttpServerComponent(services, options)
       }
       else
       {
-         this.sessionHandler.onLogInRequest(req.eveHeaders, keyId, vCode, done);
+         this.sessionHandler.onLogInRequest(keyId, vCode, done);
       }
    };
 }

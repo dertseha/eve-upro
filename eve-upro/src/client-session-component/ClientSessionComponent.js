@@ -176,11 +176,12 @@ function ClientSessionComponent(services)
 
       if (struct.err)
       {
-         logger.error('Failed to request data: ' + JSON.stringify(struct.err));
+         logger.error('Failed login request, technical: ' + JSON.stringify(struct.err));
          request.done('Request Error', null);
       }
       else if (struct.response.err)
       {
+         logger.warn('Failed login request, API: ' + JSON.stringify(struct.response.err));
          request.done(null, false);
       }
       else if ((struct.response.key.accessMask === 0) && (struct.response.key.type == "Character")
@@ -200,6 +201,7 @@ function ClientSessionComponent(services)
       }
       else
       {
+         logger.warn('Failed login request, API key did not match expectations');
          request.done(null, false);
       }
    };
@@ -211,7 +213,7 @@ function ClientSessionComponent(services)
     * @param vCode vCode for the API request
     * @param done callback on completion
     */
-   this.onLogInRequest = function(eveData, keyId, vCode, done)
+   this.onLogInRequest = function(keyId, vCode, done)
    {
       var parameter =
       {
@@ -222,8 +224,7 @@ function ClientSessionComponent(services)
 
       this.logInRequests[id] =
       {
-         done: done,
-         eveData: eveData
+         done: done
       };
 
       this.eveapiMsg.request('AccountApiKeyInfo', parameter, this.responseQueue.name, id);
@@ -327,7 +328,7 @@ function ClientSessionComponent(services)
    {
       var rCode = 'OK';
 
-      if (clientRequest.eveHeaders)
+      if (clientRequest.eveHeaders && (clientRequest.eveHeaders['trusted'] == 'Yes'))
       {
          var header =
          {
