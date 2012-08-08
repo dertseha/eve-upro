@@ -1,7 +1,6 @@
 /**
- * The scene system is the main context object for the 3D space;
- * It initializes and handles the WebGL context, has all bodies
- * registered and runs the render loop.
+ * The scene system is the main context object for the 3D space; It initializes and handles the WebGL context, has all
+ * bodies registered and runs the render loop.
  */
 upro.scene.SceneSystem = Class.create(
 {
@@ -44,6 +43,7 @@ upro.scene.SceneSystem = Class.create(
 
    /**
     * Adds a render object to the list
+    * 
     * @param body the object to add
     */
    addRenderObject: function(body)
@@ -53,7 +53,7 @@ upro.scene.SceneSystem = Class.create(
 
    /**
     * Projects given position vector onto the 2d plane based on current mv/p matrices.
-    *
+    * 
     * @param position the vec3 to project
     * @return a structure of {x, y} in view space coordinates or null if behind view
     */
@@ -89,6 +89,7 @@ upro.scene.SceneSystem = Class.create(
 
    /**
     * Tries to pick something at given viewPosition
+    * 
     * @param viewPosition to search from
     * @return A PickResult nearest to viewPosition or null if nothing found
     */
@@ -110,8 +111,8 @@ upro.scene.SceneSystem = Class.create(
    },
 
    /**
-    * Returns a rotation helper that is based on the scenes camera
-    * rotation.
+    * Returns a rotation helper that is based on the scenes camera rotation.
+    * 
     * @return a RotationBuffer instance
     */
    getCameraRotationBuffer: function()
@@ -149,7 +150,7 @@ upro.scene.SceneSystem = Class.create(
    {
       var modifiedCamera = this.camera.isOrientationModified();
 
-      this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
       mat4.identity(this.mvMatrix);
 
@@ -179,7 +180,7 @@ upro.scene.SceneSystem = Class.create(
 
    resizeCanvas: function()
    {
-      this.canvas.width = this.context.getFrame().innerWidth,
+      this.canvas.width = this.context.getFrame().innerWidth;
       this.canvas.height = this.context.getFrame().innerHeight;
    },
 
@@ -197,13 +198,17 @@ upro.scene.SceneSystem = Class.create(
 
       this.canvas = canvas;
 
-      canvas.style.backgroundColor = "gray"; // should anything go wrong, we'd see it
+      canvas.style.backgroundColor = "yellow"; // should anything go wrong, we'd see it
       this.resizeCanvas();
    },
 
    setupGL: function()
    {
-      var gl = this.canvas.getContext("experimental-webgl");
+      var gl = this.canvas.getContext("experimental-webgl",
+      {
+         premultipliedAlpha: false,
+         alpha: false
+      });
 
       this.gl = gl;
 

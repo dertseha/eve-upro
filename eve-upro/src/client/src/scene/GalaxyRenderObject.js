@@ -203,6 +203,7 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
          gl.bindTexture(gl.TEXTURE_2D, texture);
 
          // gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 
          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -215,10 +216,18 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       };
 
       texture.image.src = 'data:image/png;base64,'
-            + 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8'
-            + 'YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAACPSURBVDhPxVNBCgAhCMzYZ9Wtj/WvbvWv3UYQ2t2soEOC'
-            + 'IDiOoyLd1YxipRTOOOc0iKERARFx4aCHsSr1YkIlEPngaeMv728EAaeUXtgQQncf2yNcbRt0l84xRnUL'
-            + '7VUsirBtuPd+ujpgBI/a7REs5ODO8JzzVAEwgkft+StATteqVPwIO2LNzv/CUMHKOz+xL4uwLi0r5QAA' + 'AABJRU5ErkJggg==';
+            + 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACXklEQVR42u2Xv0tCYRSGQwIR6aIu'
+            + 'QgZRYIgImi4uBVKgCEKCl7YCoZyqQVBoaEmoxUUcFIKWhmh1CHFzjKC5wbmtf6HeD56popKKe4c+'
+            + 'eDhwOOc99zvfj3vvzMz/mG54hFf4hSUCIoi18HuJ+9Uxi3hIhMWCWBRLYhm7iD9MnJ+8Hw8fghGK'
+            + 'xURCpERaZLAp/DHiIuT5ftLuOWZkZhgXqyIr1kRObIhNbA5/lrg4eWF0PNMWN2s6L6IiibApUhAl'
+            + 'URYVYWPL+AvEZcmLomNN8xBzJK3QXjOzvNgS22JHVMWe2MdW8W8Tlycvjc48ut9a8zBPbpLXRZGZ'
+            + '7oqaOBR10RBNbB1/jTibvHV0ouj6vtrtIdYuyQyKzMrM8IBiJ+JUnIlz7Cn+BnFV8oroJNENfXY6'
+            + '/OzeOGuYZyZG7Egci5Zoi67oiT62i79F3BF5NjpZdCPU+XDjhThCq2ykLdp5gKiZaUdciCtxLW6w'
+            + 'V/g7xB2Tt4tODt1l6rzbkF7WKMbTFmhhjba2EL+k6EAMxQg7wH9JXIu8GjoFdGPU8X7U/gUukzWO'
+            + '1A4b64T2XlDkVozFnbjHjvHfENcm7xCdEroJ6rxbBovrNEW7yqxhnQ3Wpc0Dij2IRzHBPuAfENcl'
+            + 'r45OGd0Uday3DxBgl6a52Sqc7wZr2mOth8zYFH0Sz9hH/EPieuQ10Kmgm6ZO4O0DBNkgGa5Xm0um'
+            + 'yVHr094RbZ9Q/AU7wT8irk9eEx0b3Qx1gq7rgON7wPFT4Pg94PhN6Pi7wBVvQ8e/B1zxReSKb0LH'
+            + 'v4pd8V/gmj8jV/wb/tl4BRzB6khBvMZaAAAAAElFTkSuQmCC';
    },
 
    setVisible: function(visible)

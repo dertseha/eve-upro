@@ -27,5 +27,5 @@ void main(void)
       color = yellow;
       color = mix(color, green, ((vColor.r - 0.5) * 2.0));
    }
-   gl_FragColor = vec4( mix( texel.rgb, color, 1.0 ), 1.0 - sqrt(texel.r * texel.r + texel.b * texel.b + texel.g * texel.g ) );
+   gl_FragColor = vec4( mix( texel.rgb, color, 1.0 ), texel.a);
 }
