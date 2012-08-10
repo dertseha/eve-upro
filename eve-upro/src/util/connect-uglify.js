@@ -1,6 +1,33 @@
 var fs = require('fs');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var uglify = require('uglify-js');
+
+/**
+ * Processes one file and returns the result
+ * 
+ * @param sourceFile file name
+ * @param strictParsing true if strict parsing should be applied
+ * @returns the processed result
+ */
+function processFile(sourceFile, strictParsing)
+{
+   var source = fs.readFileSync(sourceFile, 'utf8');
+   var ast = uglify.parser.parse(source, strictParsing);
+   var mangleOptions =
+   {
+      toplevel: false,
+      except: [ '$super' ]
+   };
+
+   ast = uglify.uglify.ast_lift_variables(ast);
+   ast = uglify.uglify.ast_mangle(ast, mangleOptions);
+   ast = uglify.uglify.ast_squeeze(ast);
+
+   return uglify.uglify.gen_code(ast);
+}
 
 /**
  * Processes a list of source files and returns them with an optional header at the top.
@@ -13,20 +40,22 @@ function process(sources, header, options)
 
    sources.forEach(function(sourceFile)
    {
-      var source = fs.readFileSync(sourceFile, 'utf8');
-      var strictParsing = true;
-      var ast = uglify.parser.parse(source, strictParsing);
-      var mangleOptions =
+      var processed = null;
+
+      try
       {
-         toplevel: false,
-         except: [ '$super' ]
-      };
+         processed = processFile(sourceFile, true);
+      }
+      catch (ex)
+      {
+         var message = 'Failed to strict parse [' + sourceFile + ']: ' + ex;
 
-      ast = uglify.uglify.ast_lift_variables(ast);
-      ast = uglify.uglify.ast_mangle(ast, mangleOptions);
-      ast = uglify.uglify.ast_squeeze(ast);
-      result += uglify.uglify.gen_code(ast);
+         logger.warn(message);
+         console.error(message);
+         processed = processFile(sourceFile, false);
+      }
 
+      result += processed;
       result += '\n';
    });
 
@@ -35,7 +64,12 @@ function process(sources, header, options)
 
 function Uglifier(resource, sources, header, options)
 {
-   var uglified = new Buffer(process(sources, header, options || {}));
+   var uglified = '';
+
+   if (!options || !options.debug)
+   {
+      uglified = new Buffer(process(sources, header, options || {}));
+   }
 
    return (function(req, res, next)
    {

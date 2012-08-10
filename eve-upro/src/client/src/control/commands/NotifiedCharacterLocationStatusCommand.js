@@ -7,17 +7,11 @@ upro.ctrl.cmd.NotifiedCharacterLocationStatusCommand = Class.create(SimpleComman
 
       if (sessionControlProxy.isForCharacter(charId))
       {
+         var highlightMediator = this.facade().retrieveMediator(upro.view.mediators.SolarSystemHighlightMediator.NAME);
          var locationTrackerProxy = this.facade().retrieveProxy(upro.model.proxies.LocationTrackerProxy.NAME);
-         var highlightMediator = this.facade().retrieveMediator(
-               upro.view.mediators.CurrentLocationHighlightMediator.NAME);
          var solarSystem = locationTrackerProxy.getLocation(charId);
 
-         highlightMediator.clear();
-
-         if (solarSystem)
-         {
-            highlightMediator.setSystemOverlay(solarSystem);
-         }
+         highlightMediator.setHighlightSolarSystem("CurLocation", solarSystem);
       }
    }
 });

@@ -174,10 +174,10 @@ exports.sourceFiles = [];
 
    'view/mediators/mediators.js', //
    'view/mediators/AbstractMediator.js', //
-   'view/mediators/CurrentLocationHighlightMediator.js', //
    'view/mediators/DocumentMouseMediator.js', //
    'view/mediators/HudMediator.js', //
    'view/mediators/SceneMediator.js', //
+   'view/mediators/SolarSystemHighlight.js', //
    'view/mediators/SolarSystemHighlightMediator.js', //
    'view/mediators/AbstractContextMenuMediator.js', //
    'view/mediators/SolarSystemContextMenuMediator.js', //
