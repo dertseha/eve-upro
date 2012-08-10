@@ -1,6 +1,5 @@
 /**
- * The idle pointer operation is for the mouse actions while no button is pressed.
- * Tightly bound to the SceneMediator.
+ * The idle pointer operation is for the mouse actions while no button is pressed. Tightly bound to the SceneMediator.
  */
 upro.view.IdlePointerOperation = Class.create(upro.sys.PointerOperation,
 {
@@ -42,7 +41,7 @@ upro.view.IdlePointerOperation = Class.create(upro.sys.PointerOperation,
    /** {@inheritDoc} */
    onRotate: function(position, buttonStates, rotation)
    {
-
+      this.sceneMediator.addZoom(rotation[1] / 50);
    },
 
    /** {@inheritDoc} */

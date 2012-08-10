@@ -1,6 +1,5 @@
 /**
- * This oriented move operation translates relative to a
- * foreign orientation (rotation)
+ * This oriented move operation translates relative to a foreign orientation (rotation)
  */
 upro.view.OrientedMoveOperation = Class.create(upro.sys.PointerOperation,
 {
@@ -27,9 +26,11 @@ upro.view.OrientedMoveOperation = Class.create(upro.sys.PointerOperation,
    onMove: function(position, buttonStates)
    {
       var realPos = this.sceneSystem.pixelToReal(-position.x, -position.y);
-      var temp = vec3.set([realPos.x, realPos.y, 0], this.temp);
+      var temp = vec3.set([ realPos.x, realPos.y, 0 ], this.temp);
 
       var diff = vec3.subtract(this.lastPos, temp);
+
+      vec3.scale(diff, 2);
       this.moveByVector(diff);
       // store for next call
       vec3.set(temp, this.lastPos);
@@ -37,9 +38,7 @@ upro.view.OrientedMoveOperation = Class.create(upro.sys.PointerOperation,
 
    onRotate: function(position, buttonStates, rotation)
    {
-      var temp = vec3.set([0, 0, rotation[1] / -1000.0], this.temp);
 
-      this.moveByVector(temp);
    },
 
    onStart: function(position, buttonStates)

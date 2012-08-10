@@ -28,7 +28,7 @@ upro.view.SceneObjectRotationOperation = Class.create(upro.sys.PointerOperation,
    onMove: function(position, buttonStates)
    {
       var realPos = this.sceneSystem.pixelToReal(position.x, position.y);
-      var temp = vec3.set([-realPos.y, realPos.x, 0], this.temp);
+      var temp = vec3.set([ -realPos.y, realPos.x, 0 ], this.temp);
       var diff = vec3.subtract(this.lastPos, temp);
 
       vec3.scale(diff, 5);
@@ -68,6 +68,7 @@ upro.view.SceneObjectRotationOperation = Class.create(upro.sys.PointerOperation,
 
    /**
     * Rotates a circular value and ensures it's between -2PI and +2PI
+    * 
     * @param value to rotate
     * @return the rotated value
     */
@@ -89,6 +90,7 @@ upro.view.SceneObjectRotationOperation = Class.create(upro.sys.PointerOperation,
 
    /**
     * This method limits a given value
+    * 
     * @param value to limit
     * @param limit to use
     * @return the value if below limit, limit otherwise
@@ -105,6 +107,7 @@ upro.view.SceneObjectRotationOperation = Class.create(upro.sys.PointerOperation,
 
    /**
     * This method limits a given value
+    * 
     * @param value to limit
     * @param limit to use
     * @return the value if above limit, limit otherwise

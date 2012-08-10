@@ -216,18 +216,14 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       };
 
       texture.image.src = 'data:image/png;base64,'
-            + 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACXklEQVR42u2Xv0tCYRSGQwIR6aIu'
-            + 'QgZRYIgImi4uBVKgCEKCl7YCoZyqQVBoaEmoxUUcFIKWhmh1CHFzjKC5wbmtf6HeD56popKKe4c+'
-            + 'eDhwOOc99zvfj3vvzMz/mG54hFf4hSUCIoi18HuJ+9Uxi3hIhMWCWBRLYhm7iD9MnJ+8Hw8fghGK'
-            + 'xURCpERaZLAp/DHiIuT5ftLuOWZkZhgXqyIr1kRObIhNbA5/lrg4eWF0PNMWN2s6L6IiibApUhAl'
-            + 'URYVYWPL+AvEZcmLomNN8xBzJK3QXjOzvNgS22JHVMWe2MdW8W8Tlycvjc48ut9a8zBPbpLXRZGZ'
-            + '7oqaOBR10RBNbB1/jTibvHV0ouj6vtrtIdYuyQyKzMrM8IBiJ+JUnIlz7Cn+BnFV8oroJNENfXY6'
-            + '/OzeOGuYZyZG7Egci5Zoi67oiT62i79F3BF5NjpZdCPU+XDjhThCq2ykLdp5gKiZaUdciCtxLW6w'
-            + 'V/g7xB2Tt4tODt1l6rzbkF7WKMbTFmhhjba2EL+k6EAMxQg7wH9JXIu8GjoFdGPU8X7U/gUukzWO'
-            + '1A4b64T2XlDkVozFnbjHjvHfENcm7xCdEroJ6rxbBovrNEW7yqxhnQ3Wpc0Dij2IRzHBPuAfENcl'
-            + 'r45OGd0Uday3DxBgl6a52Sqc7wZr2mOth8zYFH0Sz9hH/EPieuQ10Kmgm6ZO4O0DBNkgGa5Xm0um'
-            + 'yVHr094RbZ9Q/AU7wT8irk9eEx0b3Qx1gq7rgON7wPFT4Pg94PhN6Pi7wBVvQ8e/B1zxReSKb0LH'
-            + 'v4pd8V/gmj8jV/wb/tl4BRzB6khBvMZaAAAAAElFTkSuQmCC';
+            + 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABiklEQVR42u2Xv2qDUBSHQx7BJbhk'
+            + 'dBEcXUoWx46BLKEvIPgCLllchMySqXOXLhkDEvAZQnY3QfIIAfsLfNlqahLB29ILHxcu5/zOOfef'
+            + '19Hov/2yNhaWmApHuMKjdxi3sOs9sE2wmXgVC7EUb/QLxmfY2X0lYlFhQKBQxCIRqVjTJ4yH2AX4'
+            + 'Wc8EnwhfzEVEkI34EFuxEzn9lvENdhF+PjoPBX+hmktlmfgUhTiIUlSipi8ZL7DL8FuiM7l32n2c'
+            + 'V+KdSo/iJJobnLDL8Vuh43ddjjFrN6eCi8ieCs8/BL9yxn6Pf4ye22Vj2mygiGnMEWseoMQ/Qy9A'
+            + '/2b1HlOWsJbHOyr/biaO6CToerdmweIch+zmosOaNx32RIFeiH7rXphymcQcqcOTwa8c0IvRn7Yl'
+            + '4HCjJZzrsqcESvQS9J22BFzWKeVyqXpKoEIvRd9tS8Djbl+ze+ueEqjRW6PvGTsDg++BwU/B4PfA'
+            + '4Dfh4N8CI76Gg78HjHgRGfEmNOJVbMR/gRF/Rn+3fQFyhpQHNxvQUQAAAABJRU5ErkJggg==';
    },
 
    setVisible: function(visible)

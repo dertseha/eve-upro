@@ -170,6 +170,7 @@ exports.sourceFiles = [];
    'view/SceneObjectRotationOperation.js', //
    'view/OrientedMoveOperation.js', //
    'view/IdlePointerOperation.js', //
+   'view/ZoomMoveOperation.js', //
 
    'view/mediators/mediators.js', //
    'view/mediators/AbstractMediator.js', //

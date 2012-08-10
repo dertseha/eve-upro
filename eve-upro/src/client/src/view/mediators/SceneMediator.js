@@ -1,4 +1,3 @@
-
 upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
    initialize: function($super)
@@ -14,10 +13,10 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       var context = new upro.sys.ResizableContextWindow("scene");
       var sceneSystem = new upro.scene.SceneSystem(context);
 
-      this.basicShader = sceneSystem.loadShaderProgram(upro.scene.ShaderProgram,
-         [ $('basic-vertex-shader'), $('basic-fragment-shader') ]);
-      this.systemShader = sceneSystem.loadShaderProgram(upro.scene.ShaderProgram,
-         [ $('system-vertex-shader'), $('system-fragment-shader') ]);
+      this.basicShader = sceneSystem.loadShaderProgram(upro.scene.ShaderProgram, [ $('basic-vertex-shader'),
+            $('basic-fragment-shader') ]);
+      this.systemShader = sceneSystem.loadShaderProgram(upro.scene.ShaderProgram, [ $('system-vertex-shader'),
+            $('system-fragment-shader') ]);
 
       this.setViewComponent(sceneSystem);
    },
@@ -27,8 +26,8 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       var sceneSystem = this.getViewComponent();
 
       // start with a top down view
-      vec3.set([0, 0, 0], sceneSystem.camera.position);
-      vec3.set([Math.PI / -2, 0, 0], sceneSystem.camera.rotation);
+      vec3.set([ 0, 0, 10 ], sceneSystem.camera.position);
+      vec3.set([ Math.PI / -2, 0, 0 ], sceneSystem.camera.rotation);
    },
 
    createGalaxies: function()
@@ -48,14 +47,14 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       var galaxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME).getGalaxy(galaxyId);
 
       this.galaxies[galaxyId] = galaxyRender;
-      vec3.set([0, -20, 0], galaxyRender.position);
-      for (var systemId in galaxy.solarSystems.objects)
+      vec3.set([ 0, 0, 0 ], galaxyRender.position);
+      for ( var systemId in galaxy.solarSystems.objects)
       {
          var solarSystem = galaxy.solarSystems.get(systemId);
 
          galaxyRender.addSolarSystem(solarSystem);
       }
-      for (var i = 0; i < galaxy.jumpCorridors.length; i++)
+      for ( var i = 0; i < galaxy.jumpCorridors.length; i++)
       {
          var jumpCorridor = galaxy.jumpCorridors[i];
 
@@ -110,7 +109,7 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
 
    clearRoute: function()
    {
-      for (var id in this.galaxies)
+      for ( var id in this.galaxies)
       {
          var galaxyRender = this.galaxies[id];
 
@@ -120,6 +119,7 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
 
    /**
     * Adds a TrackedProjection for given solar system
+    * 
     * @param key to register the tracker for
     * @param solarSystem for which solar system it should be registered
     * @param callback to call for changes in projection
@@ -137,6 +137,7 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
 
    /**
     * Removes a tracked projection
+    * 
     * @param key that was used for addSolarSystemTrack
     * @param solarSystem that was used for addSolarSystemTrack
     */
@@ -154,22 +155,25 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
    {
       var registry = this.facade().retrieveMediator(upro.view.mediators.DocumentMouseMediator.NAME).getViewComponent();
       var sceneSystem = this.getViewComponent();
+      var zoomOp = new upro.view.ZoomMoveOperation(sceneSystem, this);
+
+      registry.registerOperation([ true, true, false ], zoomOp);
 
       {
          var rotOp = new upro.view.SceneObjectRotationOperation(sceneSystem, sceneSystem.camera);
 
-         registry.registerOperation([true, false, false], rotOp);
+         registry.registerOperation([ true, false, false ], rotOp);
       }
       {
          var moveOp = new upro.view.OrientedMoveOperation(sceneSystem, sceneSystem.getCameraRotationBuffer(),
-            this.onMove.bind(this));
+               this.onMove.bind(this));
 
-         registry.registerOperation([false, true, false], moveOp);
+         registry.registerOperation([ false, true, false ], moveOp);
       }
       {
          var idleOp = new upro.view.IdlePointerOperation(this);
 
-         registry.registerOperation([false, false, false], idleOp);
+         registry.registerOperation([ false, false, false ], idleOp);
       }
    },
 
@@ -184,7 +188,7 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       var lowestId = null;
       var nextHigherId = null;
 
-      for (var galaxyId in this.galaxies)
+      for ( var galaxyId in this.galaxies)
       {
          if ((lowestId == null) || (lowestId > galaxyId))
          {
@@ -219,6 +223,24 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       this.facade().sendNotification(upro.app.Notifications.SetHighlightedObject, null);
    },
 
+   addZoom: function(delta)
+   {
+      var sceneSystem = this.getViewComponent();
+      var finalValue = sceneSystem.camera.position[2] + delta;
+
+      if (finalValue > 20)
+      {
+         finalValue = 20;
+      }
+      else if (finalValue < 2.5)
+      {
+         finalValue = 2.5;
+      }
+      sceneSystem.camera.position[2] = finalValue;
+      sceneSystem.camera.setOrientationModified(true);
+
+   },
+
    onMove: function(vec)
    {
       if (this.visibleGalaxyId)
@@ -236,13 +258,13 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
 
          var distance = vec3.length(galaxyRender.position);
 
-         if (galaxyRender.position[1] > 2)
+         if (galaxyRender.position[1] > 4)
          {
-            galaxyRender.position[1] = 2;
+            galaxyRender.position[1] = 4;
          }
-         if (galaxyRender.position[1] < -20)
+         if (galaxyRender.position[1] < -4)
          {
-            galaxyRender.position[1] = -20;
+            galaxyRender.position[1] = -4;
          }
 
          if (distance > 30)

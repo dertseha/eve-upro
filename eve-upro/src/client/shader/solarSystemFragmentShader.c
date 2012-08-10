@@ -7,9 +7,10 @@ uniform sampler2D texture;
 varying vec3 vColor;
 uniform vec3 uColor;
 
-vec3 red = vec3(1.0, 0.0, 0.0);
+vec3 red = vec3(0.70, 0.0, 0.0);
 vec3 yellow = vec3(1.0, 1.0, 0.0);
 vec3 green = vec3(0.0, 1.0, 0.0);
+vec3 blue = vec3(0.164, 0.823, 0.823);
 
 void main(void)
 {
@@ -25,7 +26,7 @@ void main(void)
    else
    {
       color = yellow;
-      color = mix(color, green, ((vColor.r - 0.5) * 2.0));
+      color = mix(color, blue, ((vColor.r - 0.5) * 2.0));
    }
    gl_FragColor = vec4( mix( texel.rgb, color, 1.0 ), texel.a);
 }
