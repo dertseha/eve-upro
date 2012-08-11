@@ -89,6 +89,15 @@ upro.view.mediators.SolarSystemHighlight = Class.create(
    },
 
    /**
+    * @param optionName the name of the option to return
+    * @returns the option value of given name
+    */
+   getTextOption: function(optionName)
+   {
+      return this.textOptions[optionName];
+   },
+
+   /**
     * Sets text options
     * 
     * @param options object containing the options

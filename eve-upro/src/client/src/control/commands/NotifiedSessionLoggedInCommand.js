@@ -17,7 +17,6 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
          this.setupCurLocationHighlight(highlightMediator);
       }
       this.facade().registerMediator(new upro.view.mediators.SolarSystemContextMenuMediator());
-      this.facade().registerMediator(new upro.view.mediators.ActiveRouteOverlayMediator());
       if (upro.scene.SceneSystem.SUPPORTED)
       {
          var scene = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);

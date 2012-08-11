@@ -58,6 +58,29 @@ upro.view.mediators.SolarSystemHighlightMediator = Class.create(upro.view.mediat
    },
 
    /**
+    * Removes all highlights with a specific pattern in their key
+    * 
+    * @param keyPattern the pattern object to use for matching the keys
+    */
+   removeHighlights: function(keyPattern)
+   {
+      var toRemove = [];
+      var self = this;
+
+      for ( var temp in this.entries)
+      {
+         if (keyPattern.test(temp))
+         {
+            toRemove.push(temp);
+         }
+      }
+      toRemove.forEach(function(key)
+      {
+         self.removeHighlight(key);
+      });
+   },
+
+   /**
     * Commonly used shortcut for setting/changing the solar system of a highlight. If the solar system is given, it is
     * applied. If not, then the highlight is hidden.
     * 

@@ -181,7 +181,6 @@ exports.sourceFiles = [];
    'view/mediators/SolarSystemHighlightMediator.js', //
    'view/mediators/AbstractContextMenuMediator.js', //
    'view/mediators/SolarSystemContextMenuMediator.js', //
-   'view/mediators/ActiveRouteOverlayMediator.js', //
    'view/mediators/MainContextMenuMediator.js', //
 
    'app/app.js', //
