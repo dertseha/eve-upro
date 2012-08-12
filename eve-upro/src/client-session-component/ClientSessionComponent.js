@@ -309,8 +309,7 @@ function ClientSessionComponent(services)
          }
          else
          {
-            logger.warn('Unhandled, registered request: ' + clientRequest.header.type);
-            rCode = 'Unhandled Request';
+            this.onGenericClientRequest(clientRequest);
          }
       }
       else
@@ -344,6 +343,21 @@ function ClientSessionComponent(services)
       }
 
       return rCode;
+   };
+
+   /**
+    * Client request handler (Default)
+    */
+   this.onGenericClientRequest = function(clientRequest)
+   {
+      var header =
+      {
+         type: 'ClientRequest' + clientRequest.header.type,
+         sessionId: clientRequest.header.sessionId
+      };
+      var body = clientRequest.body;
+
+      this.amqp.broadcast(header, body);
    };
 }
 util.inherits(ClientSessionComponent, Component);

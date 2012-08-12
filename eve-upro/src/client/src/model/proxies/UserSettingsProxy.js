@@ -4,10 +4,20 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
    {
       $super(upro.model.proxies.UserSettingsProxy.NAME, data, dataStore);
 
-      data.activeGalaxyChanged = this.onActiveGalaxyChanged.bind(this);
       data.routingCapabilitiesChanged = this.onRoutingCapabilitiesChanged.bind(this);
       data.ignoredSolarSystemsChanged = this.onIgnoredSolarSystemsChanged.bind(this);
       data.routingRulesChanged = this.onRoutingRulesChanged.bind(this);
+   },
+
+   onRegister: function()
+   {
+      var self = this;
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.addBroadcastHandler("CharacterActiveGalaxy", function(broadcastBody)
+      {
+         self.onCharacterActiveGalaxy(broadcastBody);
+      });
    },
 
    onRemove: function()
@@ -15,23 +25,24 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
       this.notifyActiveGalaxyChanged(undefined);
    },
 
-   onActiveGalaxyChanged: function()
+   setActiveGalaxy: function(galaxyId)
    {
-      this.notifyActiveGalaxyChanged(this.getData().getActiveGalaxy());
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest("SetActiveGalaxy",
+      {
+         galaxyId: galaxyId
+      });
+   },
+
+   onCharacterActiveGalaxy: function(broadcastBody)
+   {
+      this.notifyActiveGalaxyChanged(broadcastBody.galaxyId);
    },
 
    notifyActiveGalaxyChanged: function(galaxyId)
    {
       this.facade().sendNotification(upro.app.Notifications.ActiveGalaxyChanged, galaxyId);
-   },
-
-   setActiveGalaxy: function(galaxyId)
-   {
-      var properties = {};
-
-      properties[upro.model.UserSettings.PROPERTY_ACTIVE_GALAXY] = galaxyId;
-
-      this.updateProperties(properties);
    },
 
    onRoutingCapabilitiesChanged: function()

@@ -7,6 +7,8 @@ function Character(charId, charName, corpId, corpName)
 
    this.clients = {};
 
+   this.serviceData = {};
+
    /**
     * @returns the primary key of the character
     */

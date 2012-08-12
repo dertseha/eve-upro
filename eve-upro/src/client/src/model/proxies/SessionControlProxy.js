@@ -95,6 +95,19 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
    },
 
    /**
+    * Sends a request of given type with given body. Calls callback on successful completion.
+    * 
+    * @param type the type of the request
+    * @param body request body
+    */
+   sendRequest: function(type, body)
+   {
+      this.uplink.sendRequest(type, body, function()
+      {
+      });
+   },
+
+   /**
     * @returns the character information this session runs for
     */
    getCharacterInfo: function()

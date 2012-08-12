@@ -19,7 +19,17 @@ var Broadcasts =
    /**
     * Sent by the location service when the currently known location of a character changed (becomes known)
     */
-   CharacterLocationStatus: 0
+   CharacterLocationStatus: 0,
+
+   /**
+    * Client Request
+    */
+   ClientRequestSetActiveGalaxy: 0,
+
+   /**
+    * Sent when the currently active galaxy has been changed.
+    */
+   CharacterActiveGalaxy: 0
 };
 
 function staticInit()
