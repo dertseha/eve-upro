@@ -91,29 +91,29 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       return result;
    },
 
-   addRouteEdge: function(system1, system2, valid)
+   addRouteEdge: function(routeName, system1, system2, color)
    {
-      this.addRouteEdgeBySystem1(system1, system2, valid);
+      this.addRouteEdgeBySystem1(routeName, system1, system2, color);
       if (system1.galaxy.id != system2.galaxy.id)
       {
-         this.addRouteEdgeBySystem1(system2, system1, valid);
+         this.addRouteEdgeBySystem1(routeName, system2, system1, color);
       }
    },
 
-   addRouteEdgeBySystem1: function(system1, system2, valid)
+   addRouteEdgeBySystem1: function(routeName, system1, system2, color)
    {
       var galaxyRender = this.galaxies[system1.galaxy.id];
 
-      galaxyRender.addRouteEdge(system1, system2, valid);
+      galaxyRender.addRouteEdge(routeName, system1, system2, color);
    },
 
-   clearRoute: function()
+   clearRoute: function(routeName)
    {
       for ( var id in this.galaxies)
       {
          var galaxyRender = this.galaxies[id];
 
-         galaxyRender.clearRoute();
+         galaxyRender.clearRoute(routeName);
       }
    },
 

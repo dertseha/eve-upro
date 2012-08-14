@@ -15,9 +15,10 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       this.jumpVertices = [];
       this.jumpColors = [];
 
-      this.routeVertices = [];
-      this.routeColors = [];
+      this.routes = {};
       this.routeSegments = [];
+      this.addRoute('ActiveRoute');
+      this.addRoute('Autopilot');
 
       this.dynamicJumpSegments = {};
 
@@ -84,18 +85,37 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
 
    },
 
-   addRouteEdge: function(system1, system2, valid)
+   addRoute: function(routeName)
    {
-      var color = valid ? [ 1.0, 1.0, 0.0, 2.0 ] : [ 1.0, 0.0, 0.0, 2.0 ];
+      var route = this.routes[routeName];
 
-      this.addEdge(system1, system2, this.routeVertices, this.routeColors, color);
+      if (!route)
+      {
+         route =
+         {
+            vertices: [],
+            colors: [],
+            segment: null
+         };
+
+         this.routes[routeName] = route;
+      }
+   },
+
+   addRouteEdge: function(routeName, system1, system2, color)
+   {
+      var route = this.routes[routeName];
+
+      this.addEdge(system1, system2, route.vertices, route.colors, color);
       this.updateRouteSegments();
    },
 
-   clearRoute: function()
+   clearRoute: function(routeName)
    {
-      this.routeVertices.clear();
-      this.routeColors.clear();
+      var route = this.routes[routeName];
+
+      route.vertices.clear();
+      route.colors.clear();
       this.updateRouteSegments();
    },
 
@@ -164,11 +184,13 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
          start += copy;
       }
 
+      for ( var routeName in this.routes)
       {
-         var segment = new upro.scene.VertexBufferSegment();
+         var route = this.routes[routeName];
 
-         segment.create(scene.gl);
-         this.routeSegments.push(segment);
+         route.segment = new upro.scene.VertexBufferSegment();
+         route.segment.create(scene.gl);
+         this.routeSegments.push(route.segment);
       }
 
       $super(scene);
@@ -180,12 +202,16 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
 
    updateRouteSegments: function()
    {
-      if (this.routeSegments.length > 0)
-      {
-         var scene = this.scene;
-         var segment = this.routeSegments[0];
+      var scene = this.scene;
 
-         segment.update(scene.gl, this.routeVertices, this.routeColors, 0, this.routeVertices.length / 3);
+      for ( var routeName in this.routes)
+      {
+         var route = this.routes[routeName];
+
+         if (route.segment)
+         {
+            route.segment.update(scene.gl, route.vertices, route.colors, 0, route.vertices.length / 3);
+         }
       }
    },
 

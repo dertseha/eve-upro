@@ -9,8 +9,9 @@ upro.ctrl.cmd.NotifiedActiveRoutePathChangedCommand = Class.create(SimpleCommand
       var lastSystem = null, temp = null;
       var waypointCounter = 1;
       var solarSystem = null;
+      var okColor = [ 1.0, 1.0, 0.0, 2.0 ];
 
-      sceneMediator.clearRoute();
+      sceneMediator.clearRoute('ActiveRoute');
       highlightMediator.removeHighlights(/RouteOverlay:.*/);
 
       for ( var i = 0; i < activeRouteProxy.routeEntries.length; i++)
@@ -19,9 +20,11 @@ upro.ctrl.cmd.NotifiedActiveRoutePathChangedCommand = Class.create(SimpleCommand
          isReachable = routeEntry.isReachable;
          solarSystem = routeEntry.systemEntry.getSolarSystem();
 
+         var color = isReachable ? okColor : [ 1.0, 0.0, 0.0, 2.0 ];
+
          if (lastSystem)
          {
-            sceneMediator.addRouteEdge(lastSystem, solarSystem, isReachable);
+            sceneMediator.addRouteEdge('ActiveRoute', lastSystem, solarSystem, color);
          }
          this.setSystemOverlay(highlightMediator, solarSystem, waypointCounter, isReachable);
          waypointCounter++;
@@ -30,7 +33,7 @@ upro.ctrl.cmd.NotifiedActiveRoutePathChangedCommand = Class.create(SimpleCommand
          for ( var j = 0; j < routeEntry.transits.length; j++)
          {
             temp = routeEntry.transits[j].getSolarSystem();
-            sceneMediator.addRouteEdge(lastSystem, temp, true);
+            sceneMediator.addRouteEdge('ActiveRoute', lastSystem, temp, okColor);
             lastSystem = temp;
          }
       }
