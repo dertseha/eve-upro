@@ -12,6 +12,8 @@ upro.res.text.templates["en"] =
    "routing.menuLabel": "Routing",
    /** Command for clearing the route */
    "routing.clearRoute": "Clear Route",
+   /** Command for setting the route to the autopilot */
+   "routing.setAutopilot": "Send to autopilot",
    /** Label for routing capabilities menu */
    "routing.capabilities.menuLabel": "Capabilities",
    /** Label for routing rules menu */
@@ -27,30 +29,29 @@ upro.res.text.templates["en"] =
    "routing.rules.rule[MinSecurity].menuLabel": "Minimum Security",
    /** tip for MinSecurity at limit */
    "routing.rules.rule[MinSecurity].paramLimit": "Minimum Security at {0}",
-   /** tip for settable MinSecurity  */
+   /** tip for settable MinSecurity */
    "routing.rules.rule[MinSecurity].paramSet": "Minimum Security at {0} - Set to {1}",
 
    /** Menu label for MaxSecurity */
    "routing.rules.rule[MaxSecurity].menuLabel": "Maximum Security",
    /** tip for MaxSecurity at limit */
    "routing.rules.rule[MaxSecurity].paramLimit": "Use Security below {0}",
-   /** tip for settable MaxSecurity  */
+   /** tip for settable MaxSecurity */
    "routing.rules.rule[MaxSecurity].paramSet": "Use Security below {0} - Set to {1}",
 
    /** Menu label for Jumps */
    "routing.rules.rule[Jumps].menuLabel": "Jump Count",
    /** tip for Jumps at limit */
    "routing.rules.rule[Jumps].paramLimit": "Jump Count Margin at {0}",
-   /** tip for settable Jumps  */
+   /** tip for settable Jumps */
    "routing.rules.rule[Jumps].paramSet": "Jump Count Margin at {0} - Set to {1}",
 
    /** Menu label for JumpFuel */
    "routing.rules.rule[JumpFuel].menuLabel": "Jump Fuel (Distance)",
    /** tip for JumpFuel at limit */
    "routing.rules.rule[JumpFuel].paramLimit": "Distance Margin at {0}ly",
-   /** tip for settable JumpFuel  */
+   /** tip for settable JumpFuel */
    "routing.rules.rule[JumpFuel].paramSet": "Distance Margin at {0}ly - Set to {1}ly",
-
 
    /** Toggling of jump gate capability */
    "routing.caps.jumpGates.toggle": "Turn Jump Gate Capability {0}",
@@ -63,7 +64,6 @@ upro.res.text.templates["en"] =
    "routing.caps.jumpDrive.rangeLimit": "Jump Range at {0}ly",
    /** Jump drive range tooltip */
    "routing.caps.jumpDrive.rangeSet": "Jump Range at {0}ly - Set to {1}ly",
-
 
    /** Menu label for jump corridor control */
    "corridor.menuLabel": "Jump Corridors",

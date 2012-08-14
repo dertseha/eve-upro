@@ -132,6 +132,7 @@ exports.sourceFiles = [];
    'model/proxies/UniverseProxy.js', //
    'model/proxies/UserViewDataProxy.js', //
    'model/proxies/ActiveRouteProxy.js', //
+   'model/proxies/AutopilotProxy.js', //
 
    'control/ctrl.js', //
    'control/commands/cmd.js', //
@@ -139,6 +140,8 @@ exports.sourceFiles = [];
    'control/commands/SetupModelCommand.js', //
    'control/commands/SetupViewCommand.js', //
    'control/commands/InitApplicationCommand.js', //
+   'control/commands/NotifiedAutopilotRouteChangedCommand.js', //
+   'control/commands/NotifiedAutopilotNextRouteIndexChangedCommand.js', //
    'control/commands/NotifiedCharacterLocationStatusCommand.js', //
    'control/commands/NotifiedSessionLoggedInCommand.js', //
    'control/commands/NotifiedSetActiveGalaxyCommand.js', //
@@ -152,6 +155,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedActiveRouteAddWaypointCommand.js', //
    'control/commands/NotifiedActiveRouteAddCheckpointCommand.js', //
    'control/commands/NotifiedActiveRoutePathChangedCommand.js', //
+   'control/commands/NotifiedActiveRouteSetAutopilotCommand.js', //
    'control/commands/NotifiedUserRoutingRulesChangedCommand.js', //
    'control/commands/NotifiedUserRoutingRuleToggleCommand.js', //
    'control/commands/NotifiedUserRoutingRuleMoreCommand.js', //

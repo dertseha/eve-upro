@@ -41,6 +41,8 @@ upro.app.Notifications =
    ActiveRouteAddWaypoint: 0,
    /** The set-up of the active route has changed. */
    ActiveRoutePathChanged: 0,
+   /** Sends the active route to the autopilot */
+   ActiveRouteSetAutopilot: 0,
 
    /** Notified when the list of ignored solar systems changed. Param: Id[] */
    UserIgnoredSolarSystemsChanged: 0,
@@ -76,7 +78,12 @@ upro.app.Notifications =
    /** Prepares a new corridor of type wormhole. Param: SolarSystem */
    NewCorridorPrepareWormhole: 0,
    /** Prepares a new corridor of type jump bridge. Param: SolarSystem */
-   NewCorridorPrepareJumpBridge: 0
+   NewCorridorPrepareJumpBridge: 0,
+
+   /** A new route for the autopilot was received */
+   AutopilotRouteChanged: 0,
+   /** The index of the next route entry has changed */
+   AutopilotNextRouteIndexChanged: 0
 };
 
 /**

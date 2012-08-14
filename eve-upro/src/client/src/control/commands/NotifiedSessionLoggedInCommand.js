@@ -6,6 +6,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.facade().registerProxy(new upro.model.proxies.UserViewDataProxy());
       this.facade().registerProxy(new upro.model.proxies.LocationTrackerProxy());
 
+      this.facade().registerProxy(new upro.model.proxies.AutopilotProxy());
       this.facade().registerProxy(new upro.model.proxies.ActiveRouteProxy());
 
       this.facade().registerMediator(new upro.view.mediators.MainContextMenuMediator());

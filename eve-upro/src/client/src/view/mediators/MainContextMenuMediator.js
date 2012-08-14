@@ -1,213 +1,261 @@
 /**
  * Context menu mediator for master.
  */
-upro.view.mediators.MainContextMenuMediator = Class.create(upro.view.mediators.AbstractContextMenuMediator,
-{
-   initialize: function($super)
-   {
-      $super(upro.view.mediators.MainContextMenuMediator.NAME, null);
-   },
+upro.view.mediators.MainContextMenuMediator = Class
+      .create(upro.view.mediators.AbstractContextMenuMediator,
+            {
+               initialize: function($super)
+               {
+                  $super(upro.view.mediators.MainContextMenuMediator.NAME, null);
+               },
 
-   onRegister: function()
-   {
-      var menu = this.getViewComponent();
-      var mediator = this;
+               onRegister: function()
+               {
+                  var menu = this.getViewComponent();
+                  var mediator = this;
 
-      {  // routing
-         var routingMenu = menu.setSubMenu(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Routing),
-            upro.res.text.Lang.format("routing.menuLabel"));
+                  { // routing
+                     var routingMenu = menu.setSubMenu(0, this.createVectorIcon.bind(this,
+                           upro.res.menu.IconData.Routing), upro.res.text.Lang.format("routing.menuLabel"));
 
-         this.commandActiveRouteReset = new upro.hud.SimpleCommandAdapter( function()
-            { mediator.notify(upro.app.Notifications.ActiveRouteReset); mediator.cancel(); },
-            upro.res.text.Lang.format("routing.clearRoute"));
-         routingMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Delete), this.commandActiveRouteReset);
+                     this.commandActiveRouteReset = new upro.hud.SimpleCommandAdapter(function()
+                     {
+                        mediator.notify(upro.app.Notifications.ActiveRouteReset);
+                        mediator.cancel();
+                     }, upro.res.text.Lang.format("routing.clearRoute"));
+                     routingMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Delete),
+                           this.commandActiveRouteReset);
 
-         {  // rules
-            var rulesMenu = routingMenu.setSubMenu(5, this.createVectorIcon.bind(this, upro.res.menu.IconData.List),
-               upro.res.text.Lang.format("routing.rules.menuLabel"));
+                     this.commandActiveRouteSetAutopilot = new upro.hud.SimpleCommandAdapter(function()
+                     {
+                        mediator.notify(upro.app.Notifications.ActiveRouteSetAutopilot);
+                        mediator.cancel();
+                     }, upro.res.text.Lang.format("routing.setAutopilot"));
+                     routingMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.Autopilot),
+                           this.commandActiveRouteSetAutopilot);
 
-            this.ruleCommands = {};
-            this.createRoutingRuleCommandSet(rulesMenu, 0, "MinSecurity", upro.res.menu.IconData.MinSecurity);
-            this.createRoutingRuleCommandSet(rulesMenu, 1, "MaxSecurity", upro.res.menu.IconData.MaxSecurity);
-            this.createRoutingRuleCommandSet(rulesMenu, 2, "Jumps", upro.res.menu.IconData.Hash);
-            this.createRoutingRuleCommandSet(rulesMenu, 5, "JumpFuel", upro.res.menu.IconData.Fuel);
-         }
-         {  // capabilities
-            var capMenu = routingMenu.setSubMenu(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Capabilities),
-               upro.res.text.Lang.format("routing.capabilities.menuLabel"));
+                     { // rules
+                        var rulesMenu = routingMenu.setSubMenu(5, this.createVectorIcon.bind(this,
+                              upro.res.menu.IconData.List), upro.res.text.Lang.format("routing.rules.menuLabel"));
 
-            this.commandRoutingCapJumpGates = new upro.hud.SimpleCommandAdapter( function()
-               { mediator.notify(upro.app.Notifications.UserRoutingCapJumpGatesToggle); });
-            capMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.JumpGate), this.commandRoutingCapJumpGates);
+                        this.ruleCommands = {};
+                        this.createRoutingRuleCommandSet(rulesMenu, 0, "MinSecurity",
+                              upro.res.menu.IconData.MinSecurity);
+                        this.createRoutingRuleCommandSet(rulesMenu, 1, "MaxSecurity",
+                              upro.res.menu.IconData.MaxSecurity);
+                        this.createRoutingRuleCommandSet(rulesMenu, 2, "Jumps", upro.res.menu.IconData.Hash);
+                        this.createRoutingRuleCommandSet(rulesMenu, 5, "JumpFuel", upro.res.menu.IconData.Fuel);
+                     }
+                     { // capabilities
+                        var capMenu = routingMenu.setSubMenu(0, this.createVectorIcon.bind(this,
+                              upro.res.menu.IconData.Capabilities), upro.res.text.Lang
+                              .format("routing.capabilities.menuLabel"));
 
-            var driveMenu = capMenu.setSubMenu(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.JumpDrive),
-               upro.res.text.Lang.format("routing.caps.jumpDrive.menuLabel"));
+                        this.commandRoutingCapJumpGates = new upro.hud.SimpleCommandAdapter(function()
+                        {
+                           mediator.notify(upro.app.Notifications.UserRoutingCapJumpGatesToggle);
+                        });
+                        capMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.JumpGate),
+                              this.commandRoutingCapJumpGates);
 
-            this.commandRoutingCapJumpDrive = new upro.hud.SimpleCommandAdapter( function()
-               { mediator.notify(upro.app.Notifications.UserRoutingCapJumpDriveToggle); });
-            driveMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Power), this.commandRoutingCapJumpDrive);
-            this.commandRoutingCapJumpDriveMore = new upro.hud.SimpleCommandAdapter( function()
-               { mediator.notify(upro.app.Notifications.UserRoutingCapJumpDriveRangeStep, true); });
-            driveMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Higher), this.commandRoutingCapJumpDriveMore);
-            this.commandRoutingCapJumpDriveLess = new upro.hud.SimpleCommandAdapter( function()
-               { mediator.notify(upro.app.Notifications.UserRoutingCapJumpDriveRangeStep, false); });
-            driveMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.Lower), this.commandRoutingCapJumpDriveLess);
-         }
-      }
-   },
+                        var driveMenu = capMenu.setSubMenu(1, this.createVectorIcon.bind(this,
+                              upro.res.menu.IconData.JumpDrive), upro.res.text.Lang
+                              .format("routing.caps.jumpDrive.menuLabel"));
 
-   /**
-    * Creates the command set for a routing rule. This expects that all rules have the same commands.
-    * @param rulesMenu the menu to insert the submenu in
-    * @param rulesMenuIndex at which index to insert
-    * @param ruleType the rule type according to upro.model.UserRoutingRule.RuleConstants
-    * @param mainIcon icon to use for this rule menu
-    */
-   createRoutingRuleCommandSet: function(rulesMenu, rulesMenuIndex, ruleType, mainIcon)
-   {
-      var menuLabel = upro.res.text.Lang.format("routing.rules.rule[" + ruleType + "].menuLabel");
-      var subMenu = rulesMenu.setSubMenu(rulesMenuIndex, this.createVectorIcon.bind(this, mainIcon), menuLabel);
-      var mediator = this;
+                        this.commandRoutingCapJumpDrive = new upro.hud.SimpleCommandAdapter(function()
+                        {
+                           mediator.notify(upro.app.Notifications.UserRoutingCapJumpDriveToggle);
+                        });
+                        driveMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Power),
+                              this.commandRoutingCapJumpDrive);
+                        this.commandRoutingCapJumpDriveMore = new upro.hud.SimpleCommandAdapter(function()
+                        {
+                           mediator.notify(upro.app.Notifications.UserRoutingCapJumpDriveRangeStep, true);
+                        });
+                        driveMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Higher),
+                              this.commandRoutingCapJumpDriveMore);
+                        this.commandRoutingCapJumpDriveLess = new upro.hud.SimpleCommandAdapter(function()
+                        {
+                           mediator.notify(upro.app.Notifications.UserRoutingCapJumpDriveRangeStep, false);
+                        });
+                        driveMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.Lower),
+                              this.commandRoutingCapJumpDriveLess);
+                     }
+                  }
+               },
 
-      this.ruleCommands[ruleType] = {};
+               /**
+                * Creates the command set for a routing rule. This expects that all rules have the same commands.
+                * 
+                * @param rulesMenu the menu to insert the submenu in
+                * @param rulesMenuIndex at which index to insert
+                * @param ruleType the rule type according to upro.model.UserRoutingRule.RuleConstants
+                * @param mainIcon icon to use for this rule menu
+                */
+               createRoutingRuleCommandSet: function(rulesMenu, rulesMenuIndex, ruleType, mainIcon)
+               {
+                  var menuLabel = upro.res.text.Lang.format("routing.rules.rule[" + ruleType + "].menuLabel");
+                  var subMenu = rulesMenu.setSubMenu(rulesMenuIndex, this.createVectorIcon.bind(this, mainIcon),
+                        menuLabel);
+                  var mediator = this;
 
-      this.ruleCommands[ruleType].more = new upro.hud.SimpleCommandAdapter( function()
-         { mediator.notify(upro.app.Notifications.UserRoutingRuleMore, ruleType); });
-      subMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Higher), this.ruleCommands[ruleType].more);
-      this.ruleCommands[ruleType].less = new upro.hud.SimpleCommandAdapter( function()
-         { mediator.notify(upro.app.Notifications.UserRoutingRuleLess, ruleType); });
-      subMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.Lower), this.ruleCommands[ruleType].less);
+                  this.ruleCommands[ruleType] = {};
 
-      this.ruleCommands[ruleType].toggle = new upro.hud.SimpleCommandAdapter( function()
-         { mediator.notify(upro.app.Notifications.UserRoutingRuleToggle, ruleType); });
-      subMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Power), this.ruleCommands[ruleType].toggle);
+                  this.ruleCommands[ruleType].more = new upro.hud.SimpleCommandAdapter(function()
+                  {
+                     mediator.notify(upro.app.Notifications.UserRoutingRuleMore, ruleType);
+                  });
+                  subMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Higher),
+                        this.ruleCommands[ruleType].more);
+                  this.ruleCommands[ruleType].less = new upro.hud.SimpleCommandAdapter(function()
+                  {
+                     mediator.notify(upro.app.Notifications.UserRoutingRuleLess, ruleType);
+                  });
+                  subMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.Lower),
+                        this.ruleCommands[ruleType].less);
 
-      this.ruleCommands[ruleType].up = new upro.hud.SimpleCommandAdapter( function()
-         { mediator.notify(upro.app.Notifications.UserRoutingRuleUp, ruleType); },
-         upro.res.text.Lang.format("routing.rules.up"));
-      subMenu.setCommand(5, this.createVectorIcon.bind(this, upro.res.menu.IconData.Up), this.ruleCommands[ruleType].up);
-      this.ruleCommands[ruleType].down = new upro.hud.SimpleCommandAdapter( function()
-         { mediator.notify(upro.app.Notifications.UserRoutingRuleDown, ruleType); },
-         upro.res.text.Lang.format("routing.rules.down"));
-      subMenu.setCommand(4, this.createVectorIcon.bind(this, upro.res.menu.IconData.Down), this.ruleCommands[ruleType].down);
-   },
+                  this.ruleCommands[ruleType].toggle = new upro.hud.SimpleCommandAdapter(function()
+                  {
+                     mediator.notify(upro.app.Notifications.UserRoutingRuleToggle, ruleType);
+                  });
+                  subMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Power),
+                        this.ruleCommands[ruleType].toggle);
 
-   /** {@inheritDoc} */
-   updateCommands: function()
-   {
-      this.updateCommandActiveRoute();
-      this.updateCommandRoutingCapabilities();
-      this.updateCommandRoutingRules();
-   },
+                  this.ruleCommands[ruleType].up = new upro.hud.SimpleCommandAdapter(function()
+                  {
+                     mediator.notify(upro.app.Notifications.UserRoutingRuleUp, ruleType);
+                  }, upro.res.text.Lang.format("routing.rules.up"));
+                  subMenu.setCommand(5, this.createVectorIcon.bind(this, upro.res.menu.IconData.Up),
+                        this.ruleCommands[ruleType].up);
+                  this.ruleCommands[ruleType].down = new upro.hud.SimpleCommandAdapter(function()
+                  {
+                     mediator.notify(upro.app.Notifications.UserRoutingRuleDown, ruleType);
+                  }, upro.res.text.Lang.format("routing.rules.down"));
+                  subMenu.setCommand(4, this.createVectorIcon.bind(this, upro.res.menu.IconData.Down),
+                        this.ruleCommands[ruleType].down);
+               },
 
-   /**
-    * Updates the commands for the active route
-    */
-   updateCommandActiveRoute: function()
-   {
-      var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
+               /** {@inheritDoc} */
+               updateCommands: function()
+               {
+                  this.updateCommandActiveRoute();
+                  this.updateCommandRoutingCapabilities();
+                  this.updateCommandRoutingRules();
+               },
 
-      this.commandActiveRouteReset.setPossible(!activeRouteProxy.isEmpty());
-   },
+               /**
+                * Updates the commands for the active route
+                */
+               updateCommandActiveRoute: function()
+               {
+                  var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
 
-   updateCommandRoutingCapabilities: function()
-   {
-      var settingsProxy = this.facade().retrieveProxy(upro.model.proxies.UserSettingsProxy.NAME);
-      var inUse;
-      var onText = upro.res.text.Lang.format("general.on");
-      var offText = upro.res.text.Lang.format("general.off");
+                  this.commandActiveRouteReset.setPossible(!activeRouteProxy.isEmpty());
+               },
 
-      {  // jump gates
-         inUse = settingsProxy.getRoutingCapJumpGatesInUse();
+               updateCommandRoutingCapabilities: function()
+               {
+                  var settingsProxy = this.facade().retrieveProxy(upro.model.proxies.UserSettingsProxy.NAME);
+                  var inUse;
+                  var onText = upro.res.text.Lang.format("general.on");
+                  var offText = upro.res.text.Lang.format("general.off");
 
-         this.commandRoutingCapJumpGates.setActive(inUse);
-         this.commandRoutingCapJumpGates.setLabel(upro.res.text.Lang.format("routing.caps.jumpGates.toggle", inUse ? offText : onText));
-      }
-      {  // jump drive
-         var range = settingsProxy.getRoutingCapJumpDriveRange();
-         var belowMaximum = range < upro.model.UserSettings.JumpDriveConstants.MaximumRange;
-         var aboveMinimum = range > upro.model.UserSettings.JumpDriveConstants.MinimumRange;
-         inUse = settingsProxy.getRoutingCapJumpDriveInUse();
+                  { // jump gates
+                     inUse = settingsProxy.getRoutingCapJumpGatesInUse();
 
-         this.commandRoutingCapJumpDrive.setActive(inUse);
-         this.commandRoutingCapJumpDrive.setLabel(upro.res.text.Lang.format("routing.caps.jumpDrive.toggle", inUse ? offText : onText));
+                     this.commandRoutingCapJumpGates.setActive(inUse);
+                     this.commandRoutingCapJumpGates.setLabel(upro.res.text.Lang.format(
+                           "routing.caps.jumpGates.toggle", inUse ? offText : onText));
+                  }
+                  { // jump drive
+                     var range = settingsProxy.getRoutingCapJumpDriveRange();
+                     var belowMaximum = range < upro.model.UserSettings.JumpDriveConstants.MaximumRange;
+                     var aboveMinimum = range > upro.model.UserSettings.JumpDriveConstants.MinimumRange;
+                     inUse = settingsProxy.getRoutingCapJumpDriveInUse();
 
-         this.commandRoutingCapJumpDriveMore.setPossible(belowMaximum);
-         this.commandRoutingCapJumpDriveMore.setLabel(
-            belowMaximum
-               ? upro.res.text.Lang.format("routing.caps.jumpDrive.rangeSet", range, range + upro.model.UserSettings.JumpDriveConstants.RangeStep)
-               : upro.res.text.Lang.format("routing.caps.jumpDrive.rangeLimit", range));
-         this.commandRoutingCapJumpDriveLess.setPossible(aboveMinimum);
-         this.commandRoutingCapJumpDriveLess.setLabel(
-            aboveMinimum
-               ? upro.res.text.Lang.format("routing.caps.jumpDrive.rangeSet", range, range - upro.model.UserSettings.JumpDriveConstants.RangeStep)
-               : upro.res.text.Lang.format("routing.caps.jumpDrive.rangeLimit", range));
-      }
-   },
+                     this.commandRoutingCapJumpDrive.setActive(inUse);
+                     this.commandRoutingCapJumpDrive.setLabel(upro.res.text.Lang.format(
+                           "routing.caps.jumpDrive.toggle", inUse ? offText : onText));
 
-   /**
-    * Updates the commands for the routing rules
-    */
-   updateCommandRoutingRules: function(rules)
-   {
-      if (!rules)
-      {
-         var settingsProxy = this.facade().retrieveProxy(upro.model.proxies.UserSettingsProxy.NAME);
+                     this.commandRoutingCapJumpDriveMore.setPossible(belowMaximum);
+                     this.commandRoutingCapJumpDriveMore.setLabel(belowMaximum ? upro.res.text.Lang.format(
+                           "routing.caps.jumpDrive.rangeSet", range, range
+                                 + upro.model.UserSettings.JumpDriveConstants.RangeStep) : upro.res.text.Lang.format(
+                           "routing.caps.jumpDrive.rangeLimit", range));
+                     this.commandRoutingCapJumpDriveLess.setPossible(aboveMinimum);
+                     this.commandRoutingCapJumpDriveLess.setLabel(aboveMinimum ? upro.res.text.Lang.format(
+                           "routing.caps.jumpDrive.rangeSet", range, range
+                                 - upro.model.UserSettings.JumpDriveConstants.RangeStep) : upro.res.text.Lang.format(
+                           "routing.caps.jumpDrive.rangeLimit", range));
+                  }
+               },
 
-         rules = settingsProxy.getRoutingRules();
-      }
+               /**
+                * Updates the commands for the routing rules
+                */
+               updateCommandRoutingRules: function(rules)
+               {
+                  if (!rules)
+                  {
+                     var settingsProxy = this.facade().retrieveProxy(upro.model.proxies.UserSettingsProxy.NAME);
 
-      for (var i = 0; i < rules.length; i++)
-      {
-         var rule = rules[i];
-         var commandEntry = this.ruleCommands[rule.getRuleType()];
-         var template = upro.model.UserRoutingRule.RuleConstants[rule.getRuleType()];
+                     rules = settingsProxy.getRoutingRules();
+                  }
 
-         if (commandEntry && template)
-         {
-            var menuLabel = upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].menuLabel");
-            var parameter = rule.getParameter();
-            var belowMaximum = parameter < template.Maximum;
-            var aboveMinimum = parameter > template.Minimum;
+                  for ( var i = 0; i < rules.length; i++)
+                  {
+                     var rule = rules[i];
+                     var commandEntry = this.ruleCommands[rule.getRuleType()];
+                     var template = upro.model.UserRoutingRule.RuleConstants[rule.getRuleType()];
 
-            commandEntry.toggle.setActive(rule.getInUse());
-            commandEntry.toggle.setLabel(upro.res.text.Lang.format("routing.rules.toggle",
-               menuLabel, upro.res.text.Lang.format(rule.getInUse() ? "general.off" : "general.on")));
-            commandEntry.more.setPossible(belowMaximum);
-            commandEntry.more.setLabel(belowMaximum
-               ? upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].paramSet",
-                  (parameter * template.Factor).toFixed(template.Fixed), ((parameter + template.Increment) * template.Factor).toFixed(template.Fixed))
-               : upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].paramLimit",
-                  (parameter * template.Factor).toFixed(template.Fixed)));
-            commandEntry.less.setPossible(aboveMinimum);
-            commandEntry.less.setLabel(aboveMinimum
-               ? upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].paramSet",
-                  (parameter * template.Factor).toFixed(template.Fixed), ((parameter - template.Increment) * template.Factor).toFixed(template.Fixed))
-               : upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].paramLimit",
-                  (parameter * template.Factor).toFixed(template.Fixed)));
-            commandEntry.up.setPossible(i > 0);
-            commandEntry.down.setPossible(i < (rules.length - 1));
-         }
-      }
-   },
+                     if (commandEntry && template)
+                     {
+                        var menuLabel = upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType()
+                              + "].menuLabel");
+                        var parameter = rule.getParameter();
+                        var belowMaximum = parameter < template.Maximum;
+                        var aboveMinimum = parameter > template.Minimum;
 
-   /** Notification handler */
-   onNotifyActiveRoutePathChanged: function()
-   {
-      this.updateCommandActiveRoute();
-   },
+                        commandEntry.toggle.setActive(rule.getInUse());
+                        commandEntry.toggle.setLabel(upro.res.text.Lang.format("routing.rules.toggle", menuLabel,
+                              upro.res.text.Lang.format(rule.getInUse() ? "general.off" : "general.on")));
+                        commandEntry.more.setPossible(belowMaximum);
+                        commandEntry.more.setLabel(belowMaximum ? upro.res.text.Lang.format("routing.rules.rule["
+                              + rule.getRuleType() + "].paramSet", (parameter * template.Factor)
+                              .toFixed(template.Fixed), ((parameter + template.Increment) * template.Factor)
+                              .toFixed(template.Fixed)) : upro.res.text.Lang.format("routing.rules.rule["
+                              + rule.getRuleType() + "].paramLimit", (parameter * template.Factor)
+                              .toFixed(template.Fixed)));
+                        commandEntry.less.setPossible(aboveMinimum);
+                        commandEntry.less.setLabel(aboveMinimum ? upro.res.text.Lang.format("routing.rules.rule["
+                              + rule.getRuleType() + "].paramSet", (parameter * template.Factor)
+                              .toFixed(template.Fixed), ((parameter - template.Increment) * template.Factor)
+                              .toFixed(template.Fixed)) : upro.res.text.Lang.format("routing.rules.rule["
+                              + rule.getRuleType() + "].paramLimit", (parameter * template.Factor)
+                              .toFixed(template.Fixed)));
+                        commandEntry.up.setPossible(i > 0);
+                        commandEntry.down.setPossible(i < (rules.length - 1));
+                     }
+                  }
+               },
 
-   /** Notification handler */
-   onNotifyUserRoutingCapabilitiesChanged: function()
-   {
-      this.updateCommandRoutingCapabilities();
-   },
+               /** Notification handler */
+               onNotifyActiveRoutePathChanged: function()
+               {
+                  this.updateCommandActiveRoute();
+               },
 
-   /** Notification handler */
-   onNotifyUserRoutingRulesChanged: function(rules)
-   {
-      this.updateCommandRoutingRules(rules);
-   }
-});
+               /** Notification handler */
+               onNotifyUserRoutingCapabilitiesChanged: function()
+               {
+                  this.updateCommandRoutingCapabilities();
+               },
+
+               /** Notification handler */
+               onNotifyUserRoutingRulesChanged: function(rules)
+               {
+                  this.updateCommandRoutingRules(rules);
+               }
+            });
 
 upro.view.mediators.MainContextMenuMediator.NAME = "MainContextMenu";
