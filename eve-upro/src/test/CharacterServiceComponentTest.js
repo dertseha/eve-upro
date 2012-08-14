@@ -1,36 +1,18 @@
 var EventEmitter = require('events').EventEmitter;
+var util = require('util');
 
 var UuidFactory = require("../util/UuidFactory.js");
+var busMessages = require('../model/BusMessages.js');
 var CharacterAgentComponent = require('../character-agent-component/CharacterAgentComponent.js');
 var CharacterServiceComponent = require('../character-service-component/CharacterServiceComponent.js');
-var Character = require('../character-agent-component/Character.js');
 
 var ActiveCharacterServiceDataState = require('../character-service-component/ActiveCharacterServiceDataState.js');
 
-var busMessages = require('../model/BusMessages.js');
+var AbstractServiceComponentFixture = require('./TestSupport/AbstractServiceComponentFixture.js');
 
 function Fixture()
 {
-   this.amqp = new EventEmitter();
-   this.mongodb = new function()
-   {
-      this.defineCollection = function(name, indexDef, callback)
-      {
-         callback();
-      };
-      this.getData = function(collectionName, filter, callback)
-      {
-         callback(null, null, null);
-      };
-      this.setData = function(collectionName, id, data, callback)
-      {
-         callback(null);
-      };
-   };
-   this.characterAgent = new CharacterAgentComponent(
-   {
-      amqp: this.amqp
-   });
+   Fixture.super_.call(this);
 
    this.characterService = new CharacterServiceComponent(
    {
@@ -39,57 +21,16 @@ function Fixture()
       'character-agent': this.characterAgent
    });
 
-   this.givenExistingCharacterSession = function(charId, sessionId)
+   this.initCharacterServiceData = function(character)
    {
-      this.givenExistingCharacterSessions(charId, [ sessionId ]);
-   };
-
-   this.givenExistingCharacterSessions = function(charId, sessionIds)
-   {
-      var character = new Character(charId, 'name');
-      var self = this;
-
-      this.characterAgent.characters[charId] = character;
-      character.serviceData['character-service'] = new ActiveCharacterServiceDataState(character, this.characterService);// this.characterService.getServiceDataInit();
-      sessionIds.forEach(function(sessionId)
-      {
-         self.characterAgent.charactersBySession[sessionId] = character;
-         character.addClientSession(sessionId);
-      });
+      character.serviceData['character-service'] = new ActiveCharacterServiceDataState(character, this.characterService);
    };
 
    this.givenCharacterHasActiveGalaxy = function(charId, galaxyId)
    {
       var serviceData = this.characterAgent.characters[charId].serviceData['character-service'];
 
-      serviceData.activeGalaxyId = galaxyId;
-   };
-
-   this.givenStorageContainsData = function(documents)
-   {
-      this.mongodb.getData = function(collectionName, filter, callback)
-      {
-         documents.forEach(function(document)
-         {
-            callback(null, document.id, document.data);
-         });
-         callback(null, null, null);
-      };
-   };
-
-   this.givenStorageReturnsDataDelayed = function(documents, emitter)
-   {
-      this.mongodb.getData = function(collectionName, filter, callback)
-      {
-         emitter.on('event', function()
-         {
-            documents.forEach(function(document)
-            {
-               callback(null, document.id, document.data);
-            });
-            callback(null, null, null);
-         });
-      };
+      serviceData.rawData.activeGalaxyId = galaxyId;
    };
 
    this.expectingCharacterActiveGalaxy = function(test, charId, galaxyId, interest)
@@ -106,60 +47,8 @@ function Fixture()
          }
       };
    };
-
-   this.expectingCharacterActiveGalaxyScope = function(test, expectedInterest)
-   {
-      this.amqp.broadcast = function(header, body)
-      {
-         if (header.type && (header.type == busMessages.Broadcasts.CharacterActiveGalaxy))
-         {
-            test.deepEqual(header.interest, expectedInterest);
-         }
-      };
-   };
-
-   this.whenBroadcastReceived = function(type, sessionId, body)
-   {
-      var header =
-      {
-         type: type,
-         sessionId: sessionId
-      };
-
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + header.type, header, body);
-   };
-
-   this.whenClientConnected = function(charId, sessionId, responseQueue)
-   {
-      this.broadcastClientStatus(busMessages.Broadcasts.ClientConnected, charId, sessionId, responseQueue);
-   };
-
-   this.whenClientDisconnected = function(charId, sessionId, responseQueue)
-   {
-      this.broadcastClientStatus(busMessages.Broadcasts.ClientDisconnected, charId, sessionId);
-   };
-
-   this.broadcastClientStatus = function(type, charId, sessionId, responseQueue)
-   {
-      var header =
-      {
-         type: type
-      };
-      var body =
-      {
-         sessionId: sessionId,
-         responseQueue: responseQueue,
-         user:
-         {
-            characterId: charId
-         }
-      };
-
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + header.type, header, body);
-   };
 }
+util.inherits(Fixture, AbstractServiceComponentFixture);
 
 exports.setUp = function(callback)
 {
@@ -195,7 +84,7 @@ exports.testCharacterActiveGalaxyEmitted_WhenActiveGalaxyRequested = function(te
    test.done();
 };
 
-exports.testCharacterActiveGalaxyEmittedOnlyOnce_WhenRequestReceivedTwiceIdentical = function(test)
+exports.testCharacterActiveGalaxyEmittedOnlyOnce_WhenRequestReceivedIdentical = function(test)
 {
    var charId = 7788;
    var sessionId = UuidFactory.v4();
@@ -206,14 +95,13 @@ exports.testCharacterActiveGalaxyEmittedOnlyOnce_WhenRequestReceivedTwiceIdentic
    };
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
-   this.fixture.givenCharacterHasActiveGalaxy(charId, 5566);
+   this.fixture.givenCharacterHasActiveGalaxy(charId, galaxyId);
 
    this.fixture.expectingCharacterActiveGalaxy(test, charId, galaxyId);
 
    this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy, sessionId, broadcastBody);
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy, sessionId, broadcastBody);
 
-   test.expect(1);
+   test.expect(0);
    test.done();
 };
 
@@ -226,7 +114,7 @@ exports.testCharacterActiveGalaxyHasCharacterScope_WhenRequestReceived = functio
    this.fixture.givenExistingCharacterSession(charId, sessionId);
    this.fixture.givenCharacterHasActiveGalaxy(charId, 8899);
 
-   this.fixture.expectingCharacterActiveGalaxyScope(test, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterActiveGalaxy, [
    {
       scope: 'Character',
       id: charId
@@ -250,7 +138,7 @@ exports.testCharacterActiveGalaxyHasSessionScope_WhenSecondSessionEstablished = 
    this.fixture.givenExistingCharacterSession(charId, sessionIdExisting);
    this.fixture.givenCharacterHasActiveGalaxy(charId, 8899);
 
-   this.fixture.expectingCharacterActiveGalaxyScope(test, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterActiveGalaxy, [
    {
       scope: 'Session',
       id: sessionId
@@ -268,7 +156,7 @@ exports.testCharacterActiveGalaxySentDefault_WhenNoDataStored = function(test)
    var sessionId = UuidFactory.v4();
    var emitter = new EventEmitter();
 
-   this.fixture.givenStorageReturnsDataDelayed([
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
    {
       id: null,
       data: null
@@ -290,7 +178,7 @@ exports.testCharacterActiveGalaxyEmitted_WhenDataReturnedFromStorage = function(
    var galaxyId = 5678;
    var emitter = new EventEmitter();
 
-   this.fixture.givenStorageReturnsDataDelayed([
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
    {
       id: charId,
       data:
@@ -316,7 +204,7 @@ exports.testCharacterActiveGalaxyEmittedWithNewData_WhenRequestsWereReceivedBefo
    var newGalaxyId = 1233;
    var emitter = new EventEmitter();
 
-   this.fixture.givenStorageReturnsDataDelayed([
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
    {
       id: charId,
       data:

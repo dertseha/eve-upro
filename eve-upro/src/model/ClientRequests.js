@@ -9,7 +9,12 @@ var RequestNames =
    /**
     * Set the currently active galaxy (for the view). Body: { galaxyId: int }
     */
-   SetActiveGalaxy: 0
+   SetActiveGalaxy: 0,
+
+   /**
+    * Sets the route of the autopilot.
+    */
+   SetAutopilotRoute: 0
 };
 
 function staticInit()

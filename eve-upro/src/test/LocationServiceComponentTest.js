@@ -1,19 +1,16 @@
 var EventEmitter = require('events').EventEmitter;
+var util = require('util');
 
 var UuidFactory = require("../util/UuidFactory.js");
+var busMessages = require('../model/BusMessages.js');
 var CharacterAgentComponent = require('../character-agent-component/CharacterAgentComponent.js');
 var LocationServiceComponent = require('../location-service-component/LocationServiceComponent.js');
-var Character = require('../character-agent-component/Character.js');
 
-var busMessages = require('../model/BusMessages.js');
+var AbstractServiceComponentFixture = require('./TestSupport/AbstractServiceComponentFixture.js');
 
 function Fixture()
 {
-   this.amqp = new EventEmitter();
-   this.characterAgent = new CharacterAgentComponent(
-   {
-      amqp: this.amqp
-   });
+   Fixture.super_.call(this);
 
    this.locationService = new LocationServiceComponent(
    {
@@ -21,25 +18,10 @@ function Fixture()
       'character-agent': this.characterAgent
    });
 
-   this.givenExistingCharacterSession = function(charId, sessionId)
+   this.initCharacterServiceData = function(character)
    {
-      this.givenExistingCharacterSessions(charId, [ sessionId ]);
-   };
-
-   this.givenExistingCharacterSessions = function(charId, sessionIds)
-   {
-      var character = new Character(charId, 'name');
-      var self = this;
-
       character.lastKnownLocation = null;
       character.locationsBySessionId = {};
-
-      this.characterAgent.characters[charId] = character;
-      sessionIds.forEach(function(sessionId)
-      {
-         self.characterAgent.charactersBySession[sessionId] = character;
-         character.addClientSession(sessionId);
-      });
    };
 
    this.givenCharacterIsAt = function(charId, solarSystemId, notifyingSessions)
@@ -69,58 +51,8 @@ function Fixture()
       };
    };
 
-   this.expectingCharacterLocationStatusScope = function(test, expectedInterest)
-   {
-      this.amqp.broadcast = function(header, body)
-      {
-         if (header.type == busMessages.Broadcasts.CharacterLocationStatus)
-         {
-            test.deepEqual(header.interest, expectedInterest);
-         }
-      };
-   };
-
-   this.whenBroadcastReceived = function(type, body)
-   {
-      var header =
-      {
-         type: type
-      };
-
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + header.type, header, body);
-   };
-
-   this.whenClientConnected = function(charId, sessionId, responseQueue)
-   {
-      this.broadcastClientStatus(busMessages.Broadcasts.ClientConnected, charId, sessionId, responseQueue);
-   };
-
-   this.whenClientDisconnected = function(charId, sessionId, responseQueue)
-   {
-      this.broadcastClientStatus(busMessages.Broadcasts.ClientDisconnected, charId, sessionId);
-   };
-
-   this.broadcastClientStatus = function(type, charId, sessionId, responseQueue)
-   {
-      var header =
-      {
-         type: type
-      };
-      var body =
-      {
-         sessionId: sessionId,
-         responseQueue: responseQueue,
-         user:
-         {
-            characterId: charId
-         }
-      };
-
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + header.type, header, body);
-   };
 }
+util.inherits(Fixture, AbstractServiceComponentFixture);
 
 exports.setUp = function(callback)
 {
@@ -146,7 +78,7 @@ exports.testCharacterLocationStatusEmitted_WhenEveStatusReceived = function(test
 
    this.fixture.expectingCharacterLocationStatus(test, charId, solarSystemId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
    {
       sessionId: sessionId,
       eveInfo:
@@ -177,8 +109,8 @@ exports.testCharacterLocationStatusEmittedOnlyOnce_WhenEveStatusReceivedTwiceIde
 
    this.fixture.expectingCharacterLocationStatus(test, charId, solarSystemId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, broadcastBody);
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, broadcastBody);
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId, broadcastBody);
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId, broadcastBody);
 
    test.expect(2);
    test.done();
@@ -192,13 +124,13 @@ exports.testCharacterLocationStatusHasCharacterScope_WhenEveStatusReceived = fun
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
-   this.fixture.expectingCharacterLocationStatusScope(test, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus, [
    {
       scope: 'Character',
       id: charId
    } ]);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
    {
       sessionId: sessionId,
       eveInfo:
@@ -221,7 +153,7 @@ exports.testCharacterLocationStatusHasSessionScope_WhenSecondSessionEstablished 
    this.fixture.givenExistingCharacterSession(charId, sessionIdExisting);
    this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionIdExisting ]);
 
-   this.fixture.expectingCharacterLocationStatusScope(test, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus, [
    {
       scope: 'Session',
       id: sessionId
@@ -238,7 +170,7 @@ exports.testCharacterLocationStatusNotSent_WhenFirstSessionEstablished = functio
    var charId = 1234;
    var sessionId = UuidFactory.v4();
 
-   this.fixture.expectingCharacterLocationStatusScope(test, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus, [
    {
       scope: 'Session',
       id: sessionId

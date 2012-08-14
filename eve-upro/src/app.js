@@ -19,6 +19,7 @@ var CharacterAgentComponentBuilder = require('./character-agent-component/Charac
 var ClientSessionComponentBuilder = require('./client-session-component/ClientSessionComponentBuilder.js');
 var LocationServiceComponentBuilder = require('./location-service-component/LocationServiceComponentBuilder.js');
 var CharacterServiceComponentBuilder = require('./character-service-component/CharacterServiceComponentBuilder.js');
+var AutopilotServiceComponentBuilder = require('./autopilot-service-component/AutopilotServiceComponentBuilder.js');
 
 var cloudMongo = null;
 var cloudRabbit = null;
@@ -156,6 +157,11 @@ var serviceControl = new ServiceControl();
 }
 { // character-service
    var builder = new CharacterServiceComponentBuilder();
+
+   serviceControl.setBuilder(builder);
+}
+{ // autopilot-service
+   var builder = new AutopilotServiceComponentBuilder();
 
    serviceControl.setBuilder(builder);
 }

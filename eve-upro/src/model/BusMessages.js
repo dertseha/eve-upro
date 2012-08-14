@@ -11,6 +11,11 @@ var Broadcasts =
    ClientDisconnected: 0,
 
    /**
+    * Selects amongst all connected (and trusted) IGB connections one to control the client
+    */
+   CharacterClientControlSelection: 0,
+
+   /**
     * Caused periodically by EVE data related clients, based on IGB header data. Can come more than once with the same
     * data when there are several IGB tabs open.
     */
@@ -29,7 +34,22 @@ var Broadcasts =
    /**
     * Sent when the currently active galaxy has been changed.
     */
-   CharacterActiveGalaxy: 0
+   CharacterActiveGalaxy: 0,
+
+   /**
+    * Client Request
+    */
+   ClientRequestSetAutopilotRoute: 0,
+
+   /**
+    * Notifies the current autopilot route of the character
+    */
+   CharacterAutopilotRoute: 0,
+
+   /**
+    * Which route index the character is next
+    */
+   CharacterAutopilotRouteIndex: 0
 };
 
 function staticInit()

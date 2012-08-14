@@ -161,7 +161,8 @@ function LocationServiceComponent(services)
       var header =
       {
          type: busMessages.Broadcasts.CharacterLocationStatus,
-         interest: interest
+         interest: interest,
+         characterId: character.getCharacterId()
       };
       var body =
       {
