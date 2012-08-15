@@ -5,6 +5,7 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
       $super(upro.view.mediators.InGameBrowserMediator.NAME, new upro.eve.NullInGameBrowser());
 
       this.lastReportedRouteIndex = -1;
+      this.expectedNextRouteIndex = 0;
    },
 
    onRegister: function()
@@ -41,6 +42,7 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
 
       igb.clearAllWaypoints();
       this.lastReportedRouteIndex = -1;
+      this.expectedNextRouteIndex = 0;
    },
 
    /**
@@ -59,6 +61,13 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
          limit = route.length;
       }
 
+      if (this.expectedNextRouteIndex < nextRouteIndex)
+      {
+         upro.sys.log('Skipped some systems on autopilot route, resetting');
+         igb.clearAllWaypoints();
+         this.lastReportedRouteIndex = nextRouteIndex - 1;
+      }
+
       for ( var i = this.lastReportedRouteIndex + 1; i < limit; i++)
       {
          var routeEntry = route[i];
@@ -66,6 +75,7 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
          igb.addWaypoint(routeEntry.solarSystemId);
          this.lastReportedRouteIndex = i;
       }
+      this.expectedNextRouteIndex = nextRouteIndex + 1;
    }
 
 });
