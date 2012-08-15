@@ -23,14 +23,24 @@ function Fixture()
 
    this.initCharacterServiceData = function(character)
    {
-      character.serviceData['character-service'] = new ActiveCharacterServiceDataState(character, this.characterService);
+      this.characterService.onCharacterOnline(character);
    };
 
    this.givenCharacterHasActiveGalaxy = function(charId, galaxyId)
    {
       var serviceData = this.characterAgent.characters[charId].serviceData['character-service'];
 
-      serviceData.rawData.activeGalaxyId = galaxyId;
+      serviceData.dataState.rawData.activeGalaxyId = galaxyId;
+   };
+
+   this.givenCharacterHasIgbSessionWithControl = function(charId, sessionId, activeControl)
+   {
+      var serviceData = this.characterAgent.characters[charId].serviceData['character-service'];
+
+      serviceData.igbSessions[sessionId] =
+      {
+         activeControl: activeControl
+      };
    };
 
    this.expectingCharacterActiveGalaxy = function(test, charId, galaxyId, interest)
@@ -43,6 +53,33 @@ function Fixture()
             if (interest)
             {
                test.deepEqual(header.interest, interest);
+            }
+         }
+      };
+   };
+
+   this.expectingCharacterClientControlSelection = function(test, charId, activeSessionId)
+   {
+      this.amqp.broadcast = function(header, body)
+      {
+         if (header.type == busMessages.Broadcasts.CharacterClientControlSelection)
+         {
+            if (body.active)
+            {
+               test.deepEqual(header.interest, [
+               {
+                  scope: 'Session',
+                  id: activeSessionId
+               } ]);
+            }
+            else
+            {
+               test.deepEqual(header.interest, [
+               {
+                  scope: 'Character',
+                  id: charId
+               } ]);
+
             }
          }
       };
@@ -223,5 +260,80 @@ exports.testCharacterActiveGalaxyEmittedWithNewData_WhenRequestsWereReceivedBefo
    emitter.emit('event');
 
    test.expect(1);
+   test.done();
+};
+
+exports.testCharacterClientControlSelection_WhenFirstStatusMessageReceived = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
+   {
+      sessionId: sessionId
+   });
+
+   test.expect(2);
+   test.done();
+};
+
+exports.testCharacterClientControlSelectionNotSentAgain_WhenStatusMessageReceivedAgain = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterHasIgbSessionWithControl(charId, sessionId, true);
+
+   this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
+   {
+      sessionId: sessionId
+   });
+
+   test.expect(0);
+   test.done();
+};
+
+exports.testCharacterClientControlSelectionNotChanged_WhenStatusMessageReceivedFromSecond = function(test)
+{
+   var charId = 1234;
+   var sessionId1 = UuidFactory.v4();
+   var sessionId2 = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSessions(charId, [ sessionId1, sessionId2 ]);
+   this.fixture.givenCharacterHasIgbSessionWithControl(charId, sessionId1, true);
+
+   this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId2);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId2,
+   {
+      sessionId: sessionId2
+   });
+
+   test.expect(0);
+   test.done();
+};
+
+exports.testCharacterClientControlSelectionChanged_WhenFirstDisconnected = function(test)
+{
+   var charId = 1234;
+   var sessionId1 = UuidFactory.v4();
+   var sessionId2 = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSessions(charId, [ sessionId1, sessionId2 ]);
+   this.fixture.givenCharacterHasIgbSessionWithControl(charId, sessionId1, true);
+   this.fixture.givenCharacterHasIgbSessionWithControl(charId, sessionId2, false);
+
+   this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId2);
+
+   this.fixture.whenClientDisconnected(charId, sessionId1);
+
+   test.expect(2);
    test.done();
 };

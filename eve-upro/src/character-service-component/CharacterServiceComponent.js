@@ -1,5 +1,8 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
@@ -26,8 +29,17 @@ function CharacterServiceComponent(services)
       {
          self.onCharacterSessionAdded(character, sessionId);
       });
+      this.characterAgent.on('SessionRemoved', function(character, sessionId)
+      {
+         self.onCharacterSessionRemoved(character, sessionId);
+      });
+      this.characterAgent.on('CharacterOffline', function(character)
+      {
+         self.onCharacterOffline(character);
+      });
 
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
+      this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
 
       this.mongodb.defineCollection('CharacterData', {}, function()
       {
@@ -55,7 +67,72 @@ function CharacterServiceComponent(services)
 
       if (character)
       {
-         character.serviceData['character-service'].onBroadcastClientRequestSetActiveGalaxy(header, body);
+         character.serviceData['character-service'].dataState.onBroadcastClientRequestSetActiveGalaxy(header, body);
+      }
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastEveStatusUpdateRequest = function(header, body)
+   {
+      var sessionId = body.sessionId;
+      var character = this.characterAgent.getCharacterBySession(sessionId);
+
+      if (character)
+      {
+         var serviceData = character.serviceData['character-service'];
+
+         if (!serviceData.igbSessions[sessionId])
+         {
+            var session =
+            {
+               activeControl: false
+            };
+
+            logger.info('Detected IGB session: [' + sessionId + '] for character [' + character.characterName + ']');
+            serviceData.igbSessions[sessionId] = session;
+            this.updateIgbSessionControl(character);
+         }
+      }
+   };
+
+   /**
+    * Updates the currently active IGB session if one is missing.
+    */
+   this.updateIgbSessionControl = function(character)
+   {
+      var serviceData = character.serviceData['character-service'];
+      var selectedSessionId = null;
+      var activeSessionId = null;
+
+      for ( var sessionId in serviceData.igbSessions)
+      {
+         var session = serviceData.igbSessions[sessionId];
+
+         if (session.activeControl)
+         {
+            activeSessionId = sessionId;
+         }
+         else
+         {
+            selectedSessionId = sessionId;
+         }
+      }
+      if (!activeSessionId && selectedSessionId)
+      {
+         var responseQueue = character.getResponseQueue(sessionId);
+         var interest = [
+         {
+            scope: 'Session',
+            id: selectedSessionId
+         } ];
+
+         logger.info('Selecting IGB control session: [' + selectedSessionId + '] for character ['
+               + character.characterName + ']');
+         serviceData.igbSessions[selectedSessionId].activeControl = true;
+         this.broadcastCharacterClientControlSelection(character, this.getInterest(character), false);
+         this.broadcastCharacterClientControlSelection(character, interest, true, responseQueue);
       }
    };
 
@@ -66,6 +143,12 @@ function CharacterServiceComponent(services)
    {
       var state = new PendingCharacterServiceDataState(character, this);
 
+      logger.info('Character [' + character.characterName + '] is online');
+      character.serviceData['character-service'] =
+      {
+         igbSessions: {},
+         dataState: null
+      };
       state.activate();
    };
 
@@ -74,7 +157,33 @@ function CharacterServiceComponent(services)
     */
    this.onCharacterSessionAdded = function(character, sessionId)
    {
-      character.serviceData['character-service'].onCharacterSessionAdded(sessionId);
+      character.serviceData['character-service'].dataState.onCharacterSessionAdded(sessionId);
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterSessionRemoved = function(character, sessionId)
+   {
+      var serviceData = character.serviceData['character-service'];
+      var session = serviceData.igbSessions[sessionId];
+
+      if (session)
+      {
+         delete serviceData.igbSessions[sessionId];
+         if (session.activeControl)
+         {
+            this.updateIgbSessionControl(character);
+         }
+      }
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterOffline = function(character)
+   {
+      logger.info('Character [' + character.characterName + '] is offline');
    };
 
    /**
@@ -101,7 +210,7 @@ function CharacterServiceComponent(services)
    {
       var serviceData = character.serviceData['character-service'];
 
-      this.mongodb.setData('CharacterData', character.getCharacterId(), serviceData.rawData, function()
+      this.mongodb.setData('CharacterData', character.getCharacterId(), serviceData.dataState.rawData, function()
       {
       });
    };
@@ -124,12 +233,33 @@ function CharacterServiceComponent(services)
       };
       var body =
       {
-         galaxyId: serviceData.rawData.activeGalaxyId
+         galaxyId: serviceData.dataState.rawData.activeGalaxyId
       };
 
       this.amqp.broadcast(header, body, queueName);
    };
 
+   /**
+    * Broadcast the client control selection
+    * 
+    * @param character the Character object
+    * @param interest the interest for the broadcast message
+    * @param queueName optional explicit queue information
+    */
+   this.broadcastCharacterClientControlSelection = function(character, interest, active, queueName)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.CharacterClientControlSelection,
+         interest: interest
+      };
+      var body =
+      {
+         active: active
+      };
+
+      this.amqp.broadcast(header, body, queueName);
+   };
 }
 util.inherits(CharacterServiceComponent, Component);
 

@@ -15,6 +15,9 @@ upro.app.Notifications =
    /** The session has been dropped. Param: null */
    SessionLoggedOut: 0,
 
+   /** When permission for IGB control has been changed. Param: boolean */
+   ActiveInGameBrowserControlChanged: 0,
+
    /** The location of a character has changed. Param: charId */
    CharacterLocationStatus: 0,
 

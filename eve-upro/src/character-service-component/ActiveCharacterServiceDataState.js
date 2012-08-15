@@ -47,7 +47,7 @@ function ActiveCharacterServiceDataState(character, service, initData)
    /** {@inheritDoc} */
    this.activate = function()
    {
-      this.character.serviceData['character-service'] = this;
+      this.character.serviceData['character-service'].dataState = this;
 
       this.service.saveCharacterData(this.character);
       this.broadcastStateData(this.service.getInterest(this.character));

@@ -143,6 +143,7 @@ exports.sourceFiles = [];
    'control/commands/SetupModelCommand.js', //
    'control/commands/SetupViewCommand.js', //
    'control/commands/InitApplicationCommand.js', //
+   'control/commands/NotifiedActiveInGameBrowserControlChangedCommand.js', //
    'control/commands/NotifiedAutopilotRouteChangedCommand.js', //
    'control/commands/NotifiedAutopilotNextRouteIndexChangedCommand.js', //
    'control/commands/NotifiedCharacterLocationStatusCommand.js', //

@@ -9,16 +9,14 @@ upro.ctrl.cmd.NotifiedAutopilotRouteChangedCommand = Class.create(SimpleCommand,
             {
                this.displayRouteOnMap(route);
             }
-            this.setClientRoute(route);
+            this.clearClientRoute();
          },
 
-         setClientRoute: function(route)
+         clearClientRoute: function()
          {
             var igbMediator = this.facade().retrieveMediator(upro.view.mediators.InGameBrowserMediator.NAME);
-            var igb = igbMediator.getViewComponent();
 
-            igb.clearAllWaypoints();
-            igbMediator.setLastReportedRouteIndex(-1);
+            igbMediator.clearAutopilotRoute();
          },
 
          displayRouteOnMap: function(route)

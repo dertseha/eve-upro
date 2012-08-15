@@ -7,6 +7,8 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
       this.uplink = new upro.data.CommunicationUplink(this);
       this.broadcastHandler = {};
       this.characterInfo = null;
+
+      this.activeInGameBrowserControl = false;
    },
 
    addBroadcastHandler: function(type, callback)
@@ -22,7 +24,12 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
 
    onRegister: function()
    {
+      var self = this;
 
+      this.addBroadcastHandler('CharacterClientControlSelection', function(broadcastBody)
+      {
+         self.onBroadcastCharacterClientControlSelection(broadcastBody);
+      });
    },
 
    shutdown: function()
@@ -124,6 +131,11 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
       return this.characterInfo && (this.characterInfo.characterId == charId);
    },
 
+   /**
+    * Called when a connection has been established
+    * 
+    * @param characterInfo for which character this session is
+    */
    onSessionEstablished: function(characterInfo)
    {
       upro.sys.log("Session Established for: " + characterInfo.characterName + " (" + characterInfo.corporationName
@@ -131,6 +143,12 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
       this.characterInfo = characterInfo;
    },
 
+   /**
+    * Basic broadcast handler dispatching to the specifically registered handler
+    * 
+    * @param header the broadcast header
+    * @param body the broadcast body
+    */
    onBroadcast: function(header, body)
    {
       // upro.sys.log("Broadcast: " + Object.toJSON(header) + "/" + Object.toJSON(body));
@@ -142,6 +160,20 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
          {
             callback(body);
          });
+      }
+   },
+
+   /**
+    * Broadcast Handler
+    */
+   onBroadcastCharacterClientControlSelection: function(broadcastBody)
+   {
+      if (this.activeInGameBrowserControl != broadcastBody.active)
+      {
+         this.activeInGameBrowserControl = broadcastBody.active;
+
+         this.facade().sendNotification(upro.app.Notifications.ActiveInGameBrowserControlChanged,
+               this.activeInGameBrowserControl);
       }
    }
 

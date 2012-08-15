@@ -19,7 +19,7 @@ function PendingCharacterServiceDataState(character, service)
    /** {@inheritDoc} */
    this.activate = function()
    {
-      this.character.serviceData['character-service'] = this;
+      this.character.serviceData['character-service'].dataState = this;
 
       var self = this;
       var filter =
@@ -38,12 +38,6 @@ function PendingCharacterServiceDataState(character, service)
 
             newState.activate();
             activated = true;
-         }
-         else if (!activated)
-         {
-            var newState = new ActiveCharacterServiceDataState(self.character, self.service, null);
-
-            newState.activate();
          }
       });
    };
