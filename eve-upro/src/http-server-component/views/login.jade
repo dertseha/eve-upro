@@ -19,6 +19,10 @@ block content
             p
                | No trusted headers received from the browser. IGB might not be configured to trust this site.
                | It is highly recommended to do so. See Options -> Trusted Sites and make sure this site is trusted. 
+         else if (message == 'noSsl')
+            p
+               | You are not connecting via a secure connection. Your key and all further information will be transmitted
+               | as plain text over the network. If you do not desire this, make sure 'https' is used in the URL. 
          else
             p #{message}
 

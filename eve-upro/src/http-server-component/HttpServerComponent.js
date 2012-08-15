@@ -323,8 +323,13 @@ function HttpServerComponent(services, options)
          var userAgent = req.headers['user-agent'];
          var isInGameBrowser = userAgent && (userAgent.indexOf('EVE-IGB') >= 0);
          var hasInGameBrowserTrust = req.eveHeaders && (req.eveHeaders['trusted'] == 'Yes');
+         var isSslConnection = !!req.headers['sslsessionid'];
 
-         if (!message && isInGameBrowser && !hasInGameBrowserTrust)
+         if (!message && !isSslConnection)
+         {
+            message = 'noSsl';
+         }
+         else if (!message && isInGameBrowser && !hasInGameBrowserTrust)
          {
             message = 'notTrusted';
          }
