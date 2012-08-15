@@ -8,7 +8,7 @@ upro.ctrl.cmd.InitApplicationCommand = Class.create(SimpleCommand,
    {
       var sessionControl = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionControl.runUnregistered();
+      sessionControl.establishUplink();
    }
 
 });

@@ -2,29 +2,22 @@
  * This proxy is the primary entry point for anything the user does currently. The same session stays active as long as
  * at least one client is bound to it.
  */
-upro.model.proxies.UserSessionProxy = Class.create(upro.model.proxies.AbstractDataStoreInfoProxy,
+upro.model.proxies.UserSessionProxy = Class.create(Proxy,
 {
-   initialize: function($super, data, dataStore)
+   initialize: function($super)
    {
-      $super(upro.model.proxies.UserSessionProxy.NAME, data, dataStore);
-
-      data.corridorPreparationChanged = this.onCorridorPreparationChanged.bind(this);
+      $super(upro.model.proxies.UserSessionProxy.NAME);
 
    },
 
    onRegister: function()
    {
-      this.facade().sendNotification(upro.app.Notifications.SessionLoggedIn, null);
+
    },
 
    setCorridorPreparation: function(solarSystem, jumpType)
    {
-      var properties = {};
 
-      properties[upro.model.UserSession.PROPERTY_CORRIDOR_PREP_SYSTEM_ID] = solarSystem ? solarSystem.id : "";
-      properties[upro.model.UserSession.PROPERTY_CORRIDOR_PREP_JUMP_TYPE] = jumpType ? jumpType : "";
-
-      this.updateProperties(properties);
    },
 
    /**
@@ -34,9 +27,7 @@ upro.model.proxies.UserSessionProxy = Class.create(upro.model.proxies.AbstractDa
     */
    getCorridorPreparationJumpType: function()
    {
-      var temp = this.getData().getCorridorPrepJumpType();
-
-      return (temp && (temp.length > 0)) ? temp : upro.nav.JumpType.None;
+      return upro.nav.JumpType.None;
    },
 
    /**
@@ -46,10 +37,7 @@ upro.model.proxies.UserSessionProxy = Class.create(upro.model.proxies.AbstractDa
     */
    getCorridorPreparationSolarSystem: function()
    {
-      var id = this.getData().getCorridorPrepSystemId();
-      var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
-
-      return id ? universeProxy.findSolarSystemById(id) : null;
+      return null;
    },
 
    onCorridorPreparationChanged: function()

@@ -169,8 +169,8 @@ upro.view.mediators.MainContextMenuMediator = Class
                   }
                   { // jump drive
                      var range = settingsProxy.getRoutingCapJumpDriveRange();
-                     var belowMaximum = range < upro.model.UserSettings.JumpDriveConstants.MaximumRange;
-                     var aboveMinimum = range > upro.model.UserSettings.JumpDriveConstants.MinimumRange;
+                     var belowMaximum = range < upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MaximumRange;
+                     var aboveMinimum = range > upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MinimumRange;
                      inUse = settingsProxy.getRoutingCapJumpDriveInUse();
 
                      this.commandRoutingCapJumpDrive.setActive(inUse);
@@ -180,13 +180,13 @@ upro.view.mediators.MainContextMenuMediator = Class
                      this.commandRoutingCapJumpDriveMore.setPossible(belowMaximum);
                      this.commandRoutingCapJumpDriveMore.setLabel(belowMaximum ? upro.res.text.Lang.format(
                            "routing.caps.jumpDrive.rangeSet", range, range
-                                 + upro.model.UserSettings.JumpDriveConstants.RangeStep) : upro.res.text.Lang.format(
-                           "routing.caps.jumpDrive.rangeLimit", range));
+                                 + upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep)
+                           : upro.res.text.Lang.format("routing.caps.jumpDrive.rangeLimit", range));
                      this.commandRoutingCapJumpDriveLess.setPossible(aboveMinimum);
                      this.commandRoutingCapJumpDriveLess.setLabel(aboveMinimum ? upro.res.text.Lang.format(
                            "routing.caps.jumpDrive.rangeSet", range, range
-                                 - upro.model.UserSettings.JumpDriveConstants.RangeStep) : upro.res.text.Lang.format(
-                           "routing.caps.jumpDrive.rangeLimit", range));
+                                 - upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep)
+                           : upro.res.text.Lang.format("routing.caps.jumpDrive.rangeLimit", range));
                   }
                },
 

@@ -17,6 +17,10 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
          this.setupHoverPosHighlight(highlightMediator);
          this.setupCurLocationHighlight(highlightMediator);
       }
+
+      this.facade().registerProxy(new upro.model.proxies.UserSessionProxy());
+      this.facade().registerProxy(new upro.model.proxies.UserSettingsProxy());
+
       this.facade().registerMediator(new upro.view.mediators.SolarSystemContextMenuMediator());
       if (upro.scene.SceneSystem.SUPPORTED)
       {

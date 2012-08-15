@@ -9,11 +9,8 @@ upro.app.Notifications =
    /** Some debuggin message. Param: text */
    DebugMessage: 0,
 
-   SessionLogInRequest: 0,
    /** A session has been successfully created. Param: null */
    SessionLoggedIn: 0,
-   /** The session has been dropped. Param: null */
-   SessionLoggedOut: 0,
 
    /** When permission for IGB control has been changed. Param: boolean */
    ActiveInGameBrowserControlChanged: 0,

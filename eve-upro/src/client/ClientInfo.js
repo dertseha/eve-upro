@@ -105,30 +105,13 @@ exports.sourceFiles = [];
 
    'data/data.js', //
    'data/CommunicationUplink.js', //
-   'data/InfoId.js', //
-   'data/InfoTypeFactory.js', //
-   'data/DataStoreInfo.js', //
-   'data/DataStore.js', //
-   'data/DataStoreModifier.js', //
-   'data/DataStoreWriteTransaction.js', //
-   'data/MemoryDataStore.js', //
-   'data/MemoryDataStoreEntry.js', //
-   'data/MemoryDataStoreWriteTransaction.js', //
-   'data/MemoryDataStoreModifyTester.js', //
-   'data/MemoryDataStoreModifyExecutor.js', //
 
    'model/model.js', //
-   'model/AbstractProxiedDataStoreInfo.js', //
    'model/LocationTracker.js', //
-   'model/UserSession.js', //
-   'model/UserSettings.js', //
-   'model/UserIgnoredSolarSystem.js', //
    'model/UserRoutingRule.js', //
 
    'model/proxies/proxies.js', //
-   'model/proxies/InfoTypeFactoryProxy.js', //
    'model/proxies/SessionControlProxy.js', //
-   'model/proxies/AbstractDataStoreInfoProxy.js', //
    'model/proxies/LocationTrackerProxy.js', //
    'model/proxies/UserSessionProxy.js', //
    'model/proxies/UserSettingsProxy.js', //

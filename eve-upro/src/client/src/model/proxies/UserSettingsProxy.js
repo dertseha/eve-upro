@@ -1,12 +1,32 @@
-upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractDataStoreInfoProxy,
+upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 {
-   initialize: function($super, data, dataStore)
+   initialize: function($super)
    {
-      $super(upro.model.proxies.UserSettingsProxy.NAME, data, dataStore);
+      $super(upro.model.proxies.UserSettingsProxy.NAME);
 
-      data.routingCapabilitiesChanged = this.onRoutingCapabilitiesChanged.bind(this);
-      data.ignoredSolarSystemsChanged = this.onIgnoredSolarSystemsChanged.bind(this);
-      data.routingRulesChanged = this.onRoutingRulesChanged.bind(this);
+      this.ignoredSolarSystems = [ 30000142 ]; // Jita
+
+      this.routingCapJumpGatesInUse = true;
+      this.routingCapJumpDriveInUse = false;
+      this.routingCapJumpDriveRange = 5.0;
+
+      this.routingRules = {};
+      this.createRoutingRule(0, "MinSecurity", true, 5);
+      this.createRoutingRule(1, "MaxSecurity", false, 10);
+      this.createRoutingRule(2, "Jumps", true, 0);
+      this.createRoutingRule(3, "JumpFuel", false, 0);
+   },
+
+   createRoutingRule: function(index, ruleType, inUse, parameter)
+   {
+      var rule = new upro.model.UserRoutingRule();
+
+      rule.index = index;
+      rule.ruleType = ruleType;
+      rule.inUse = inUse;
+      rule.parameter = parameter;
+
+      this.routingRules[ruleType] = rule;
    },
 
    onRegister: function()
@@ -18,6 +38,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
       {
          self.onCharacterActiveGalaxy(broadcastBody);
       });
+
+      this.onRoutingCapabilitiesChanged();
+      this.onIgnoredSolarSystemsChanged();
+      this.onRoutingRulesChanged();
    },
 
    onRemove: function()
@@ -52,37 +76,29 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
 
    getRoutingCapJumpGatesInUse: function()
    {
-      return this.getData().getRoutingCapJumpGatesInUse();
+      return this.routingCapJumpGatesInUse;
    },
 
    toggleRoutingCapJumpGates: function()
    {
-      var properties = {};
-
-      properties[upro.model.UserSettings.PROPERTY_ROUTING_CAP_JUMP_GATES_IN_USE] = this.encodeBoolean(!this
-            .getRoutingCapJumpGatesInUse());
-
-      this.updateProperties(properties);
+      this.routingCapJumpGatesInUse = !this.getRoutingCapJumpGatesInUse();
+      this.onRoutingCapabilitiesChanged();
    },
 
    getRoutingCapJumpDriveInUse: function()
    {
-      return this.getData().getRoutingCapJumpDriveInUse();
+      return this.routingCapJumpDriveInUse;
    },
 
    toggleRoutingCapJumpDrive: function()
    {
-      var properties = {};
-
-      properties[upro.model.UserSettings.PROPERTY_ROUTING_CAP_JUMP_DRIVE_IN_USE] = this.encodeBoolean(!this
-            .getRoutingCapJumpDriveInUse());
-
-      this.updateProperties(properties);
+      this.routingCapJumpDriveInUse = !this.getRoutingCapJumpDriveInUse();
+      this.onRoutingCapabilitiesChanged();
    },
 
    getRoutingCapJumpDriveRange: function()
    {
-      return this.getData().getRoutingCapJumpDriveRange();
+      return this.routingCapJumpDriveRange;
    },
 
    /**
@@ -92,18 +108,15 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
     */
    stepRoutingCapJumpDriveRange: function(increment)
    {
-      var value = this.getRoutingCapJumpDriveRange()
-            + (increment ? upro.model.UserSettings.JumpDriveConstants.RangeStep
-                  : -upro.model.UserSettings.JumpDriveConstants.RangeStep);
+      var value = this.routingCapJumpDriveRange
+            + (increment ? upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep
+                  : -upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep);
 
-      if ((value >= upro.model.UserSettings.JumpDriveConstants.MinimumRange)
-            && (value <= upro.model.UserSettings.JumpDriveConstants.MaximumRange))
+      if ((value >= upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MinimumRange)
+            && (value <= upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MaximumRange))
       {
-         var properties = {};
-
-         properties[upro.model.UserSettings.PROPERTY_ROUTING_CAP_JUMP_DRIVE_RANGE] = value;
-
-         this.updateProperties(properties);
+         this.routingCapJumpDriveRange = value;
+         this.onRoutingCapabilitiesChanged();
       }
    },
 
@@ -115,31 +128,29 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
 
    toggleIgnoredSolarSystem: function(solarSystemId)
    {
-      var transaction = this.getDataStore().createWriteTransaction();
-      var data = this.getData();
-      var entries = data.getIgnoredSolarSystems();
+      var entries = this.ignoredSolarSystems;
+      var newArray = [];
       var found = false;
 
-      for ( var i = 0; i < entries.length; i++)
+      for ( var i = entries.length - 1; i >= 0; i--)
       {
          var entry = entries[i];
 
-         if (entry.getSolarSystemId() == solarSystemId)
+         if (entry == solarSystemId)
          {
-            transaction.deleteInfo(entry.getInfoId());
             found = true;
+         }
+         else
+         {
+            newArray.push(entry);
          }
       }
       if (!found)
       {
-         var ignoredId = new upro.data.InfoId(upro.model.UserIgnoredSolarSystem.TYPE);
-
-         transaction.createInfo(data.getInfoId(), ignoredId,
-         {
-            "solarSystemId": solarSystemId
-         });
+         newArray.push(solarSystemId);
       }
-      transaction.commit();
+      this.ignoredSolarSystems = newArray;
+      this.onIgnoredSolarSystemsChanged();
    },
 
    /**
@@ -149,17 +160,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
     */
    getIgnoredSolarSystemIds: function()
    {
-      var entries = this.getData().getIgnoredSolarSystems();
-      var result = [];
-
-      for ( var i = 0; i < entries.length; i++)
-      {
-         var entry = entries[i];
-
-         result.push(entry.getSolarSystemId());
-      }
-
-      return result;
+      return this.ignoredSolarSystems;
    },
 
    /**
@@ -177,7 +178,18 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
     */
    getRoutingRules: function()
    {
-      return this.getData().getRoutingRules();
+      var result = [];
+
+      for ( var ruleType in this.routingRules)
+      {
+         result.push(this.routingRules[ruleType]);
+      }
+      result.sort(function sortByIndex(a, b)
+      {
+         return a.getIndex() - b.getIndex();
+      });
+
+      return result;
    },
 
    /**
@@ -187,16 +199,12 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
     */
    toggleRoutingRule: function(ruleType)
    {
-      var rule = this.getData().getRoutingRuleByType(ruleType);
+      var rule = this.routingRules[ruleType];
 
       if (rule)
       {
-         var transaction = this.getDataStore().createWriteTransaction();
-         var properties = {};
-
-         properties[upro.model.UserRoutingRule.PROPERTY_IN_USE] = rule.getInUse() ? 0 : 1;
-         transaction.updateInfo(rule.getInfoId(), properties);
-         transaction.commit();
+         rule.inUse = !rule.inUse;
+         this.onRoutingRulesChanged();
       }
    },
 
@@ -208,18 +216,14 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
     */
    stepRoutingRuleParameter: function(ruleType, increment)
    {
-      var rule = this.getData().getRoutingRuleByType(ruleType);
+      var rule = this.routingRules[ruleType];
 
       if (rule)
       {
-         var template = upro.model.UserRoutingRule.RuleConstants[rule.getRuleType()];
-         var transaction = this.getDataStore().createWriteTransaction();
-         var properties = {};
+         var template = upro.model.UserRoutingRule.RuleConstants[rule.ruleType];
 
-         properties[upro.model.UserRoutingRule.PROPERTY_PARAMETER] = rule.getParameter()
-               + (increment ? template.Increment : -template.Increment);
-         transaction.updateInfo(rule.getInfoId(), properties);
-         transaction.commit();
+         rule.parameter = rule.parameter + (increment ? template.Increment : -template.Increment);
+         this.onRoutingRulesChanged();
       }
    },
 
@@ -231,7 +235,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
     */
    moveRoutingRule: function(ruleType, up)
    {
-      var rule = this.getData().getRoutingRuleByType(ruleType);
+      var rule = this.routingRules[ruleType];
 
       if (rule)
       {
@@ -241,23 +245,19 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
          if ((newIndex >= 0) && (newIndex < upro.model.UserRoutingRule.RuleLimit))
          {
             var rules = this.getRoutingRules();
-            var transaction = this.getDataStore().createWriteTransaction();
-            var properties = {};
 
-            // update the specified rule
-            properties[upro.model.UserRoutingRule.PROPERTY_INDEX] = newIndex;
-            transaction.updateInfo(rule.getInfoId(), properties);
             for ( var i = 0; i < rules.length; i++)
-            { // go through other rules and swapt their index
-               rule = rules[i];
-               if (rule.getIndex() == newIndex)
+            { // go through other rules and swap their index
+               var tempRule = rules[i];
+
+               if (tempRule.getIndex() == newIndex)
                {
-                  properties = {};
-                  properties[upro.model.UserRoutingRule.PROPERTY_INDEX] = oldIndex;
-                  transaction.updateInfo(rule.getInfoId(), properties);
+                  tempRule.index = oldIndex;
                }
             }
-            transaction.commit();
+            // update the specified rule
+            rule.index = newIndex;
+            this.onRoutingRulesChanged();
          }
       }
    }
@@ -265,3 +265,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractD
 });
 
 upro.model.proxies.UserSettingsProxy.NAME = "UserSettings";
+
+upro.model.proxies.UserSettingsProxy.JumpDriveConstants =
+{
+   MinimumRange: 0.25,
+   MaximumRange: 20.0,
+   RangeStep: 0.25
+};
