@@ -201,7 +201,9 @@ function ClientSessionComponent(services)
       }
       else
       {
-         logger.warn('Failed login request, API key did not match expectations');
+         logger.warn('Failed login request, API key did not match expectations; Type: [' + struct.response.key.type
+               + '], accessMask: ' + struct.response.key.accessMask + ' Character(s): '
+               + struct.response.characters.length);
          request.done(null, false);
       }
    };

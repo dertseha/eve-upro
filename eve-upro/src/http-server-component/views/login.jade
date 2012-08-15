@@ -12,7 +12,13 @@ block content
    if message
       div(class="message")
          if (message == 'loginFailed')
-            p Login request failed. Please verify your credentials and try again.
+            p
+               | Login request failed. Please verify your credentials and try again. The key must be of type
+               | Character and be for one character only. The access mask must be 0.
+         else if (message == 'notTrusted')
+            p
+               | No trusted headers received from the browser. IGB might not be configured to trust this site.
+               | It is highly recommended to do so. See Options -> Trusted Sites and make sure this site is trusted. 
          else
             p #{message}
 

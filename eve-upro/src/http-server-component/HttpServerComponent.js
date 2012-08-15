@@ -320,7 +320,14 @@ function HttpServerComponent(services, options)
       else
       {
          var message = req.query.message;
+         var userAgent = req.headers['user-agent'];
+         var isInGameBrowser = userAgent && (userAgent.indexOf('EVE-IGB') >= 0);
+         var hasInGameBrowserTrust = req.eveHeaders && (req.eveHeaders['trusted'] == 'Yes');
 
+         if (!message && isInGameBrowser && !hasInGameBrowserTrust)
+         {
+            message = 'notTrusted';
+         }
          res.render('login.jade',
          {
             message: message

@@ -162,7 +162,7 @@ function AmqpComponent(options)
    {
       var data = JSON.parse(message.data);
 
-      // logger.trace('MSG: ' + message.data);
+      // logger.info('MSG: ' + message.data);
       this.emit('broadcast', data.header, data.body);
       this.emit('broadcast:' + data.header.type, data.header, data.body);
    };
