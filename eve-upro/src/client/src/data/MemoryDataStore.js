@@ -181,7 +181,8 @@ upro.data.MemoryDataStore = Class.create(upro.data.DataStore,
     */
    deferProcessPendingActions: function()
    {
-      this.processPendingActions.bind(this).defer();
+      // this.processPendingActions.bind(this).defer();
+      this.processPendingActions();
    },
 
    /**

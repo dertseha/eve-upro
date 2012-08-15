@@ -1,4 +1,3 @@
-
 upro.view.mediators.HudMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
    initialize: function($super)
@@ -18,14 +17,7 @@ upro.view.mediators.HudMediator = Class.create(upro.view.mediators.AbstractMedia
    {
       this.getViewComponent().debugMessage(text);
    },
-/*
-   onNotifyActiveGalaxyChanged: function(galaxyId)
-   {
-      var galaxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME).getGalaxy(galaxyId);
 
-      this.getViewComponent().debugMessage("ActiveGalaxy: " + (galaxy ? galaxy.name : "<none>"));
-   },
-*/
    onNotifySessionLoggedIn: function()
    {
       this.getViewComponent().debugMessage("Online!");

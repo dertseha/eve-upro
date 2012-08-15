@@ -109,11 +109,6 @@ upro.model.proxies.UniverseProxy = Class.create(Proxy,
          this.loadConstellations(galaxy, mapData);
          this.loadSolarSystems(galaxy, mapData);
          this.loadSolarSystemJumps(galaxy, mapData, staticJumpType);
-         /*
-          * this.facade().sendNotification(upro.app.Notifications.DebugMessage, galaxy.toString() + ": " +
-          * mapData.regionData.length + " Regions, " + mapData.constellationData.length + " Constellations, " +
-          * mapData.solarSystemData.length + " Solar Systems, " + mapData.solarSystemJumpData.length + " Static Jumps");
-          */
       }
    },
 

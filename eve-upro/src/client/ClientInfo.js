@@ -39,6 +39,9 @@ exports.sourceFiles = [];
 
    'eve/eve.js', //
    'eve/Util.js', //
+   'eve/NullInGameBrowser.js', //
+   'eve/RealInGameBrowser.js', //
+   'eve/ThrottledInGameBrowser.js', //
 
    'navigation/navigation.js', //
    'navigation/IdentifiedObjectHolder.js', //
@@ -180,6 +183,7 @@ exports.sourceFiles = [];
    'view/mediators/AbstractMediator.js', //
    'view/mediators/DocumentMouseMediator.js', //
    'view/mediators/HudMediator.js', //
+   'view/mediators/InGameBrowserMediator.js', //
    'view/mediators/SceneMediator.js', //
    'view/mediators/SolarSystemHighlight.js', //
    'view/mediators/SolarSystemHighlightMediator.js', //

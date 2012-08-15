@@ -2,18 +2,35 @@ upro.ctrl.cmd.NotifiedAutopilotRouteChangedCommand = Class.create(SimpleCommand,
       {
          execute: function(notification)
          {
-            var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
             var autopilotProxy = this.facade().retrieveProxy(upro.model.proxies.AutopilotProxy.NAME);
+            var route = autopilotProxy.getRoute();
+
+            if (upro.scene.SceneSystem.SUPPORTED)
+            {
+               this.displayRouteOnMap(route);
+            }
+            this.setClientRoute(route);
+         },
+
+         setClientRoute: function(route)
+         {
+            var igbMediator = this.facade().retrieveMediator(upro.view.mediators.InGameBrowserMediator.NAME);
+            var igb = igbMediator.getViewComponent();
+
+            igb.clearAllWaypoints();
+            igbMediator.setLastReportedRouteIndex(-1);
+         },
+
+         displayRouteOnMap: function(route)
+         {
+            var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
             var sceneMediator = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
             var highlightMediator = this.facade().retrieveMediator(
                   upro.view.mediators.SolarSystemHighlightMediator.NAME);
-            var route = autopilotProxy.getRoute();
             var okColor = [ 0.0, 1.0, 0.7, 2.0 ];
             var lastEntry = null;
             var lastSystem = null;
             var waypointCounter = 1;
-
-            // upro.sys.log('Autopilot new route: ' + Object.toJSON(route));
 
             sceneMediator.clearRoute('Autopilot');
             highlightMediator.removeHighlights(/Autopilot:.*/);
