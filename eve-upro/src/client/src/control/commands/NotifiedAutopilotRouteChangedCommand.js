@@ -27,7 +27,7 @@ upro.ctrl.cmd.NotifiedAutopilotRouteChangedCommand = Class.create(SimpleCommand,
             var sceneMediator = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
             var highlightMediator = this.facade().retrieveMediator(
                   upro.view.mediators.SolarSystemHighlightMediator.NAME);
-            var okColor = [ 0.0, 1.0, 0.7, 2.0 ];
+            var okColor = [ 1.0, 1.0, 0.0, 2.0 ];
             var lastEntry = null;
             var lastSystem = null;
             var waypointCounter = 1;
@@ -83,8 +83,8 @@ upro.ctrl.cmd.NotifiedAutopilotRouteChangedCommand = Class.create(SimpleCommand,
 
             if (!entry)
             {
-               var textColor = isReachable ? "#00FFC0" : "#FF0000";
-               var bracketColor = isReachable ? "#008040" : "800000";
+               var textColor = isReachable ? "#FFFF00" : "#FF0000";
+               var bracketColor = isReachable ? "#808000" : "800000";
 
                var textOptions =
                {
