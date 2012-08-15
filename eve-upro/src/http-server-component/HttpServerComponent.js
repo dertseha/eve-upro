@@ -302,7 +302,8 @@ function HttpServerComponent(services, options)
             shaders: [ getShaderInfo('vertex', 'basic-vertex-shader', 'basicVertexShader.c'),
                   getShaderInfo('fragment', 'basic-fragment-shader', 'basicFragmentShader.c'),
                   getShaderInfo('vertex', 'system-vertex-shader', 'solarSystemVertexShader.c'),
-                  getShaderInfo('fragment', 'system-fragment-shader', 'solarSystemFragmentShader.c') ]
+                  getShaderInfo('fragment', 'system-fragment-shader', 'solarSystemFragmentShader.c') ],
+            clientConfig: JSON.stringify(this.options.clientOptions)
          });
       }
       else
@@ -406,7 +407,8 @@ function HttpServerComponent(services, options)
          {
             var clientRequest =
             {
-               eveHeaders: this.getValidEveHeaders(req),
+               eveHeaders: req.eveHeaders,
+               user: req.user,
                header: req.body.params.header,
                body: req.body.params.body
             };
@@ -414,10 +416,14 @@ function HttpServerComponent(services, options)
             {
                jsonrpc: '2.0',
                id: req.body.id,
-               result: null
+               result:
+               {
+                  eveHeadersPresence: !!req.eveHeaders,
+                  returnCode: null
+               }
             };
 
-            resultObj.result = this.sessionHandler.onClientRequest(clientRequest);
+            resultObj.result.returnCode = this.sessionHandler.onClientRequest(clientRequest);
 
             { // send result
                var body = JSON.stringify(resultObj);
@@ -439,25 +445,6 @@ function HttpServerComponent(services, options)
       {
          res.send(401);
       }
-   };
-
-   /**
-    * Returns the eveHeaders construct from the request if the provided information (so far acceptable) matches to the
-    * logged in user.
-    * 
-    * @param req request object
-    * @returns an object containing the eve headers if valid, null otherwise
-    */
-   this.getValidEveHeaders = function(req)
-   {
-      var eveHeaders = null;
-
-      if (req.user && req.eveHeaders && (req.user.characterId == req.eveHeaders.charId))
-      {
-         eveHeaders = req.eveHeaders;
-      }
-
-      return eveHeaders;
    };
 
    /**

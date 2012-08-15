@@ -13,10 +13,10 @@ exports.testEveHeaderParserShouldSetData = function(test)
    };
    var expected =
    {
-      shipId: 1234,
-      shiptypeName: 'ShipName',
-      constellationId: 5678,
-      constellationName: 'ConstName'
+      shipid: 1234,
+      shiptypename: 'ShipName',
+      constellationid: 5678,
+      constellationname: 'ConstName'
    };
    var req =
    {

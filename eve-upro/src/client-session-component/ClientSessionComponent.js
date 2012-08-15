@@ -9,6 +9,9 @@ var clientEvents = require('../model/ClientEvents');
 var clientRequests = require('../model/ClientRequests');
 var busMessages = require('../model/BusMessages.js');
 
+var EveInfoExtractorNull = require('./EveInfoExtractorNull.js');
+var EveInfoExtractorHeaders = require('./EveInfoExtractorHeaders.js');
+
 function ClientSessionComponent(services)
 {
    ClientSessionComponent.super_.call(this);
@@ -328,17 +331,18 @@ function ClientSessionComponent(services)
    this.onClientRequestStatus = function(clientRequest)
    {
       var rCode = 'OK';
+      var eveInfo = this.extractEveInfo(clientRequest);
 
-      if (clientRequest.eveHeaders && (clientRequest.eveHeaders['trusted'] == 'Yes'))
+      if (eveInfo && (eveInfo.trusted == 'Yes') && (eveInfo.characterId == clientRequest.user.characterId))
       {
          var header =
          {
-            type: busMessages.Broadcasts.EveStatusUpdateRequest
+            type: busMessages.Broadcasts.EveStatusUpdateRequest,
+            sessionId: clientRequest.header.sessionId
          };
          var body =
          {
-            sessionId: clientRequest.header.sessionId,
-            eveInfo: clientRequest.eveHeaders
+            eveInfo: eveInfo
          };
 
          this.amqp.broadcast(header, body);
@@ -346,6 +350,42 @@ function ClientSessionComponent(services)
 
       return rCode;
    };
+
+   this.extractEveInfo = function(clientRequest)
+   {
+      var result = null;
+      var extractor = new EveInfoExtractorNull();
+      var headerToInfoMap =
+      {
+         trusted: "trusted",
+         charid: "characterId",
+         charname: "characterName",
+         corpid: "corporationId",
+         corpname: "corporationName",
+         solarsystemid: "solarSystemId"
+      };
+
+      if (clientRequest.eveHeaders)
+      {
+         extractor = new EveInfoExtractorHeaders(clientRequest.eveHeaders);
+      }
+
+      for ( var headerName in headerToInfoMap)
+      {
+         var value = extractor.get(headerName);
+
+         if (value)
+         {
+            if (!result)
+            {
+               result = {};
+            }
+            result[headerToInfoMap[headerName]] = value;
+         }
+      }
+
+      return result;
+   },
 
    /**
     * Client request handler (Default)

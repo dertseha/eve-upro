@@ -1,7 +1,6 @@
 /**
  * Parses all the headers, looking for those set by the IGB of EVE. These headers start with "eve_", which will be
- * removed. Header names are all lowercase, with trailing 'Id' and 'Name' parts capitalized. e.g.: eve_shipname ->
- * shipName
+ * removed. Header names are all lowercase. e.g.: eve_shipname -> shipname
  * 
  * If EVE headers are identified, the request object receives another member named "eveHeaders".
  * 
@@ -19,7 +18,7 @@ module.exports = function(req, res, next)
    {
       if (headerName.substring(0, 4) === 'eve_')
       {
-         var extractedName = headerName.substring(4).replace('id', 'Id').replace('name', 'Name');
+         var extractedName = headerName.substring(4);
 
          result[extractedName] = req.headers[headerName];
          found = true;

@@ -76,7 +76,7 @@ function CharacterServiceComponent(services)
     */
    this.onBroadcastEveStatusUpdateRequest = function(header, body)
    {
-      var sessionId = body.sessionId;
+      var sessionId = header.sessionId;
       var character = this.characterAgent.getCharacterBySession(sessionId);
 
       if (character)

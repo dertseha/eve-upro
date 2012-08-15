@@ -1,6 +1,6 @@
 /**
- * The system namespace holds the access implementations to the
- * system the application runs in - typically, the browser window.
+ * The system namespace holds the access implementations to the system the application runs in - typically, the browser
+ * window.
  */
 upro.sys = {};
 
@@ -10,8 +10,16 @@ upro.sys = {};
 Prototype.Browser.EVE_IGB = typeof CCPEVE !== "undefined";
 
 /**
- * Provides log output of given text
- * defaults to console.log with date/time and a prefix
+ * @returns true if this application is running in the in-game-browser (IGB)
+ */
+upro.sys.isRunningInInGameBrowser = function()
+{
+   return typeof CCPEVE !== "undefined";
+};
+
+/**
+ * Provides log output of given text defaults to console.log with date/time and a prefix
+ * 
  * @param text to log
  */
 upro.sys.log = function(text)

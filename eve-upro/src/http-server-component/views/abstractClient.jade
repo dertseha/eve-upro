@@ -36,5 +36,8 @@ block post-scripts
    each shader in shaders
       script(type='x-shader/x-' + shader.type, id=shader.id, charset='utf-8')
          !{shader.content}
-   
+         
+   script
+      upro.config = !{clientConfig}
+      
    block startup

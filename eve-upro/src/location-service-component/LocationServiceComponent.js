@@ -53,13 +53,13 @@ function LocationServiceComponent(services)
     */
    this.onBroadcastEveStatusUpdateRequest = function(header, body)
    {
-      var character = this.characterAgent.getCharacterBySession(body.sessionId);
-      var newLocation = body.eveInfo.solarsystemId;
+      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+      var newLocation = body.eveInfo.solarSystemId;
 
       if (character && (character.lastKnownLocation != newLocation))
       {
          character.lastKnownLocation = newLocation;
-         character.locationsBySessionId[body.sessionId] = newLocation;
+         character.locationsBySessionId[header.sessionId] = newLocation;
          this.broadcastLocationStatus(character, this.getLocationInterest(character));
       }
    };

@@ -46,6 +46,7 @@ function extractCloudConfiguration()
 extractCloudConfiguration();
 
 nconf.use('memory');
+nconf.file(__dirname + '/upro-config.json');
 nconf.env();
 nconf.argv();
 nconf.defaults(
@@ -75,6 +76,10 @@ nconf.defaults(
    'upro':
    {
       profiles: [ 'http-client', 'eveapi' ]
+   },
+   'client':
+   {
+
    }
 });
 
@@ -124,7 +129,9 @@ var serviceControl = new ServiceControl();
       cookieSecret: nconf.get('http').cookieSecret,
       sessionSecret: nconf.get('http').sessionSecret,
 
-      storeOptions: storeOptions
+      storeOptions: storeOptions,
+
+      clientOptions: nconf.get('client')
    };
 
    builder.setOptions(options);
