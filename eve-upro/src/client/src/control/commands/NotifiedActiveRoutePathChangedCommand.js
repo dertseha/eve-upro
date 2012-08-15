@@ -2,6 +2,14 @@ upro.ctrl.cmd.NotifiedActiveRoutePathChangedCommand = Class.create(SimpleCommand
 {
    execute: function(notification)
    {
+      if (!upro.sys.isRunningInInGameBrowser())
+      {
+         this.updateGraphics();
+      }
+   },
+
+   updateGraphics: function()
+   {
       var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
       var sceneMediator = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
       var highlightMediator = this.facade().retrieveMediator(upro.view.mediators.SolarSystemHighlightMediator.NAME);
