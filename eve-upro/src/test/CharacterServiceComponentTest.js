@@ -43,21 +43,6 @@ function Fixture()
       };
    };
 
-   this.expectingCharacterActiveGalaxy = function(test, charId, galaxyId, interest)
-   {
-      this.amqp.broadcast = function(header, body)
-      {
-         if (header.type == busMessages.Broadcasts.CharacterActiveGalaxy)
-         {
-            test.equal(body.galaxyId, galaxyId);
-            if (interest)
-            {
-               test.deepEqual(header.interest, interest);
-            }
-         }
-      };
-   };
-
    this.expectingCharacterClientControlSelection = function(test, charId, activeSessionId)
    {
       this.amqp.broadcast = function(header, body)
@@ -83,6 +68,45 @@ function Fixture()
             }
          }
       };
+   };
+
+   this.expectingCharacterActiveGalaxy = function(test, charId, galaxyId, interest)
+   {
+      this.amqp.broadcast = function(header, body)
+      {
+         if (header.type == busMessages.Broadcasts.CharacterActiveGalaxy)
+         {
+            test.equal(body.galaxyId, galaxyId);
+            if (interest)
+            {
+               test.deepEqual(header.interest, interest);
+            }
+         }
+      };
+   };
+
+   this.expectingCharacterIgnoredSolarSystems = function(test, charId, ignoredSolarSystems, interest)
+   {
+      this.amqp.broadcast = function(header, body)
+      {
+         if (header.type == busMessages.Broadcasts.CharacterIgnoredSolarSystems)
+         {
+            test.equal(body.ignoredSolarSystems, ignoredSolarSystems);
+            if (interest)
+            {
+               test.deepEqual(header.interest, interest);
+            }
+         }
+      };
+   };
+
+   this.whenBroadcastSetIgnoredSolarSystemIsReceived = function(sessionId, solarSystemId, ignore)
+   {
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem, sessionId,
+      {
+         solarSystemId: solarSystemId,
+         ignore: ignore
+      });
    };
 }
 util.inherits(Fixture, AbstractServiceComponentFixture);
@@ -335,5 +359,151 @@ exports.testCharacterClientControlSelectionChanged_WhenFirstDisconnected = funct
    this.fixture.whenClientDisconnected(charId, sessionId1);
 
    test.expect(2);
+   test.done();
+};
+
+exports.testCharacterIgnoredSolarSystemsAreDefault_WhenInitialLogin = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+   var ignoredSolarSystems = [ 30000142 ]; // Jita
+
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', []);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenStorageReturnsData('CharacterData');
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
+   {
+      ignoredSolarSystems: ignoredSolarSystems
+   });
+
+   test.done();
+};
+
+exports.testCharacterIgnoredSolarSystemsAreDefault_WhenStorageMissesEntry = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+   var ignoredSolarSystems = [ 30000142 ]; // Jita
+
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [ {} ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenStorageReturnsData('CharacterData');
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
+   {
+      ignoredSolarSystems: ignoredSolarSystems
+   });
+
+   test.done();
+};
+
+exports.testCharacterIgnoredSolarSystemsAreReadFromStorage_WhenStorageReturns = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+   var ignoredSolarSystems = [ 123, 456, 789 ];
+
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         ignoredSolarSystems: ignoredSolarSystems
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenStorageReturnsData('CharacterData');
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
+   {
+      ignoredSolarSystems: ignoredSolarSystems
+   });
+
+   test.done();
+};
+
+exports.testCharacterIgnoredSolarSystemsSent_WhenDisabledGetsEnabled = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenStorageContainsData('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         ignoredSolarSystems: [ 123, 456, 789 ]
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, 456, false);
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
+   {
+      ignoredSolarSystems: [ 123, 789 ]
+   });
+
+   test.done();
+};
+
+exports.testCharacterIgnoredSolarSystemsSent_WhenEnabledGetsDisabled = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenStorageContainsData('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         ignoredSolarSystems: [ 456, 789 ]
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, 123, true);
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
+   {
+      ignoredSolarSystems: [ 456, 789, 123 ]
+   });
+
+   test.done();
+};
+
+exports.testCharacterIgnoredSolarSystemsSentWithModifiedData_WhenChangeRequestedBeforeStorageReturns = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         ignoredSolarSystems: [ 123 ]
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, 456, true);
+   this.fixture.whenStorageReturnsData('CharacterData');
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
+   {
+      ignoredSolarSystems: [ 123, 456 ]
+   });
+
    test.done();
 };

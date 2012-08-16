@@ -5,13 +5,22 @@ function AbstractCharacterServiceDataState(character, service)
 
    this.rawData =
    {
-      activeGalaxyId: null
+      activeGalaxyId: null,
+      ignoredSolarSystems: []
    };
 
    /**
     * Activates the state
     */
    this.activate = function()
+   {
+
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterSessionAdded = function(sessionId)
    {
 
    };
@@ -25,9 +34,9 @@ function AbstractCharacterServiceDataState(character, service)
    };
 
    /**
-    * Character state handler
+    * Broadcast handler
     */
-   this.onCharacterSessionAdded = function(sessionId)
+   this.onBroadcastClientRequestSetIgnoredSolarSystem = function(header, body)
    {
 
    };

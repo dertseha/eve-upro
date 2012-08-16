@@ -14,7 +14,12 @@ var RequestNames =
    /**
     * Sets the route of the autopilot.
     */
-   SetAutopilotRoute: 0
+   SetAutopilotRoute: 0,
+
+   /**
+    * Changes an ignored solar system
+    */
+   SetIgnoredSolarSystem: 0
 };
 
 function staticInit()

@@ -16,6 +16,8 @@ function PendingCharacterServiceDataState(character, service)
 {
    PendingCharacterServiceDataState.super_.call(this, character, service);
 
+   this.pendingIgnoreSolarSystemRequests = [];
+
    /** {@inheritDoc} */
    this.activate = function()
    {
@@ -35,6 +37,10 @@ function PendingCharacterServiceDataState(character, service)
             var newState = new ActiveCharacterServiceDataState(self.character, self.service, data);
 
             newState.setActiveGalaxyId(self.rawData.activeGalaxyId);
+            self.pendingIgnoreSolarSystemRequests.forEach(function(request)
+            {
+               newState.handleIgnoreSolarSystem(request);
+            });
 
             newState.activate();
             activated = true;
@@ -49,6 +55,12 @@ function PendingCharacterServiceDataState(character, service)
       {
          this.rawData.activeGalaxyId = body.galaxyId;
       }
+   };
+
+   /** {@inheritDoc} */
+   this.onBroadcastClientRequestSetIgnoredSolarSystem = function(header, body)
+   {
+      this.pendingIgnoreSolarSystemRequests.push(body);
    };
 }
 util.inherits(PendingCharacterServiceDataState, AbstractCharacterServiceDataState);

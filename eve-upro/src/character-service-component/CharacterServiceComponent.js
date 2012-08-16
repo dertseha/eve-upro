@@ -38,8 +38,9 @@ function CharacterServiceComponent(services)
          self.onCharacterOffline(character);
       });
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
       this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem);
 
       this.mongodb.defineCollection('CharacterData', {}, function()
       {
@@ -56,19 +57,6 @@ function CharacterServiceComponent(services)
       {
          handler.call(self, header, body);
       });
-   };
-
-   /**
-    * Broadcast handler
-    */
-   this.onBroadcastClientRequestSetActiveGalaxy = function(header, body)
-   {
-      var character = this.characterAgent.getCharacterBySession(header.sessionId);
-
-      if (character)
-      {
-         character.serviceData['character-service'].dataState.onBroadcastClientRequestSetActiveGalaxy(header, body);
-      }
    };
 
    /**
@@ -94,6 +82,33 @@ function CharacterServiceComponent(services)
             serviceData.igbSessions[sessionId] = session;
             this.updateIgbSessionControl(character);
          }
+      }
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastClientRequestSetActiveGalaxy = function(header, body)
+   {
+      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+
+      if (character)
+      {
+         character.serviceData['character-service'].dataState.onBroadcastClientRequestSetActiveGalaxy(header, body);
+      }
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastClientRequestSetIgnoredSolarSystem = function(header, body)
+   {
+      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+
+      if (character)
+      {
+         character.serviceData['character-service'].dataState.onBroadcastClientRequestSetIgnoredSolarSystem(header,
+               body);
       }
    };
 
@@ -216,6 +231,28 @@ function CharacterServiceComponent(services)
    };
 
    /**
+    * Broadcast the client control selection
+    * 
+    * @param character the Character object
+    * @param interest the interest for the broadcast message
+    * @param queueName optional explicit queue information
+    */
+   this.broadcastCharacterClientControlSelection = function(character, interest, active, queueName)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.CharacterClientControlSelection,
+         interest: interest
+      };
+      var body =
+      {
+         active: active
+      };
+
+      this.amqp.broadcast(header, body, queueName);
+   };
+
+   /**
     * Broadcast the active galaxy of given character
     * 
     * @param character the Character object
@@ -240,22 +277,24 @@ function CharacterServiceComponent(services)
    };
 
    /**
-    * Broadcast the client control selection
+    * Broadcast the ignored solar systems of given character
     * 
     * @param character the Character object
     * @param interest the interest for the broadcast message
     * @param queueName optional explicit queue information
     */
-   this.broadcastCharacterClientControlSelection = function(character, interest, active, queueName)
+   this.broadcastIgnoredSolarSystems = function(character, interest, queueName)
    {
+      var serviceData = character.serviceData['character-service'];
+
       var header =
       {
-         type: busMessages.Broadcasts.CharacterClientControlSelection,
+         type: busMessages.Broadcasts.CharacterIgnoredSolarSystems,
          interest: interest
       };
       var body =
       {
-         active: active
+         ignoredSolarSystems: serviceData.dataState.rawData.ignoredSolarSystems
       };
 
       this.amqp.broadcast(header, body, queueName);

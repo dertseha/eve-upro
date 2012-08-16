@@ -10,12 +10,27 @@ var CharacterAgentComponent = require('../../character-agent-component/Character
 
 function AbstractServiceComponentFixture()
 {
+   var self = this;
+
+   this.broadcastedMessages = [];
+
    this.amqp = new EventEmitter();
    this.amqp.broadcast = function(header, body)
    {
       this.emit('broadcast', header, body);
       this.emit('broadcast:' + header.type, header, body);
    };
+
+   this.amqp.on('broadcast', function(header, body)
+   {
+      var message =
+      {
+         header: header,
+         body: body
+      };
+
+      self.broadcastedMessages.push(message);
+   });
 
    this.mongodb = new function()
    {
@@ -101,8 +116,13 @@ function AbstractServiceComponentFixture()
    this.givenStorageReturnsDataDelayed = function(collectionName, documents, emitter)
    {
       this.mongodb.storedData[collectionName] = documents;
-      this.mongodb.delayedData[collectionName] = emitter;
+      this.mongodb.delayedData[collectionName] = emitter || new EventEmitter();
    };
+
+   this.whenStorageReturnsData = function(collectionName)
+   {
+      this.mongodb.delayedData[collectionName].emit('event');
+   },
 
    this.whenBroadcastReceived = function(type, sessionId, body, extraHeader)
    {
@@ -168,6 +188,38 @@ function AbstractServiceComponentFixture()
             test.deepEqual(header.interest, expectedInterest);
          }
       };
+   };
+
+   this.findLastBroadcastOfType = function(type)
+   {
+      var found = null;
+      var i;
+
+      for (i = this.broadcastedMessages.length - 1; !found && (i >= 0); i--)
+      {
+         var temp = this.broadcastedMessages[i];
+
+         if (temp.header.type == type)
+         {
+            found = temp;
+         }
+      }
+
+      return found;
+   };
+
+   this.thenTheLastBroadcastShouldHaveBeen = function(test, type, body, interest)
+   {
+      var lastMessage = this.findLastBroadcastOfType(type);
+
+      if (lastMessage)
+      {
+         if (interest)
+         {
+            test.deepEqual(lastMessage.header.interest, interest);
+         }
+         test.deepEqual(lastMessage.body, body);
+      }
    };
 }
 

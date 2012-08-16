@@ -38,6 +38,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       {
          self.onCharacterActiveGalaxy(broadcastBody);
       });
+      sessionProxy.addBroadcastHandler("CharacterIgnoredSolarSystems", function(broadcastBody)
+      {
+         self.onCharacterIgnoredSolarSystems(broadcastBody);
+      });
 
       this.onRoutingCapabilitiesChanged();
       this.onIgnoredSolarSystemsChanged();
@@ -120,6 +124,12 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       }
    },
 
+   onCharacterIgnoredSolarSystems: function(broadcastBody)
+   {
+      this.ignoredSolarSystems = broadcastBody.ignoredSolarSystems;
+      this.onIgnoredSolarSystemsChanged();
+   },
+
    onIgnoredSolarSystemsChanged: function()
    {
       this.facade().sendNotification(upro.app.Notifications.UserIgnoredSolarSystemsChanged,
@@ -128,29 +138,13 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
    toggleIgnoredSolarSystem: function(solarSystemId)
    {
-      var entries = this.ignoredSolarSystems;
-      var newArray = [];
-      var found = false;
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      for ( var i = entries.length - 1; i >= 0; i--)
+      sessionProxy.sendRequest("SetIgnoredSolarSystem",
       {
-         var entry = entries[i];
-
-         if (entry == solarSystemId)
-         {
-            found = true;
-         }
-         else
-         {
-            newArray.push(entry);
-         }
-      }
-      if (!found)
-      {
-         newArray.push(solarSystemId);
-      }
-      this.ignoredSolarSystems = newArray;
-      this.onIgnoredSolarSystemsChanged();
+         solarSystemId: solarSystemId,
+         ignore: !this.isSolarSystemIgnored(solarSystemId)
+      });
    },
 
    /**
@@ -161,6 +155,15 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
    getIgnoredSolarSystemIds: function()
    {
       return this.ignoredSolarSystems;
+   },
+
+   /**
+    * @param solarSystemId the ID to look for
+    * @returns {Boolean} true if ignored
+    */
+   isSolarSystemIgnored: function(solarSystemId)
+   {
+      return this.ignoredSolarSystems.indexOf(solarSystemId) >= 0;
    },
 
    /**

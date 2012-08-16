@@ -49,7 +49,17 @@ var Broadcasts =
    /**
     * Which route index the character is next
     */
-   CharacterAutopilotRouteIndex: 0
+   CharacterAutopilotRouteIndex: 0,
+
+   /**
+    * Client Request
+    */
+   ClientRequestSetIgnoredSolarSystem: 0,
+
+   /**
+    * The list of currently ignored solar systems for a character
+    */
+   CharacterIgnoredSolarSystems: 0
 };
 
 function staticInit()
