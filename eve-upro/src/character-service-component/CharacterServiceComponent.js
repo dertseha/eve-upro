@@ -6,8 +6,17 @@ var logger = log4js.getLogger();
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
-var PendingCharacterServiceDataState = require('./PendingCharacterServiceDataState.js');
+var CharacterServiceData = require('./CharacterServiceData.js');
 
+/**
+ * The character service component handles all single character related information, such as session selection for IGB
+ * control or character specific settings.
+ * 
+ * It is responsible for registering the broadcast and state handler, create an online specific object per character and
+ * forward all requests to this object (CharacterServiceData)
+ * 
+ * @param services the required services
+ */
 function CharacterServiceComponent(services)
 {
    CharacterServiceComponent.super_.call(this);
@@ -38,9 +47,9 @@ function CharacterServiceComponent(services)
          self.onCharacterOffline(character);
       });
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem);
 
       this.mongodb.defineCollection('CharacterData', {}, function()
       {
@@ -48,21 +57,23 @@ function CharacterServiceComponent(services)
       });
    };
 
-   this.registerBroadcastHandler = function(broadcastName)
+   /**
+    * Registers a session specific broadcast handler for given broadcast name
+    */
+   this.registerSessionBroadcastHandler = function(broadcastName)
    {
       var self = this;
-      var handler = this['onBroadcast' + broadcastName];
 
       this.amqp.on('broadcast:' + broadcastName, function(header, body)
       {
-         handler.call(self, header, body);
+         self.onSessionBroadcast(header, body);
       });
    };
 
    /**
-    * Broadcast handler
+    * Handles a session specific broadcast and forwards it to the corresponding character service data
     */
-   this.onBroadcastEveStatusUpdateRequest = function(header, body)
+   this.onSessionBroadcast = function(header, body)
    {
       var sessionId = header.sessionId;
       var character = this.characterAgent.getCharacterBySession(sessionId);
@@ -70,84 +81,13 @@ function CharacterServiceComponent(services)
       if (character)
       {
          var serviceData = character.serviceData['character-service'];
+         var handler = serviceData['onBroadcast' + header.type];
 
-         if (!serviceData.igbSessions[sessionId])
+         if (!handler)
          {
-            var session =
-            {
-               activeControl: false
-            };
-
-            logger.info('Detected IGB session: [' + sessionId + '] for character [' + character.characterName + ']');
-            serviceData.igbSessions[sessionId] = session;
-            this.updateIgbSessionControl(character);
+            handler = serviceData['onBroadcast'];
          }
-      }
-   };
-
-   /**
-    * Broadcast handler
-    */
-   this.onBroadcastClientRequestSetActiveGalaxy = function(header, body)
-   {
-      var character = this.characterAgent.getCharacterBySession(header.sessionId);
-
-      if (character)
-      {
-         character.serviceData['character-service'].dataState.onBroadcastClientRequestSetActiveGalaxy(header, body);
-      }
-   };
-
-   /**
-    * Broadcast handler
-    */
-   this.onBroadcastClientRequestSetIgnoredSolarSystem = function(header, body)
-   {
-      var character = this.characterAgent.getCharacterBySession(header.sessionId);
-
-      if (character)
-      {
-         character.serviceData['character-service'].dataState.onBroadcastClientRequestSetIgnoredSolarSystem(header,
-               body);
-      }
-   };
-
-   /**
-    * Updates the currently active IGB session if one is missing.
-    */
-   this.updateIgbSessionControl = function(character)
-   {
-      var serviceData = character.serviceData['character-service'];
-      var selectedSessionId = null;
-      var activeSessionId = null;
-
-      for ( var sessionId in serviceData.igbSessions)
-      {
-         var session = serviceData.igbSessions[sessionId];
-
-         if (session.activeControl)
-         {
-            activeSessionId = sessionId;
-         }
-         else
-         {
-            selectedSessionId = sessionId;
-         }
-      }
-      if (!activeSessionId && selectedSessionId)
-      {
-         var responseQueue = character.getResponseQueue(sessionId);
-         var interest = [
-         {
-            scope: 'Session',
-            id: selectedSessionId
-         } ];
-
-         logger.info('Selecting IGB control session: [' + selectedSessionId + '] for character ['
-               + character.characterName + ']');
-         serviceData.igbSessions[selectedSessionId].activeControl = true;
-         this.broadcastCharacterClientControlSelection(character, this.getInterest(character), false);
-         this.broadcastCharacterClientControlSelection(character, interest, true, responseQueue);
+         handler.call(serviceData, header, body);
       }
    };
 
@@ -156,15 +96,12 @@ function CharacterServiceComponent(services)
     */
    this.onCharacterOnline = function(character)
    {
-      var state = new PendingCharacterServiceDataState(character, this);
+      var serviceData = new CharacterServiceData(this, character);
 
+      character.serviceData['character-service'] = serviceData;
       logger.info('Character [' + character.characterName + '] is online');
-      character.serviceData['character-service'] =
-      {
-         igbSessions: {},
-         dataState: null
-      };
-      state.activate();
+
+      serviceData.processingState.activate();
    };
 
    /**
@@ -172,7 +109,7 @@ function CharacterServiceComponent(services)
     */
    this.onCharacterSessionAdded = function(character, sessionId)
    {
-      character.serviceData['character-service'].dataState.onCharacterSessionAdded(sessionId);
+      character.serviceData['character-service'].onCharacterSessionAdded(sessionId);
    };
 
    /**
@@ -180,17 +117,7 @@ function CharacterServiceComponent(services)
     */
    this.onCharacterSessionRemoved = function(character, sessionId)
    {
-      var serviceData = character.serviceData['character-service'];
-      var session = serviceData.igbSessions[sessionId];
-
-      if (session)
-      {
-         delete serviceData.igbSessions[sessionId];
-         if (session.activeControl)
-         {
-            this.updateIgbSessionControl(character);
-         }
-      }
+      character.serviceData['character-service'].onCharacterSessionRemoved(sessionId);
    };
 
    /**
@@ -199,105 +126,6 @@ function CharacterServiceComponent(services)
    this.onCharacterOffline = function(character)
    {
       logger.info('Character [' + character.characterName + '] is offline');
-   };
-
-   /**
-    * @param character the character for which the interest is to create
-    * @returns the generic interest for given character (typically only the character itself)
-    */
-   this.getInterest = function(character)
-   {
-      var interest = [
-      {
-         scope: 'Character',
-         id: character.getCharacterId()
-      } ];
-
-      return interest;
-   };
-
-   /**
-    * Saves the character data of given character object
-    * 
-    * @param character the Character object
-    */
-   this.saveCharacterData = function(character)
-   {
-      var serviceData = character.serviceData['character-service'];
-
-      this.mongodb.setData('CharacterData', character.getCharacterId(), serviceData.dataState.rawData, function()
-      {
-      });
-   };
-
-   /**
-    * Broadcast the client control selection
-    * 
-    * @param character the Character object
-    * @param interest the interest for the broadcast message
-    * @param queueName optional explicit queue information
-    */
-   this.broadcastCharacterClientControlSelection = function(character, interest, active, queueName)
-   {
-      var header =
-      {
-         type: busMessages.Broadcasts.CharacterClientControlSelection,
-         interest: interest
-      };
-      var body =
-      {
-         active: active
-      };
-
-      this.amqp.broadcast(header, body, queueName);
-   };
-
-   /**
-    * Broadcast the active galaxy of given character
-    * 
-    * @param character the Character object
-    * @param interest the interest for the broadcast message
-    * @param queueName optional explicit queue information
-    */
-   this.broadcastActiveGalaxy = function(character, interest, queueName)
-   {
-      var serviceData = character.serviceData['character-service'];
-
-      var header =
-      {
-         type: busMessages.Broadcasts.CharacterActiveGalaxy,
-         interest: interest
-      };
-      var body =
-      {
-         galaxyId: serviceData.dataState.rawData.activeGalaxyId
-      };
-
-      this.amqp.broadcast(header, body, queueName);
-   };
-
-   /**
-    * Broadcast the ignored solar systems of given character
-    * 
-    * @param character the Character object
-    * @param interest the interest for the broadcast message
-    * @param queueName optional explicit queue information
-    */
-   this.broadcastIgnoredSolarSystems = function(character, interest, queueName)
-   {
-      var serviceData = character.serviceData['character-service'];
-
-      var header =
-      {
-         type: busMessages.Broadcasts.CharacterIgnoredSolarSystems,
-         interest: interest
-      };
-      var body =
-      {
-         ignoredSolarSystems: serviceData.dataState.rawData.ignoredSolarSystems
-      };
-
-      this.amqp.broadcast(header, body, queueName);
    };
 }
 util.inherits(CharacterServiceComponent, Component);

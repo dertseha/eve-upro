@@ -6,8 +6,6 @@ var busMessages = require('../model/BusMessages.js');
 var CharacterAgentComponent = require('../character-agent-component/CharacterAgentComponent.js');
 var CharacterServiceComponent = require('../character-service-component/CharacterServiceComponent.js');
 
-var ActiveCharacterServiceDataState = require('../character-service-component/ActiveCharacterServiceDataState.js');
-
 var AbstractServiceComponentFixture = require('./TestSupport/AbstractServiceComponentFixture.js');
 
 function Fixture()
@@ -30,7 +28,7 @@ function Fixture()
    {
       var serviceData = this.characterAgent.characters[charId].serviceData['character-service'];
 
-      serviceData.dataState.rawData.activeGalaxyId = galaxyId;
+      serviceData.rawData.activeGalaxyId = galaxyId;
    };
 
    this.givenCharacterHasIgbSessionWithControl = function(charId, sessionId, activeControl)
