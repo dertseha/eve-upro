@@ -52,6 +52,8 @@ function CharacterServiceComponent(services)
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleData);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleIndex);
 
       this.mongodb.defineCollection('CharacterData', {}, function()
       {

@@ -124,6 +124,58 @@ function Fixture()
 
       test.deepEqual(result, expectedResult);
    };
+
+   this.givenEmptyRoutingRules = function()
+   {
+      this.serviceData.rawData.routingRules = {};
+   };
+
+   this.givenRoutingRule = function(name, rule)
+   {
+      this.serviceData.rawData.routingRules[name] = rule;
+   };
+
+   this.whenProcessingClientRequestSetRoutingRuleData = function(name, inUse, parameter)
+   {
+      var header = {};
+      var body =
+      {
+         name: name,
+         inUse: inUse,
+         parameter: parameter
+      };
+
+      return this.serviceData.processClientRequestSetRoutingRuleData(header, body);
+   };
+
+   this.whenProcessingClientRequestSetRoutingRuleIndex = function(name, index)
+   {
+      var header = {};
+      var body =
+      {
+         name: name,
+         index: index
+      };
+
+      return this.serviceData.processClientRequestSetRoutingRuleIndex(header, body);
+   };
+
+   this.thenRoutingRuleShouldBe = function(test, name, expected)
+   {
+      test.deepEqual(this.serviceData.rawData.routingRules[name], expected);
+   };
+
+   this.thenRoutingRuleIndexShouldBe = function(test, name, expected)
+   {
+      test.equal(this.serviceData.rawData.routingRules[name].index, expected);
+   };
+
+   this.thenProcessClientRequestSetRoutingRuleDataShouldReturn = function(test, name, inUse, parameter, expectedResult)
+   {
+      var result = this.whenProcessingClientRequestSetRoutingRuleData(name, inUse, parameter);
+
+      test.deepEqual(result, expectedResult);
+   };
 }
 
 exports.setUp = function(callback)
@@ -404,6 +456,117 @@ exports.testProcessSetRoutingCapabilityJumpDriveShouldReturnNotifier_WhenChanged
 
    this.fixture.thenProcessCharacterSetRoutingCapabilityJumpDriveShouldReturn(test, true, 11.0,
          [ 'CharacterRoutingCapabilities' ]);
+
+   test.done();
+};
+
+exports.testRoutingRuleChanged_WhenAppliedFromData = function(test)
+{
+   var newValue =
+   {
+      index: 3,
+      inUse: false,
+      parameter: 3
+   };
+
+   this.fixture.givenRoutingRule('minSecurity',
+   {
+      index: 0,
+      inUse: true,
+      parameter: 5
+   });
+
+   this.fixture.whenCharacterDataWasApplied(
+   {
+      routingRules:
+      {
+         minSecurity: newValue
+      }
+   });
+
+   this.fixture.thenRoutingRuleShouldBe(test, 'minSecurity', newValue);
+
+   test.done();
+};
+
+exports.testRoutingRuleChanged_WhenProcessedDifferent = function(test)
+{
+   var newValue =
+   {
+      index: 1,
+      inUse: false,
+      parameter: 3
+   };
+
+   this.fixture.givenRoutingRule('jumpFuel',
+   {
+      index: 1,
+      inUse: true,
+      parameter: 4
+   });
+
+   this.fixture.whenProcessingClientRequestSetRoutingRuleData('jumpFuel', newValue.inUse, newValue.parameter);
+
+   this.fixture.thenRoutingRuleShouldBe(test, 'jumpFuel', newValue);
+
+   test.done();
+};
+
+exports.testProcessSetRoutingRuleShouldReturnEmptyArray_WhenUnchanged = function(test)
+{
+   var value =
+   {
+      index: 1,
+      inUse: true,
+      parameter: 4
+   };
+
+   this.fixture.givenRoutingRule('jumps', value);
+
+   this.fixture.thenProcessClientRequestSetRoutingRuleDataShouldReturn(test, 'jumps', value.inUse, value.parameter, []);
+
+   test.done();
+};
+
+exports.testProcessSetRoutingRuleShouldReturnNotifier_WhenChanged = function(test)
+{
+   var value =
+   {
+      index: 1,
+      inUse: true,
+      parameter: 4
+   };
+
+   this.fixture.givenRoutingRule('maxSecurity', value);
+
+   this.fixture.thenProcessClientRequestSetRoutingRuleDataShouldReturn(test, 'maxSecurity', false, value.parameter,
+         [ 'CharacterRoutingRules' ]);
+
+   test.done();
+};
+
+exports.testRoutingRuleChanged_WhenIndexChanged = function(test)
+{
+   var newValue = 1;
+
+   this.fixture.givenEmptyRoutingRules();
+   this.fixture.givenRoutingRule('jumpFuel',
+   {
+      index: 0,
+      inUse: true,
+      parameter: 4
+   });
+   this.fixture.givenRoutingRule('minSecurity',
+   {
+      index: 1,
+      inUse: true,
+      parameter: 4
+   });
+
+   this.fixture.whenProcessingClientRequestSetRoutingRuleIndex('jumpFuel', newValue);
+
+   this.fixture.thenRoutingRuleIndexShouldBe(test, 'jumpFuel', newValue);
+   this.fixture.thenRoutingRuleIndexShouldBe(test, 'minSecurity', 0);
 
    test.done();
 };

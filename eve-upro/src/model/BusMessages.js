@@ -74,7 +74,22 @@ var Broadcasts =
    /**
     * Client request for setting routing capabilities for jump drives
     */
-   ClientRequestSetRoutingCapabilityJumpDrive: 0
+   ClientRequestSetRoutingCapabilityJumpDrive: 0,
+
+   /**
+    * The current routing rules of a character
+    */
+   CharacterRoutingRules: 0,
+
+   /**
+    * Sets data of a routing rule
+    */
+   ClientRequestSetRoutingRuleData: 0,
+
+   /**
+    * Sets the index of a routing rule (priority)
+    */
+   ClientRequestSetRoutingRuleIndex: 0
 };
 
 function staticInit()

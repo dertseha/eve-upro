@@ -29,7 +29,17 @@ var RequestNames =
    /**
     * Set the jump drive routing capability
     */
-   SetRoutingCapabilityJumpDrive: 0
+   SetRoutingCapabilityJumpDrive: 0,
+
+   /**
+    * Sets data of a routing rule
+    */
+   SetRoutingRuleData: 0,
+
+   /**
+    * Sets the index of a routing rule (priority)
+    */
+   SetRoutingRuleIndex: 0
 };
 
 function staticInit()

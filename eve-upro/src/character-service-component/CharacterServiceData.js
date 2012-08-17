@@ -8,6 +8,26 @@ var busMessages = require('../model/BusMessages.js');
 var PendingCharacterServiceDataProcessingState = require('./PendingCharacterServiceDataProcessingState.js');
 
 /**
+ * Creates a routing rule data object
+ * 
+ * @param index the index of the rule
+ * @param inUse in use flag
+ * @param parameter parameter
+ * @returns a data object
+ */
+function createRoutingRuleData(index, inUse, parameter)
+{
+   var rule =
+   {
+      index: index,
+      inUse: inUse,
+      parameter: parameter
+   };
+
+   return rule;
+}
+
+/**
  * The character service data is a character specific handler for the character service component. It handles all client
  * requests specific for this component.
  * 
@@ -42,6 +62,13 @@ function CharacterServiceData(service, character)
             inUse: false,
             range: 5.0
          }
+      },
+      routingRules:
+      {
+         minSecurity: createRoutingRuleData(0, true, 5),
+         maxSecurity: createRoutingRuleData(1, false, 5),
+         jumps: createRoutingRuleData(2, true, 0),
+         jumpFuel: createRoutingRuleData(3, false, 0)
       }
    };
    this.igbSessions = {};
@@ -135,6 +162,7 @@ function CharacterServiceData(service, character)
       this.broadcastCharacterActiveGalaxy(interest, queue);
       this.broadcastCharacterIgnoredSolarSystems(interest, queue);
       this.broadcastCharacterRoutingCapabilities(interest, queue);
+      this.broadcastCharacterRoutingRules(interest, queue);
    };
 
    /**
@@ -367,6 +395,89 @@ function CharacterServiceData(service, character)
       return notifier;
    };
 
+   /**
+    * Broadcast the current routing rules
+    * 
+    * @param interest the interest for the broadcast message
+    * @param queueName optional explicit queue information
+    */
+   this.broadcastCharacterRoutingRules = function(interest, queueName)
+   {
+      var body = this.rawData.routingRules;
+
+      this.broadcast(busMessages.Broadcasts.CharacterRoutingRules, body, interest, queueName);
+   };
+
+   /**
+    * Processes the broadcast message
+    */
+   this.processClientRequestSetRoutingRuleData = function(header, body)
+   {
+      var notifier = [];
+      var rule = this.rawData.routingRules[body.name];
+      logger.warn('data: ' + JSON.stringify(body));
+
+      if (rule)
+      {
+         var newData = this.mergeData(rule, body);
+
+         if ((rule.inUse != newData.inUse) || (rule.parameter != newData.parameter))
+         {
+            rule.inUse = newData.inUse;
+            rule.parameter = newData.parameter;
+            notifier.push(busMessages.Broadcasts.CharacterRoutingRules);
+         }
+      }
+
+      return notifier;
+   };
+
+   /**
+    * Finds a routing rule by its index
+    * 
+    * @param index the index to look for
+    * @return the found rule data object
+    */
+   this.findRoutingRuleByIndex = function(index)
+   {
+      var rule = null;
+
+      for ( var name in this.rawData.routingRules)
+      {
+         var temp = this.rawData.routingRules[name];
+
+         if (temp.index == index)
+         {
+            rule = temp;
+         }
+      }
+
+      return rule;
+   };
+
+   /**
+    * Processes the broadcast message
+    */
+   this.processClientRequestSetRoutingRuleIndex = function(header, body)
+   {
+      var notifier = [];
+      var rule = this.rawData.routingRules[body.name];
+
+      if (rule)
+      {
+         var otherRule = this.findRoutingRuleByIndex(body.index);
+
+         logger.warn('index: to ' + body.index + ' found: ' + JSON.stringify(otherRule));
+         if (otherRule)
+         {
+            otherRule.index = rule.index;
+            rule.index = body.index;
+            notifier.push(busMessages.Broadcasts.CharacterRoutingRules);
+         }
+      }
+
+      return notifier;
+   };
 }
 
 module.exports = CharacterServiceData;

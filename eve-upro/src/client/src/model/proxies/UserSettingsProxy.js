@@ -20,13 +20,14 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       };
 
       this.routingRules = {};
-      this.createRoutingRule(0, "MinSecurity", true, 5);
-      this.createRoutingRule(1, "MaxSecurity", false, 10);
-      this.createRoutingRule(2, "Jumps", true, 0);
-      this.createRoutingRule(3, "JumpFuel", false, 0);
+
+      this.createRoutingRule(0, "MinSecurity", true, 5, "minSecurity");
+      this.createRoutingRule(1, "MaxSecurity", false, 10, "maxSecurity");
+      this.createRoutingRule(2, "Jumps", true, 0, "jumps");
+      this.createRoutingRule(3, "JumpFuel", false, 0, "jumpFuel");
    },
 
-   createRoutingRule: function(index, ruleType, inUse, parameter)
+   createRoutingRule: function(index, ruleType, inUse, parameter, name)
    {
       var rule = new upro.model.UserRoutingRule();
 
@@ -34,8 +35,11 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       rule.ruleType = ruleType;
       rule.inUse = inUse;
       rule.parameter = parameter;
+      rule.name = name;
 
       this.routingRules[ruleType] = rule;
+
+      return rule;
    },
 
    onRegister: function()
@@ -54,6 +58,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       sessionProxy.addBroadcastHandler("CharacterRoutingCapabilities", function(broadcastBody)
       {
          self.onCharacterRoutingCapabilities(broadcastBody);
+      });
+      sessionProxy.addBroadcastHandler("CharacterRoutingRules", function(broadcastBody)
+      {
+         self.onCharacterRoutingRules(broadcastBody);
       });
 
       this.onRoutingCapabilitiesChanged();
@@ -197,6 +205,37 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       return this.ignoredSolarSystems.indexOf(solarSystemId) >= 0;
    },
 
+   findRoutingRuleByName: function(name)
+   {
+      var rule = null;
+
+      for ( var type in this.routingRules)
+      {
+         var temp = this.routingRules[type];
+
+         if (temp.name == name)
+         {
+            rule = temp;
+         }
+      }
+
+      return rule;
+   },
+
+   onCharacterRoutingRules: function(broadcastBody)
+   {
+      for ( var ruleName in broadcastBody)
+      {
+         var rawData = broadcastBody[ruleName];
+         var rule = this.findRoutingRuleByName(ruleName);
+
+         rule.index = rawData.index;
+         rule.inUse = rawData.inUse;
+         rule.parameter = rawData.parameter;
+      }
+      this.onRoutingRulesChanged();
+   },
+
    /**
     * Callback on changed routing rules
     */
@@ -237,8 +276,13 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
       if (rule)
       {
-         rule.inUse = !rule.inUse;
-         this.onRoutingRulesChanged();
+         var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+         sessionProxy.sendRequest("SetRoutingRuleData",
+         {
+            name: rule.name,
+            inUse: !rule.inUse
+         });
       }
    },
 
@@ -255,9 +299,13 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       if (rule)
       {
          var template = upro.model.UserRoutingRule.RuleConstants[rule.ruleType];
+         var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-         rule.parameter = rule.parameter + (increment ? template.Increment : -template.Increment);
-         this.onRoutingRulesChanged();
+         sessionProxy.sendRequest("SetRoutingRuleData",
+         {
+            name: rule.name,
+            parameter: rule.parameter + (increment ? template.Increment : -template.Increment)
+         });
       }
    },
 
@@ -278,20 +326,13 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
          if ((newIndex >= 0) && (newIndex < upro.model.UserRoutingRule.RuleLimit))
          {
-            var rules = this.getRoutingRules();
+            var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-            for ( var i = 0; i < rules.length; i++)
-            { // go through other rules and swap their index
-               var tempRule = rules[i];
-
-               if (tempRule.getIndex() == newIndex)
-               {
-                  tempRule.index = oldIndex;
-               }
-            }
-            // update the specified rule
-            rule.index = newIndex;
-            this.onRoutingRulesChanged();
+            sessionProxy.sendRequest("SetRoutingRuleIndex",
+            {
+               name: rule.name,
+               index: newIndex
+            });
          }
       }
    }
