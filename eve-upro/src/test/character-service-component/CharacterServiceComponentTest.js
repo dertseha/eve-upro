@@ -83,27 +83,20 @@ function Fixture()
       };
    };
 
-   this.expectingCharacterIgnoredSolarSystems = function(test, charId, ignoredSolarSystems, interest)
-   {
-      this.amqp.broadcast = function(header, body)
-      {
-         if (header.type == busMessages.Broadcasts.CharacterIgnoredSolarSystems)
-         {
-            test.equal(body.ignoredSolarSystems, ignoredSolarSystems);
-            if (interest)
-            {
-               test.deepEqual(header.interest, interest);
-            }
-         }
-      };
-   };
-
    this.whenBroadcastSetIgnoredSolarSystemIsReceived = function(sessionId, solarSystemId, ignore)
    {
       this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem, sessionId,
       {
          solarSystemId: solarSystemId,
          ignore: ignore
+      });
+   };
+
+   this.whenBroadcastSetRoutingCapabilitiyJumpGatesIsReceived = function(sessionId, inUse)
+   {
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates, sessionId,
+      {
+         inUse: inUse
       });
    };
 }
@@ -265,6 +258,76 @@ exports.testCharacterIgnoredSolarSystemsSent_WhenEnabledGetsDisabled = function(
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
    {
       ignoredSolarSystems: [ 456, 789, 123 ]
+   });
+
+   test.done();
+};
+
+exports.testCharacterRoutingCapabilitiesSent_WhenJumpGatesEnabled = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenStorageContainsData('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         routingCapabilities:
+         {
+            jumpGates:
+            {
+               inUse: false
+            }
+         }
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastSetRoutingCapabilitiyJumpGatesIsReceived(sessionId, true);
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterRoutingCapabilities',
+   {
+      jumpGates:
+      {
+         inUse: true
+      }
+   });
+
+   test.done();
+};
+
+exports.testCharacterRoutingCapabilitiesSent_WhenJumpGatesDisabled = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenStorageContainsData('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         routingCapabilities:
+         {
+            jumpGates:
+            {
+               inUse: true
+            }
+         }
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastSetRoutingCapabilitiyJumpGatesIsReceived(sessionId, false);
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterRoutingCapabilities',
+   {
+      jumpGates:
+      {
+         inUse: false
+      }
    });
 
    test.done();

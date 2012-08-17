@@ -102,6 +102,7 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
    onBroadcast: function(header, body)
    {
       var handlerList = this.broadcastHandler[header.type];
+      var self = this;
 
       if (handlerList)
       {
@@ -113,9 +114,8 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
             }
             catch (ex)
             {
-               this.facade().sendNotification(upro.app.Notifications.DebugMessage, "Error: " + ex);
-
                upro.sys.log("Error handling broadcast: " + ex);
+               self.facade().sendNotification(upro.app.Notifications.DebugMessage, "Error: " + ex);
             }
          });
       }

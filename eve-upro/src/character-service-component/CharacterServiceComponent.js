@@ -50,6 +50,7 @@ function CharacterServiceComponent(services)
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates);
 
       this.mongodb.defineCollection('CharacterData', {}, function()
       {

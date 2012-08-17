@@ -6,7 +6,19 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
       this.ignoredSolarSystems = [ 30000142 ]; // Jita
 
-      this.routingCapJumpGatesInUse = true;
+      this.routingCapabilities =
+      {
+         jumpGates:
+         {
+            inUse: false
+         },
+         jumpDrive:
+         {
+            inUse: false,
+            range: 0.0
+         }
+      };
+
       this.routingCapJumpDriveInUse = false;
       this.routingCapJumpDriveRange = 5.0;
 
@@ -42,6 +54,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       {
          self.onCharacterIgnoredSolarSystems(broadcastBody);
       });
+      sessionProxy.addBroadcastHandler("CharacterRoutingCapabilities", function(broadcastBody)
+      {
+         self.onCharacterRoutingCapabilities(broadcastBody);
+      });
 
       this.onRoutingCapabilitiesChanged();
       this.onIgnoredSolarSystemsChanged();
@@ -73,6 +89,12 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       this.facade().sendNotification(upro.app.Notifications.ActiveGalaxyChanged, galaxyId);
    },
 
+   onCharacterRoutingCapabilities: function(broadcastBody)
+   {
+      this.routingCapabilities = broadcastBody;
+      this.onRoutingCapabilitiesChanged();
+   },
+
    onRoutingCapabilitiesChanged: function()
    {
       this.facade().sendNotification(upro.app.Notifications.UserRoutingCapabilitiesChanged);
@@ -80,13 +102,17 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
    getRoutingCapJumpGatesInUse: function()
    {
-      return this.routingCapJumpGatesInUse;
+      return this.routingCapabilities.jumpGates.inUse;
    },
 
    toggleRoutingCapJumpGates: function()
    {
-      this.routingCapJumpGatesInUse = !this.getRoutingCapJumpGatesInUse();
-      this.onRoutingCapabilitiesChanged();
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest("SetRoutingCapabilityJumpGates",
+      {
+         inUse: !this.getRoutingCapJumpGatesInUse()
+      });
    },
 
    getRoutingCapJumpDriveInUse: function()

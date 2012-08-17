@@ -59,7 +59,17 @@ var Broadcasts =
    /**
     * The list of currently ignored solar systems for a character
     */
-   CharacterIgnoredSolarSystems: 0
+   CharacterIgnoredSolarSystems: 0,
+
+   /**
+    * The current routing capabilities of a character
+    */
+   CharacterRoutingCapabilities: 0,
+
+   /**
+    * Client request for setting routing capabilities for jump gates
+    */
+   ClientRequestSetRoutingCapabilityJumpGates: 0
 };
 
 function staticInit()

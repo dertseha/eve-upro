@@ -67,6 +67,34 @@ function Fixture()
 
       test.deepEqual(result, expectedResult);
    };
+
+   this.givenRoutingCapabilityJumpGates = function(capability)
+   {
+      this.serviceData.rawData.routingCapabilities.jumpGates = capability;
+   };
+
+   this.whenProcessingCharacterSetRoutingCapabilityJumpGates = function(inUse)
+   {
+      var header = {};
+      var body =
+      {
+         inUse: inUse
+      };
+
+      return this.serviceData.processClientRequestSetRoutingCapabilityJumpGates(header, body);
+   };
+
+   this.thenRoutingCapabilityJumpGatesShouldBe = function(test, expected)
+   {
+      test.deepEqual(this.serviceData.rawData.routingCapabilities.jumpGates, expected);
+   };
+
+   this.thenProcessCharacterSetRoutingCapabilityJumpGatesShouldReturn = function(test, inUse, expectedResult)
+   {
+      var result = this.whenProcessingCharacterSetRoutingCapabilityJumpGates(inUse);
+
+      test.deepEqual(result, expectedResult);
+   };
 }
 
 exports.setUp = function(callback)
@@ -178,6 +206,79 @@ exports.testProcessSetIgnoredSolarSystemShouldReturnNotifier_WhenChanged = funct
 
    this.fixture.thenProcessCharacterSetIgnoredSolarSystemShouldReturn(test, 210, true,
          [ 'CharacterIgnoredSolarSystems' ]);
+
+   test.done();
+};
+
+exports.testRoutingCapabilityJumpGatesChanged_WhenAppliedFromData = function(test)
+{
+   var newValue =
+   {
+      inUse: false
+   };
+
+   this.fixture.givenRoutingCapabilityJumpGates(
+   {
+      inUse: true
+   });
+
+   this.fixture.whenCharacterDataWasApplied(
+   {
+      routingCapabilities:
+      {
+         jumpGates: newValue
+      }
+   });
+
+   this.fixture.thenRoutingCapabilityJumpGatesShouldBe(test, newValue);
+
+   test.done();
+};
+
+exports.testRoutingCapabilityJumpGatesChanged_WhenProcessedDifferent = function(test)
+{
+   var newValue =
+   {
+      inUse: false
+   };
+
+   this.fixture.givenRoutingCapabilityJumpGates(
+   {
+      inUse: true
+   });
+
+   this.fixture.whenProcessingCharacterSetRoutingCapabilityJumpGates(false);
+
+   this.fixture.thenRoutingCapabilityJumpGatesShouldBe(test, newValue);
+
+   test.done();
+};
+
+exports.testProcessSetRoutingCapabilityJumpGatesShouldReturnEmptyArray_WhenUnchanged = function(test)
+{
+   var value =
+   {
+      inUse: true
+   };
+
+   this.fixture.givenRoutingCapabilityJumpGates(value);
+
+   this.fixture.thenProcessCharacterSetRoutingCapabilityJumpGatesShouldReturn(test, value.inUse, []);
+
+   test.done();
+};
+
+exports.testProcessSetRoutingCapabilityJumpGatesShouldReturnNotifier_WhenChanged = function(test)
+{
+   this.fixture.givenRoutingCapabilityJumpGates(
+   {
+      inUse: false
+   });
+
+   this.fixture.thenProcessCharacterSetRoutingCapabilityJumpGatesShouldReturn(test,
+   {
+      inUse: true
+   }, [ 'CharacterRoutingCapabilities' ]);
 
    test.done();
 };

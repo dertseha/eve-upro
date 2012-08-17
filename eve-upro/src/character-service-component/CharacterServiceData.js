@@ -30,7 +30,14 @@ function CharacterServiceData(service, character)
    this.rawData =
    {
       activeGalaxyId: 9,
-      ignoredSolarSystems: [ 30000142 ]
+      ignoredSolarSystems: [ 30000142 ],
+      routingCapabilities:
+      {
+         jumpGates:
+         {
+            inUse: true
+         }
+      }
    };
    this.igbSessions = {};
 
@@ -41,17 +48,40 @@ function CharacterServiceData(service, character)
     */
    this.applyCharacterData = function(data)
    {
-      if (data)
+      this.rawData = this.mergeData(this.rawData, data);
+   };
+
+   /**
+    * Merges two objects into each other, returning the result. The destination is considered to be the master to
+    * describe the schema, source may skip fields.
+    * 
+    * @param dest the template object
+    * @param source the source object
+    * @return a new object containing the merge result
+    */
+   this.mergeData = function(dest, source)
+   {
+      var result = {};
+
+      for ( var name in dest)
       {
-         if (data.activeGalaxyId)
+         var resultValue = dest[name];
+
+         if ((source !== null) && (source !== undefined))
          {
-            this.rawData.activeGalaxyId = data.activeGalaxyId;
+            if (!Array.isArray(resultValue) && (typeof resultValue === 'object'))
+            {
+               resultValue = this.mergeData(resultValue, source[name]);
+            }
+            else
+            {
+               resultValue = source[name];
+            }
          }
-         if (data.ignoredSolarSystems)
-         {
-            this.rawData.ignoredSolarSystems = data.ignoredSolarSystems;
-         }
+         result[name] = resultValue;
       }
+
+      return result;
    };
 
    /**
@@ -97,6 +127,7 @@ function CharacterServiceData(service, character)
    {
       this.broadcastCharacterActiveGalaxy(interest, queue);
       this.broadcastCharacterIgnoredSolarSystems(interest, queue);
+      this.broadcastCharacterRoutingCapabilities(interest, queue);
    };
 
    /**
@@ -280,6 +311,36 @@ function CharacterServiceData(service, character)
 
       this.broadcast(busMessages.Broadcasts.CharacterIgnoredSolarSystems, body, interest, queueName);
    };
+
+   /**
+    * Broadcast the current routing capabilities
+    * 
+    * @param interest the interest for the broadcast message
+    * @param queueName optional explicit queue information
+    */
+   this.broadcastCharacterRoutingCapabilities = function(interest, queueName)
+   {
+      var body = this.rawData.routingCapabilities;
+
+      this.broadcast(busMessages.Broadcasts.CharacterRoutingCapabilities, body, interest, queueName);
+   };
+
+   /**
+    * Processes the broadcast message
+    */
+   this.processClientRequestSetRoutingCapabilityJumpGates = function(header, body)
+   {
+      var notifier = [];
+
+      if (this.rawData.routingCapabilities.jumpGates.inUse != body.inUse)
+      {
+         this.rawData.routingCapabilities.jumpGates.inUse = body.inUse;
+         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities);
+      }
+
+      return notifier;
+   };
+
 }
 
 module.exports = CharacterServiceData;

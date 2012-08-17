@@ -19,7 +19,12 @@ var RequestNames =
    /**
     * Changes an ignored solar system
     */
-   SetIgnoredSolarSystem: 0
+   SetIgnoredSolarSystem: 0,
+
+   /**
+    * Set the jump gates routing capability
+    */
+   SetRoutingCapabilityJumpGates: 0
 };
 
 function staticInit()
