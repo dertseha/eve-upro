@@ -415,7 +415,6 @@ function CharacterServiceData(service, character)
    {
       var notifier = [];
       var rule = this.rawData.routingRules[body.name];
-      logger.warn('data: ' + JSON.stringify(body));
 
       if (rule)
       {
@@ -467,7 +466,6 @@ function CharacterServiceData(service, character)
       {
          var otherRule = this.findRoutingRuleByIndex(body.index);
 
-         logger.warn('index: to ' + body.index + ' found: ' + JSON.stringify(otherRule));
          if (otherRule)
          {
             otherRule.index = rule.index;
