@@ -218,7 +218,7 @@ function CharacterServiceData(service, character)
       if (galaxyId && (this.rawData.activeGalaxyId != galaxyId))
       {
          this.rawData.activeGalaxyId = galaxyId;
-         notifier.push('CharacterActiveGalaxy');
+         notifier.push(busMessages.Broadcasts.CharacterActiveGalaxy);
       }
 
       return notifier;
@@ -262,7 +262,7 @@ function CharacterServiceData(service, character)
          changed = true;
       }
 
-      return changed ? [ 'CharacterIgnoredSolarSystems' ] : [];
+      return changed ? [ busMessages.Broadcasts.CharacterIgnoredSolarSystems ] : [];
    };
 
    /**

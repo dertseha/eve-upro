@@ -69,7 +69,7 @@ function PendingCharacterServiceDataProcessingState(serviceData)
     */
    this.onFirstDataResult = function(data)
    {
-      var newState = new ActiveCharacterServiceDataProcessingState(this.serviceData);
+      var newState = this.getActiveProcessingState();
 
       // restore the data
       this.serviceData.applyCharacterData(data);
@@ -87,6 +87,16 @@ function PendingCharacterServiceDataProcessingState(serviceData)
       // make new active state current
       newState.resultNotifier = new ActiveResultNotifier(this.serviceData);
       this.serviceData.processingState = newState;
+   };
+
+   /**
+    * Factory method to return the active state
+    * 
+    * @returns the active state that should follow this state
+    */
+   this.getActiveProcessingState = function()
+   {
+      return new ActiveCharacterServiceDataProcessingState(this.serviceData);
    };
 }
 util.inherits(PendingCharacterServiceDataProcessingState, CharacterServiceDataProcessingState);

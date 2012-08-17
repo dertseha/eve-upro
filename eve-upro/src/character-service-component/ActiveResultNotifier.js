@@ -20,13 +20,16 @@ function ActiveResultNotifier(serviceData)
    {
       var self = this;
 
-      this.serviceData.saveCharacterData();
-      notifyNames.forEach(function(notifyName)
+      if (notifyNames.length > 0)
       {
-         var handler = self.serviceData['broadcast' + notifyName];
+         this.serviceData.saveCharacterData();
+         notifyNames.forEach(function(notifyName)
+         {
+            var handler = self.serviceData['broadcast' + notifyName];
 
-         handler.call(self.serviceData);
-      });
+            handler.call(self.serviceData);
+         });
+      }
    };
 }
 util.inherits(ActiveResultNotifier, ResultNotifier);

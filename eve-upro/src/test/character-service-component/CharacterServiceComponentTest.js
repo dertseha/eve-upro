@@ -1,12 +1,12 @@
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
-var UuidFactory = require("../util/UuidFactory.js");
-var busMessages = require('../model/BusMessages.js');
-var CharacterAgentComponent = require('../character-agent-component/CharacterAgentComponent.js');
-var CharacterServiceComponent = require('../character-service-component/CharacterServiceComponent.js');
+var UuidFactory = require("../../util/UuidFactory.js");
+var busMessages = require('../../model/BusMessages.js');
+var CharacterAgentComponent = require('../../character-agent-component/CharacterAgentComponent.js');
+var CharacterServiceComponent = require('../../character-service-component/CharacterServiceComponent.js');
 
-var AbstractServiceComponentFixture = require('./TestSupport/AbstractServiceComponentFixture.js');
+var AbstractServiceComponentFixture = require('../TestSupport/AbstractServiceComponentFixture.js');
 
 function Fixture()
 {
@@ -143,148 +143,6 @@ exports.testCharacterActiveGalaxyEmitted_WhenActiveGalaxyRequested = function(te
    test.done();
 };
 
-exports.testCharacterActiveGalaxyEmittedOnlyOnce_WhenRequestReceivedIdentical = function(test)
-{
-   var charId = 7788;
-   var sessionId = UuidFactory.v4();
-   var galaxyId = 3344;
-   var broadcastBody =
-   {
-      galaxyId: galaxyId
-   };
-
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
-   this.fixture.givenCharacterHasActiveGalaxy(charId, galaxyId);
-
-   this.fixture.expectingCharacterActiveGalaxy(test, charId, galaxyId);
-
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy, sessionId, broadcastBody);
-
-   test.expect(0);
-   test.done();
-};
-
-exports.testCharacterActiveGalaxyHasCharacterScope_WhenRequestReceived = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var galaxyId = 5678;
-
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
-   this.fixture.givenCharacterHasActiveGalaxy(charId, 8899);
-
-   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterActiveGalaxy, [
-   {
-      scope: 'Character',
-      id: charId
-   } ]);
-
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy, sessionId,
-   {
-      galaxyId: galaxyId
-   });
-
-   test.expect(1);
-   test.done();
-};
-
-exports.testCharacterActiveGalaxyHasSessionScope_WhenSecondSessionEstablished = function(test)
-{
-   var charId = 1234;
-   var sessionIdExisting = UuidFactory.v4();
-   var sessionId = UuidFactory.v4();
-
-   this.fixture.givenExistingCharacterSession(charId, sessionIdExisting);
-   this.fixture.givenCharacterHasActiveGalaxy(charId, 8899);
-
-   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterActiveGalaxy, [
-   {
-      scope: 'Session',
-      id: sessionId
-   } ]);
-
-   this.fixture.whenClientConnected(charId, sessionId);
-
-   test.expect(1);
-   test.done();
-};
-
-exports.testCharacterActiveGalaxySentDefault_WhenNoDataStored = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var emitter = new EventEmitter();
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
-   {
-      id: null,
-      data: null
-   } ], emitter);
-
-   this.fixture.expectingCharacterActiveGalaxy(test, charId, 9);
-
-   this.fixture.whenClientConnected(charId, sessionId);
-   emitter.emit('event');
-
-   test.expect(1);
-   test.done();
-};
-
-exports.testCharacterActiveGalaxyEmitted_WhenDataReturnedFromStorage = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var galaxyId = 5678;
-   var emitter = new EventEmitter();
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
-   {
-      id: charId,
-      data:
-      {
-         activeGalaxyId: galaxyId
-      }
-   } ], emitter);
-
-   this.fixture.expectingCharacterActiveGalaxy(test, charId, galaxyId);
-
-   this.fixture.whenClientConnected(charId, sessionId);
-   emitter.emit('event');
-
-   test.expect(1);
-   test.done();
-};
-
-exports.testCharacterActiveGalaxyEmittedWithNewData_WhenRequestsWereReceivedBeforeStorage = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var storedGalaxyId = 5678;
-   var newGalaxyId = 1233;
-   var emitter = new EventEmitter();
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
-   {
-      id: charId,
-      data:
-      {
-         activeGalaxyId: storedGalaxyId
-      }
-   } ], emitter);
-
-   this.fixture.expectingCharacterActiveGalaxy(test, charId, newGalaxyId);
-
-   this.fixture.whenClientConnected(charId, sessionId);
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy, sessionId,
-   {
-      galaxyId: newGalaxyId
-   });
-   emitter.emit('event');
-
-   test.expect(1);
-   test.done();
-};
-
 exports.testCharacterClientControlSelection_WhenFirstStatusMessageReceived = function(test)
 {
    var charId = 1234;
@@ -360,73 +218,6 @@ exports.testCharacterClientControlSelectionChanged_WhenFirstDisconnected = funct
    test.done();
 };
 
-exports.testCharacterIgnoredSolarSystemsAreDefault_WhenInitialLogin = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var ignoredSolarSystems = [ 30000142 ]; // Jita
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', []);
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
-
-   this.fixture.whenStorageReturnsData('CharacterData');
-
-   test.expect(1);
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
-   {
-      ignoredSolarSystems: ignoredSolarSystems
-   });
-
-   test.done();
-};
-
-exports.testCharacterIgnoredSolarSystemsAreDefault_WhenStorageMissesEntry = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var ignoredSolarSystems = [ 30000142 ]; // Jita
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [ {} ]);
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
-
-   this.fixture.whenStorageReturnsData('CharacterData');
-
-   test.expect(1);
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
-   {
-      ignoredSolarSystems: ignoredSolarSystems
-   });
-
-   test.done();
-};
-
-exports.testCharacterIgnoredSolarSystemsAreReadFromStorage_WhenStorageReturns = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-   var ignoredSolarSystems = [ 123, 456, 789 ];
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
-   {
-      id: charId,
-      data:
-      {
-         ignoredSolarSystems: ignoredSolarSystems
-      }
-   } ]);
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
-
-   this.fixture.whenStorageReturnsData('CharacterData');
-
-   test.expect(1);
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
-   {
-      ignoredSolarSystems: ignoredSolarSystems
-   });
-
-   test.done();
-};
-
 exports.testCharacterIgnoredSolarSystemsSent_WhenDisabledGetsEnabled = function(test)
 {
    var charId = 1234;
@@ -474,33 +265,6 @@ exports.testCharacterIgnoredSolarSystemsSent_WhenEnabledGetsDisabled = function(
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
    {
       ignoredSolarSystems: [ 456, 789, 123 ]
-   });
-
-   test.done();
-};
-
-exports.testCharacterIgnoredSolarSystemsSentWithModifiedData_WhenChangeRequestedBeforeStorageReturns = function(test)
-{
-   var charId = 1234;
-   var sessionId = UuidFactory.v4();
-
-   this.fixture.givenStorageReturnsDataDelayed('CharacterData', [
-   {
-      id: charId,
-      data:
-      {
-         ignoredSolarSystems: [ 123 ]
-      }
-   } ]);
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
-
-   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, 456, true);
-   this.fixture.whenStorageReturnsData('CharacterData');
-
-   test.expect(1);
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
-   {
-      ignoredSolarSystems: [ 123, 456 ]
    });
 
    test.done();
