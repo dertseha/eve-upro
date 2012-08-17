@@ -221,6 +221,19 @@ function AbstractServiceComponentFixture()
          test.deepEqual(lastMessage.body, body);
       }
    };
+
+   this.thenTheLastBroadcastShouldHaveIncluded = function(test, type, bodyParts)
+   {
+      var lastMessage = this.findLastBroadcastOfType(type);
+
+      if (lastMessage)
+      {
+         for ( var name in bodyParts)
+         {
+            test.deepEqual(lastMessage.body[name], bodyParts[name]);
+         }
+      }
+   };
 }
 
 module.exports = AbstractServiceComponentFixture;

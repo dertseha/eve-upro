@@ -24,7 +24,12 @@ var RequestNames =
    /**
     * Set the jump gates routing capability
     */
-   SetRoutingCapabilityJumpGates: 0
+   SetRoutingCapabilityJumpGates: 0,
+
+   /**
+    * Set the jump drive routing capability
+    */
+   SetRoutingCapabilityJumpDrive: 0
 };
 
 function staticInit()

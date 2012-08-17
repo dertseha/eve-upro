@@ -95,6 +95,35 @@ function Fixture()
 
       test.deepEqual(result, expectedResult);
    };
+
+   this.givenRoutingCapabilityJumpDrive = function(capability)
+   {
+      this.serviceData.rawData.routingCapabilities.jumpDrive = capability;
+   };
+
+   this.whenProcessingCharacterSetRoutingCapabilityJumpDrive = function(inUse, range)
+   {
+      var header = {};
+      var body =
+      {
+         inUse: inUse,
+         range: range
+      };
+
+      return this.serviceData.processClientRequestSetRoutingCapabilityJumpDrive(header, body);
+   };
+
+   this.thenRoutingCapabilityJumpDriveShouldBe = function(test, expected)
+   {
+      test.deepEqual(this.serviceData.rawData.routingCapabilities.jumpDrive, expected);
+   };
+
+   this.thenProcessCharacterSetRoutingCapabilityJumpDriveShouldReturn = function(test, inUse, range, expectedResult)
+   {
+      var result = this.whenProcessingCharacterSetRoutingCapabilityJumpDrive(inUse, range);
+
+      test.deepEqual(result, expectedResult);
+   };
 }
 
 exports.setUp = function(callback)
@@ -272,13 +301,109 @@ exports.testProcessSetRoutingCapabilityJumpGatesShouldReturnNotifier_WhenChanged
 {
    this.fixture.givenRoutingCapabilityJumpGates(
    {
-      inUse: false
+      inUse: true
    });
 
-   this.fixture.thenProcessCharacterSetRoutingCapabilityJumpGatesShouldReturn(test,
+   this.fixture.thenProcessCharacterSetRoutingCapabilityJumpGatesShouldReturn(test, false,
+         [ 'CharacterRoutingCapabilities' ]);
+
+   test.done();
+};
+
+exports.testRoutingCapabilityJumpDriveChanged_WhenAppliedFromData = function(test)
+{
+   var newValue =
    {
-      inUse: true
-   }, [ 'CharacterRoutingCapabilities' ]);
+      inUse: false,
+      range: 10.0
+   };
+
+   this.fixture.givenRoutingCapabilityJumpDrive(
+   {
+      inUse: true,
+      range: 5.0
+   });
+
+   this.fixture.whenCharacterDataWasApplied(
+   {
+      routingCapabilities:
+      {
+         jumpDrive: newValue
+      }
+   });
+
+   this.fixture.thenRoutingCapabilityJumpDriveShouldBe(test, newValue);
+
+   test.done();
+};
+
+exports.testRoutingCapabilityJumpDriveChanged_WhenProcessedDifferent = function(test)
+{
+   var newValue =
+   {
+      inUse: false,
+      range: 7.0
+   };
+
+   this.fixture.givenRoutingCapabilityJumpDrive(
+   {
+      inUse: true,
+      range: 3.0
+   });
+
+   this.fixture.whenProcessingCharacterSetRoutingCapabilityJumpDrive(newValue.inUse, newValue.range);
+
+   this.fixture.thenRoutingCapabilityJumpDriveShouldBe(test, newValue);
+
+   test.done();
+};
+
+exports.testRoutingCapabilityJumpDriveStaysVald_WhenValuesSkipped = function(test)
+{
+   var newValue =
+   {
+      inUse: false,
+      range: 3.0
+   };
+
+   this.fixture.givenRoutingCapabilityJumpDrive(
+   {
+      inUse: true,
+      range: 3.0
+   });
+
+   this.fixture.whenProcessingCharacterSetRoutingCapabilityJumpDrive(newValue.inUse, null);
+
+   this.fixture.thenRoutingCapabilityJumpDriveShouldBe(test, newValue);
+
+   test.done();
+};
+
+exports.testProcessSetRoutingCapabilityJumpDriveShouldReturnEmptyArray_WhenUnchanged = function(test)
+{
+   var value =
+   {
+      inUse: true,
+      range: 3.0
+   };
+
+   this.fixture.givenRoutingCapabilityJumpDrive(value);
+
+   this.fixture.thenProcessCharacterSetRoutingCapabilityJumpDriveShouldReturn(test, value.inUse, value.range, []);
+
+   test.done();
+};
+
+exports.testProcessSetRoutingCapabilityJumpDriveShouldReturnNotifier_WhenChanged = function(test)
+{
+   this.fixture.givenRoutingCapabilityJumpDrive(
+   {
+      inUse: false,
+      range: 11.0
+   });
+
+   this.fixture.thenProcessCharacterSetRoutingCapabilityJumpDriveShouldReturn(test, true, 11.0,
+         [ 'CharacterRoutingCapabilities' ]);
 
    test.done();
 };

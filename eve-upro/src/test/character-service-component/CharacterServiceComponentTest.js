@@ -99,6 +99,15 @@ function Fixture()
          inUse: inUse
       });
    };
+
+   this.whenBroadcastSetRoutingCapabilitiyJumpDriveIsReceived = function(sessionId, inUse, range)
+   {
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive, sessionId,
+      {
+         inUse: inUse,
+         range: range
+      });
+   };
 }
 util.inherits(Fixture, AbstractServiceComponentFixture);
 
@@ -287,7 +296,7 @@ exports.testCharacterRoutingCapabilitiesSent_WhenJumpGatesEnabled = function(tes
    this.fixture.whenBroadcastSetRoutingCapabilitiyJumpGatesIsReceived(sessionId, true);
 
    test.expect(1);
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterRoutingCapabilities',
+   this.fixture.thenTheLastBroadcastShouldHaveIncluded(test, 'CharacterRoutingCapabilities',
    {
       jumpGates:
       {
@@ -322,11 +331,48 @@ exports.testCharacterRoutingCapabilitiesSent_WhenJumpGatesDisabled = function(te
    this.fixture.whenBroadcastSetRoutingCapabilitiyJumpGatesIsReceived(sessionId, false);
 
    test.expect(1);
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterRoutingCapabilities',
+   this.fixture.thenTheLastBroadcastShouldHaveIncluded(test, 'CharacterRoutingCapabilities',
    {
       jumpGates:
       {
          inUse: false
+      }
+   });
+
+   test.done();
+};
+
+exports.testCharacterRoutingCapabilitiesSent_WhenJumpDriveChanged = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenStorageContainsData('CharacterData', [
+   {
+      id: charId,
+      data:
+      {
+         routingCapabilities:
+         {
+            jumpDrive:
+            {
+               inUse: true,
+               range: 10.0
+            }
+         }
+      }
+   } ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastSetRoutingCapabilitiyJumpDriveIsReceived(sessionId, true, 9.5);
+
+   test.expect(1);
+   this.fixture.thenTheLastBroadcastShouldHaveIncluded(test, 'CharacterRoutingCapabilities',
+   {
+      jumpDrive:
+      {
+         inUse: true,
+         range: 9.5
       }
    });
 

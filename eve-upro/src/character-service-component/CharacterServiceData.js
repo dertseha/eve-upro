@@ -36,6 +36,11 @@ function CharacterServiceData(service, character)
          jumpGates:
          {
             inUse: true
+         },
+         jumpDrive:
+         {
+            inUse: false,
+            range: 5.0
          }
       }
    };
@@ -69,11 +74,13 @@ function CharacterServiceData(service, character)
 
          if ((source !== null) && (source !== undefined))
          {
+            var sourceValue = source[name];
+
             if (!Array.isArray(resultValue) && (typeof resultValue === 'object'))
             {
-               resultValue = this.mergeData(resultValue, source[name]);
+               resultValue = this.mergeData(resultValue, sourceValue);
             }
-            else
+            else if ((sourceValue !== null) && (sourceValue !== undefined))
             {
                resultValue = source[name];
             }
@@ -335,6 +342,25 @@ function CharacterServiceData(service, character)
       if (this.rawData.routingCapabilities.jumpGates.inUse != body.inUse)
       {
          this.rawData.routingCapabilities.jumpGates.inUse = body.inUse;
+         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities);
+      }
+
+      return notifier;
+   };
+
+   /**
+    * Processes the broadcast message
+    */
+   this.processClientRequestSetRoutingCapabilityJumpDrive = function(header, body)
+   {
+      var notifier = [];
+      var newData = this.mergeData(this.rawData.routingCapabilities.jumpDrive, body);
+
+      if ((this.rawData.routingCapabilities.jumpDrive.inUse != newData.inUse)
+            || (this.rawData.routingCapabilities.jumpDrive.range != newData.range))
+      {
+         this.rawData.routingCapabilities.jumpDrive.inUse = newData.inUse;
+         this.rawData.routingCapabilities.jumpDrive.range = newData.range;
          notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities);
       }
 

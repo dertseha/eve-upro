@@ -69,7 +69,12 @@ var Broadcasts =
    /**
     * Client request for setting routing capabilities for jump gates
     */
-   ClientRequestSetRoutingCapabilityJumpGates: 0
+   ClientRequestSetRoutingCapabilityJumpGates: 0,
+
+   /**
+    * Client request for setting routing capabilities for jump drives
+    */
+   ClientRequestSetRoutingCapabilityJumpDrive: 0
 };
 
 function staticInit()

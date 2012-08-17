@@ -319,6 +319,7 @@ function ClientSessionComponent(services)
       }
       else
       {
+         logger.warn('Unregistered client request [' + clientRequest.header.type + ']');
          rCode = 'Unknown Request';
       }
 

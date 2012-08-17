@@ -19,9 +19,6 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
          }
       };
 
-      this.routingCapJumpDriveInUse = false;
-      this.routingCapJumpDriveRange = 5.0;
-
       this.routingRules = {};
       this.createRoutingRule(0, "MinSecurity", true, 5);
       this.createRoutingRule(1, "MaxSecurity", false, 10);
@@ -117,18 +114,22 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
    getRoutingCapJumpDriveInUse: function()
    {
-      return this.routingCapJumpDriveInUse;
+      return this.routingCapabilities.jumpDrive.inUse;
    },
 
    toggleRoutingCapJumpDrive: function()
    {
-      this.routingCapJumpDriveInUse = !this.getRoutingCapJumpDriveInUse();
-      this.onRoutingCapabilitiesChanged();
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
+      {
+         inUse: !this.getRoutingCapJumpDriveInUse()
+      });
    },
 
    getRoutingCapJumpDriveRange: function()
    {
-      return this.routingCapJumpDriveRange;
+      return this.routingCapabilities.jumpDrive.range;
    },
 
    /**
@@ -138,15 +139,19 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
     */
    stepRoutingCapJumpDriveRange: function(increment)
    {
-      var value = this.routingCapJumpDriveRange
+      var value = this.getRoutingCapJumpDriveRange()
             + (increment ? upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep
                   : -upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep);
 
       if ((value >= upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MinimumRange)
             && (value <= upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MaximumRange))
       {
-         this.routingCapJumpDriveRange = value;
-         this.onRoutingCapabilitiesChanged();
+         var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+         sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
+         {
+            range: value
+         });
       }
    },
 
