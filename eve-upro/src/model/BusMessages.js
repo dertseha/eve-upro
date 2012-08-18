@@ -1,7 +1,7 @@
 var schema = require('js-schema');
 
-var clientRequests = require('./clientRequests.js').clientRequests;
-var clientBroadcastEvents = require('./clientBroadcastEvents.js').clientBroadcastEvents;
+var clientRequests = require('./ClientRequests.js').clientRequests;
+var clientBroadcastEvents = require('./ClientBroadcastEvents.js').clientBroadcastEvents;
 
 var userSchema =
 {
