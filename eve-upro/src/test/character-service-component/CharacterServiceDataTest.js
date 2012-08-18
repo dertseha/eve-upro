@@ -512,6 +512,27 @@ exports.testRoutingRuleChanged_WhenProcessedDifferent = function(test)
    test.done();
 };
 
+exports.testRoutingRuleUnchanged_WhenInvalidParameter = function(test)
+{
+   this.fixture.givenRoutingRule('minSecurity',
+   {
+      index: 1,
+      inUse: true,
+      parameter: 4
+   });
+
+   this.fixture.whenProcessingClientRequestSetRoutingRuleData('minSecurity', false, 6);
+
+   this.fixture.thenRoutingRuleShouldBe(test, 'minSecurity',
+   {
+      index: 1,
+      inUse: true,
+      parameter: 4
+   });
+
+   test.done();
+};
+
 exports.testProcessSetRoutingRuleShouldReturnEmptyArray_WhenUnchanged = function(test)
 {
    var value =
@@ -534,7 +555,7 @@ exports.testProcessSetRoutingRuleShouldReturnNotifier_WhenChanged = function(tes
    {
       index: 1,
       inUse: true,
-      parameter: 4
+      parameter: 7
    };
 
    this.fixture.givenRoutingRule('maxSecurity', value);

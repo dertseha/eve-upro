@@ -56,7 +56,7 @@ function process(sources, header, options)
       }
 
       result += processed;
-      result += '\n';
+      result += ';\n'; // the semicolon is important to avoid problems that might come from concatenation
    });
 
    return result;

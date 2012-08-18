@@ -1,7 +1,7 @@
 var path = require('path');
 
 exports.header = "/*\n" + " * Copyright (c) 2011-2012 Christian Haas\n" + " *\n"
-      + " * This software is provided 'as-is', // without any express or implied\n"
+      + " * This software is provided 'as-is', without any express or implied\n"
       + " * warranty. In no event will the authors be held liable for any damages\n"
       + " * arising from the use of this software.\n" + " *\n"
       + " * Permission is granted to anyone to use this software for any purpose,\n"
@@ -19,6 +19,8 @@ exports.sourceFiles = [];
 
 (function()
 {
+   var shareBase = '../../model/';
+
    var sourceFiles = [ //
    'upro.js', //
    'Uuid.js', //
@@ -107,6 +109,7 @@ exports.sourceFiles = [];
    'data/CommunicationUplink.js', //
 
    'model/model.js', //
+   shareBase + 'navigation/RoutingRules.js', //
    'model/LocationTracker.js', //
    'model/UserRoutingRule.js', //
 

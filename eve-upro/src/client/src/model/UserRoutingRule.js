@@ -3,15 +3,16 @@
  */
 upro.model.UserRoutingRule = Class.create(
 {
-   initialize: function(ruleType, pathFinderRuleConstructor, index, inUse, parameter)
+   initialize: function(ruleType, pathFinderRuleConstructor)
    {
       this.ruleType = ruleType;
       this.pathFinderRuleConstructor = pathFinderRuleConstructor;
-      this.index = index;
-      this.inUse = inUse;
-      this.parameter = parameter;
 
-      this.template = upro.model.UserRoutingRule.RuleConstants[this.ruleType];
+      this.template = upro.model.RoutingRules[this.ruleType];
+
+      this.index = this.template.defaultIndex;
+      this.inUse = this.template.defaultInUse;
+      this.parameter = this.template.defaultValue;
    },
 
    /**
@@ -35,7 +36,7 @@ upro.model.UserRoutingRule = Class.create(
     */
    getPathFinderRule: function()
    {
-      return new this.pathFinderRuleConstructor((this.parameter * this.template.Factor).toFixed(this.template.Fixed));
+      return new this.pathFinderRuleConstructor(this.getFixedParameter());
    },
 
    /**
@@ -59,7 +60,7 @@ upro.model.UserRoutingRule = Class.create(
     */
    isBelowMaximum: function()
    {
-      return this.parameter < this.template.Maximum;
+      return this.parameter < this.template.maximum;
    },
 
    /**
@@ -67,7 +68,7 @@ upro.model.UserRoutingRule = Class.create(
     */
    isAboveMinimum: function()
    {
-      return this.parameter > this.template.Minimum;
+      return this.parameter > this.template.minimum;
    },
 
    /**
@@ -75,7 +76,7 @@ upro.model.UserRoutingRule = Class.create(
     */
    getFixedParameter: function()
    {
-      return this.getFixedValue(this.parameter);
+      return this.template.getFixedValue(this.parameter);
    },
 
    /**
@@ -83,7 +84,7 @@ upro.model.UserRoutingRule = Class.create(
     */
    getFixedParameterIncremented: function()
    {
-      return this.getFixedValue(this.parameter + this.template.Increment);
+      return this.template.getFixedValue(this.parameter + this.template.increment);
    },
 
    /**
@@ -91,48 +92,6 @@ upro.model.UserRoutingRule = Class.create(
     */
    getFixedParameterDecremented: function()
    {
-      return this.getFixedValue(this.parameter - this.template.Increment);
-   },
-
-   /**
-    * @returns the value in fixed notation as per template definition
-    */
-   getFixedValue: function(value)
-   {
-      return (value * this.template.Factor).toFixed(this.template.Fixed);
-   },
+      return this.template.getFixedValue(this.parameter - this.template.increment);
+   }
 });
-
-upro.model.UserRoutingRule.RuleConstants = {};
-upro.model.UserRoutingRule.RuleConstants["jumps"] =
-{
-   Increment: 1,
-   Minimum: 0,
-   Maximum: 10,
-   Factor: 1,
-   Fixed: 0
-};
-upro.model.UserRoutingRule.RuleConstants["jumpFuel"] =
-{
-   Increment: 0.25,
-   Minimum: 0,
-   Maximum: 5,
-   Factor: 1,
-   Fixed: 2
-};
-upro.model.UserRoutingRule.RuleConstants["minSecurity"] =
-{
-   Increment: 1,
-   Minimum: 0,
-   Maximum: 5,
-   Factor: 0.1,
-   Fixed: 1
-};
-upro.model.UserRoutingRule.RuleConstants["maxSecurity"] =
-{
-   Increment: 1,
-   Minimum: 5,
-   Maximum: 10,
-   Factor: 0.1,
-   Fixed: 1
-};

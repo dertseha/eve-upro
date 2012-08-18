@@ -21,19 +21,15 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
       this.routingRules = {};
 
-      this.createRoutingRule("minSecurity", 0, true, 5, upro.nav.finder.PathFinderCostRuleMinSecurity);
-      this.createRoutingRule("maxSecurity", 1, false, 10, upro.nav.finder.PathFinderCostRuleMaxSecurity);
-      this.createRoutingRule("jumps", 2, true, 0, upro.nav.finder.PathFinderCostRuleJumps);
-      this.createRoutingRule("jumpFuel", 3, false, 0, upro.nav.finder.PathFinderCostRuleJumpFuel);
+      this.registerRoutingRule("minSecurity", upro.nav.finder.PathFinderCostRuleMinSecurity);
+      this.registerRoutingRule("maxSecurity", upro.nav.finder.PathFinderCostRuleMaxSecurity);
+      this.registerRoutingRule("jumps", upro.nav.finder.PathFinderCostRuleJumps);
+      this.registerRoutingRule("jumpFuel", upro.nav.finder.PathFinderCostRuleJumpFuel);
    },
 
-   createRoutingRule: function(ruleType, index, inUse, parameter, pathFinderConstructor)
+   registerRoutingRule: function(ruleType, pathFinderConstructor)
    {
-      var rule = new upro.model.UserRoutingRule(ruleType, pathFinderConstructor, index, inUse, parameter);
-
-      this.routingRules[ruleType] = rule;
-
-      return rule;
+      this.routingRules[ruleType] = new upro.model.UserRoutingRule(ruleType, pathFinderConstructor);
    },
 
    onRegister: function()
@@ -280,7 +276,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
          sessionProxy.sendRequest("SetRoutingRuleData",
          {
             name: ruleType,
-            parameter: rule.parameter + (increment ? rule.template.Increment : -rule.template.Increment)
+            parameter: rule.parameter + (increment ? rule.template.increment : -rule.template.increment)
          });
       }
    },

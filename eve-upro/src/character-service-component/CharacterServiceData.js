@@ -4,24 +4,23 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 
 var busMessages = require('../model/BusMessages.js');
+var RoutingRules = require('../model/navigation/RoutingRules.js').RoutingRules;
 
 var PendingCharacterServiceDataProcessingState = require('./PendingCharacterServiceDataProcessingState.js');
 
 /**
  * Creates a routing rule data object
  * 
- * @param index the index of the rule
- * @param inUse in use flag
- * @param parameter parameter
+ * @param ruleTemplate the routing rule template
  * @returns a data object
  */
-function createRoutingRuleData(index, inUse, parameter)
+function createRoutingRuleData(ruleTemplate)
 {
    var rule =
    {
-      index: index,
-      inUse: inUse,
-      parameter: parameter
+      index: ruleTemplate.defaultIndex,
+      inUse: ruleTemplate.defaultInUse,
+      parameter: ruleTemplate.defaultValue
    };
 
    return rule;
@@ -63,14 +62,15 @@ function CharacterServiceData(service, character)
             range: 5.0
          }
       },
-      routingRules:
-      {
-         minSecurity: createRoutingRuleData(0, true, 5),
-         maxSecurity: createRoutingRuleData(1, false, 5),
-         jumps: createRoutingRuleData(2, true, 0),
-         jumpFuel: createRoutingRuleData(3, false, 0)
-      }
+      routingRules: {}
    };
+   for ( var routingRuleName in RoutingRules)
+   {
+      var ruleTemplate = RoutingRules[routingRuleName];
+
+      this.rawData.routingRules[routingRuleName] = createRoutingRuleData(ruleTemplate);
+   }
+
    this.igbSessions = {};
 
    this.processingState = new PendingCharacterServiceDataProcessingState(this);
@@ -415,12 +415,14 @@ function CharacterServiceData(service, character)
    {
       var notifier = [];
       var rule = this.rawData.routingRules[body.name];
+      var ruleTemplate = RoutingRules[body.name];
 
-      if (rule)
+      if (rule && ruleTemplate)
       {
          var newData = this.mergeData(rule, body);
+         var isValid = ruleTemplate.isParameterValid(newData.parameter);
 
-         if ((rule.inUse != newData.inUse) || (rule.parameter != newData.parameter))
+         if (isValid && ((rule.inUse != newData.inUse) || (rule.parameter != newData.parameter)))
          {
             rule.inUse = newData.inUse;
             rule.parameter = newData.parameter;
