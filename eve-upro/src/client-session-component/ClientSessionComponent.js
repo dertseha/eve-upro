@@ -27,8 +27,6 @@ function ClientSessionComponent(services, options)
    this.dataPorts = {};
    this.options = options;
 
-   logger.warn("security: " + JSON.stringify(this.options.security));
-
    /** {@inheritDoc} */
    this.start = function()
    {

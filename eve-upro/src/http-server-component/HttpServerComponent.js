@@ -153,6 +153,15 @@ function HttpServerComponent(services, options)
    {
       var expressServer = express();
       var self = this;
+      var defaultCookieSecret = 'Some special secret';
+      var cookieSecret = this.options.cookieSecret || defaultCookieSecret;
+      var defaultSessionSecret = 'Some other secret';
+      var sessionSecret = self.options.sessionSecret || defaultSessionSecret;
+
+      if ((cookieSecret == defaultCookieSecret) || (sessionSecret == defaultSessionSecret))
+      {
+         logger.warn('HTTP configuration uses some defaults that should not be used');
+      }
 
       this.expressServer = expressServer;
       this.sessionStore = new MongoStore(
@@ -188,14 +197,15 @@ function HttpServerComponent(services, options)
          }));
          expressServer.use(express.bodyParser());
          expressServer.use(express.methodOverride());
-         expressServer.use(express.cookieParser(self.options.cookieSecret || 'Some special secret'));
+         expressServer.use(express.cookieParser(cookieSecret));
 
          expressServer.use(express.session(
          {
             key: 'upro.sid',
-            secret: self.options.sessionSecret || 'Some other secret',
+            secret: sessionSecret,
             store: self.sessionStore
          }));
+
          expressServer.use(passport.initialize());
          expressServer.use(passport.session());
          expressServer.use(new ConnectRateLimiter(function(req)

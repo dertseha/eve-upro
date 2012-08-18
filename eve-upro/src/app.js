@@ -69,13 +69,12 @@ nconf.defaults(
    {
       host: nconf.get('VCAP_APP_HOST') || 'localhost',
       port: nconf.get('VMC_APP_PORT') || 3000,
-      cookieSecret: 'The unknown cookie secret',
-      sessionSecret: 'The also unknown session secret'
+      cookieSecret: null,
+      sessionSecret: null
    },
 
    'upro':
    {
-      profiles: [ 'http-client', 'eveapi' ],
       security:
       {
          allowed:
