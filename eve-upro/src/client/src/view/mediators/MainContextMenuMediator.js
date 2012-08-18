@@ -89,7 +89,7 @@ upro.view.mediators.MainContextMenuMediator = Class
                 * 
                 * @param rulesMenu the menu to insert the submenu in
                 * @param rulesMenuIndex at which index to insert
-                * @param ruleType the rule type according to upro.model.UserRoutingRule.RuleConstants
+                * @param ruleType the rule type according to upro.model.UserRoutingRule
                 * @param mainIcon icon to use for this rule menu
                 */
                createRoutingRuleCommandSet: function(rulesMenu, rulesMenuIndex, ruleType, mainIcon)
@@ -206,33 +206,28 @@ upro.view.mediators.MainContextMenuMediator = Class
                   {
                      var rule = rules[i];
                      var commandEntry = this.ruleCommands[rule.getRuleType()];
-                     var template = upro.model.UserRoutingRule.RuleConstants[rule.getRuleType()];
 
-                     if (commandEntry && template)
+                     if (commandEntry)
                      {
                         var menuLabel = upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType()
                               + "].menuLabel");
-                        var parameter = rule.getParameter();
-                        var belowMaximum = parameter < template.Maximum;
-                        var aboveMinimum = parameter > template.Minimum;
+                        var parameter = rule.getFixedParameter();
+                        var belowMaximum = rule.isBelowMaximum();
+                        var aboveMinimum = rule.isAboveMinimum();
 
                         commandEntry.toggle.setActive(rule.getInUse());
                         commandEntry.toggle.setLabel(upro.res.text.Lang.format("routing.rules.toggle", menuLabel,
                               upro.res.text.Lang.format(rule.getInUse() ? "general.off" : "general.on")));
                         commandEntry.more.setPossible(belowMaximum);
                         commandEntry.more.setLabel(belowMaximum ? upro.res.text.Lang.format("routing.rules.rule["
-                              + rule.getRuleType() + "].paramSet", (parameter * template.Factor)
-                              .toFixed(template.Fixed), ((parameter + template.Increment) * template.Factor)
-                              .toFixed(template.Fixed)) : upro.res.text.Lang.format("routing.rules.rule["
-                              + rule.getRuleType() + "].paramLimit", (parameter * template.Factor)
-                              .toFixed(template.Fixed)));
+                              + rule.getRuleType() + "].paramSet", parameter, rule.getFixedParameterIncremented())
+                              : upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].paramLimit",
+                                    parameter));
                         commandEntry.less.setPossible(aboveMinimum);
                         commandEntry.less.setLabel(aboveMinimum ? upro.res.text.Lang.format("routing.rules.rule["
-                              + rule.getRuleType() + "].paramSet", (parameter * template.Factor)
-                              .toFixed(template.Fixed), ((parameter - template.Increment) * template.Factor)
-                              .toFixed(template.Fixed)) : upro.res.text.Lang.format("routing.rules.rule["
-                              + rule.getRuleType() + "].paramLimit", (parameter * template.Factor)
-                              .toFixed(template.Fixed)));
+                              + rule.getRuleType() + "].paramSet", parameter, rule.getFixedParameterDecremented())
+                              : upro.res.text.Lang.format("routing.rules.rule[" + rule.getRuleType() + "].paramLimit",
+                                    parameter));
                         commandEntry.up.setPossible(i > 0);
                         commandEntry.down.setPossible(i < (rules.length - 1));
                      }

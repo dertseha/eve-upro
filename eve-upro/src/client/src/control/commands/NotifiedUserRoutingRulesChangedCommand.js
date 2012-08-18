@@ -1,4 +1,3 @@
-
 upro.ctrl.cmd.NotifiedUserRoutingRulesChangedCommand = Class.create(SimpleCommand,
 {
    execute: function(notification)
@@ -7,14 +6,13 @@ upro.ctrl.cmd.NotifiedUserRoutingRulesChangedCommand = Class.create(SimpleComman
       var rules = notification.getBody();
       var finderRules = [];
 
-      for (var i = 0; i < rules.length; i++)
+      for ( var i = 0; i < rules.length; i++)
       {
          var rule = rules[i];
-         var template = upro.model.UserRoutingRule.RuleConstants[rule.getRuleType()];
 
-         if (rule.getInUse() && template)
+         if (rule.getInUse())
          {
-            var finderRule = new template.Constructor((rule.getParameter() * template.Factor).toFixed(template.Fixed));
+            var finderRule = rule.getPathFinderRule();
 
             finderRules.push(finderRule);
          }
