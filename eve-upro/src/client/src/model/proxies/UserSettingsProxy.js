@@ -137,20 +137,14 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
     */
    stepRoutingCapJumpDriveRange: function(increment)
    {
-      var value = this.getRoutingCapJumpDriveRange()
-            + (increment ? upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep
-                  : -upro.model.proxies.UserSettingsProxy.JumpDriveConstants.RangeStep);
+      var rangeStep = upro.model.RoutingCapabilities.jumpDrive.rangeStep;
+      var value = this.getRoutingCapJumpDriveRange() + (increment ? rangeStep : -rangeStep);
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      if ((value >= upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MinimumRange)
-            && (value <= upro.model.proxies.UserSettingsProxy.JumpDriveConstants.MaximumRange))
+      sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
       {
-         var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
-
-         sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
-         {
-            range: value
-         });
-      }
+         range: value
+      });
    },
 
    onCharacterIgnoredSolarSystems: function(broadcastBody)
@@ -312,10 +306,3 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 });
 
 upro.model.proxies.UserSettingsProxy.NAME = "UserSettings";
-
-upro.model.proxies.UserSettingsProxy.JumpDriveConstants =
-{
-   MinimumRange: 0.25,
-   MaximumRange: 20.0,
-   RangeStep: 0.25
-};

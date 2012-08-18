@@ -110,6 +110,7 @@ exports.sourceFiles = [];
 
    'model/model.js', //
    shareBase + 'navigation/RoutingRules.js', //
+   shareBase + 'navigation/RoutingCapabilities.js', //
    'model/LocationTracker.js', //
    'model/UserRoutingRule.js', //
 

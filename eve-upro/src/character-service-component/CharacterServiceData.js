@@ -5,6 +5,7 @@ var logger = log4js.getLogger();
 
 var busMessages = require('../model/BusMessages.js');
 var RoutingRules = require('../model/navigation/RoutingRules.js').RoutingRules;
+var RoutingCapabilities = require('../model/navigation/RoutingCapabilities.js').RoutingCapabilities;
 
 var PendingCharacterServiceDataProcessingState = require('./PendingCharacterServiceDataProcessingState.js');
 
@@ -58,8 +59,8 @@ function CharacterServiceData(service, character)
          },
          jumpDrive:
          {
-            inUse: false,
-            range: 5.0
+            inUse: RoutingCapabilities.jumpDrive.defaultInUse,
+            range: RoutingCapabilities.jumpDrive.defaultValue
          }
       },
       routingRules: {}
@@ -382,10 +383,12 @@ function CharacterServiceData(service, character)
    this.processClientRequestSetRoutingCapabilityJumpDrive = function(header, body)
    {
       var notifier = [];
+      var capability = this.rawData.routingCapabilities.jumpDrive;
+      var template = RoutingCapabilities.jumpDrive;
       var newData = this.mergeData(this.rawData.routingCapabilities.jumpDrive, body);
+      var isValid = (newData.range >= template.rangeMinimum) && (newData.range <= template.rangeMaximum);
 
-      if ((this.rawData.routingCapabilities.jumpDrive.inUse != newData.inUse)
-            || (this.rawData.routingCapabilities.jumpDrive.range != newData.range))
+      if (isValid && ((capability.inUse != newData.inUse) || (capability.range != newData.range)))
       {
          this.rawData.routingCapabilities.jumpDrive.inUse = newData.inUse;
          this.rawData.routingCapabilities.jumpDrive.range = newData.range;

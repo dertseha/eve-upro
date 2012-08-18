@@ -410,6 +410,25 @@ exports.testRoutingCapabilityJumpDriveChanged_WhenProcessedDifferent = function(
    test.done();
 };
 
+exports.testRoutingCapabilityJumpDriveUnchanged_WhenInvalid = function(test)
+{
+   this.fixture.givenRoutingCapabilityJumpDrive(
+   {
+      inUse: true,
+      range: 3.0
+   });
+
+   this.fixture.whenProcessingCharacterSetRoutingCapabilityJumpDrive(false, 1000.0);
+
+   this.fixture.thenRoutingCapabilityJumpDriveShouldBe(test,
+   {
+      inUse: true,
+      range: 3.0
+   });
+
+   test.done();
+};
+
 exports.testRoutingCapabilityJumpDriveStaysVald_WhenValuesSkipped = function(test)
 {
    var newValue =
