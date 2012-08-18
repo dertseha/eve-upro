@@ -12,7 +12,7 @@ var busMessages = require('../model/BusMessages.js');
 var EveInfoExtractorNull = require('./EveInfoExtractorNull.js');
 var EveInfoExtractorHeaders = require('./EveInfoExtractorHeaders.js');
 
-function ClientSessionComponent(services)
+function ClientSessionComponent(services, options)
 {
    ClientSessionComponent.super_.call(this);
 
@@ -25,6 +25,9 @@ function ClientSessionComponent(services)
    this.logInRequests = {};
 
    this.dataPorts = {};
+   this.options = options;
+
+   logger.warn("security: " + JSON.stringify(this.options.security));
 
    /** {@inheritDoc} */
    this.start = function()
@@ -199,8 +202,16 @@ function ClientSessionComponent(services)
             corporationName: character.corporationName
          };
 
-         logger.info('Successful login request for character ' + user.characterId + ' [' + user.characterName + ']');
-         request.done(null, user);
+         if (this.isUserAllowed(user))
+         {
+            logger.info('Successful login request for character ' + user.characterId + ' [' + user.characterName + ']');
+            request.done(null, user);
+         }
+         else
+         {
+            logger.warn('Denied login request for character ' + user.characterId + ' [' + user.characterName + ']');
+            request.done(null, false);
+         }
       }
       else
       {
@@ -209,6 +220,63 @@ function ClientSessionComponent(services)
                + struct.response.characters.length);
          request.done(null, false);
       }
+   };
+
+   /**
+    * Checks whether the given user is allowed to access the service
+    * 
+    * @param user the user object identifying character and corporation
+    * @returns true if allowed
+    */
+   this.isUserAllowed = function(user)
+   {
+      var rCode = true;
+
+      if (!this.isSecuritySetEmpty(this.options.security.allowed))
+      {
+         rCode = this.isUserInSecuritySet(user, this.options.security.allowed);
+      }
+      if (!this.isSecuritySetEmpty(this.options.security.denied))
+      {
+         rCode = !this.isUserInSecuritySet(user, this.options.security.denied);
+      }
+
+      return rCode;
+   };
+
+   /**
+    * @returns true if given security set is empty (not defined)
+    */
+   this.isSecuritySetEmpty = function(set)
+   {
+      var rCode = true;
+
+      if (set)
+      {
+         rCode = (!set.characterIds || (set.characterIds.length == 0))
+               && (!set.corporationIds || (set.corporationIds.length == 0));
+      }
+
+      return rCode;
+   };
+
+   /**
+    * @returns true if given user is within the given security set
+    */
+   this.isUserInSecuritySet = function(user, set)
+   {
+      var rCode = false;
+
+      if (set.characterIds && (set.characterIds.indexOf(user.characterId) >= 0))
+      {
+         rCode = true;
+      }
+      if (set.corporationIds && (set.corporationIds.indexOf(user.corporationId) >= 0))
+      {
+         rCode = true;
+      }
+
+      return rCode;
    };
 
    /**

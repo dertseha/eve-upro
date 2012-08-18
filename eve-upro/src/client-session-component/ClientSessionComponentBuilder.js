@@ -7,6 +7,8 @@ function ClientSessionComponentBuilder()
 {
    ClientSessionComponentBuilder.super_.call(this);
 
+   this.options = {};
+
    /** {@inheritDoc} */
    this.getServiceName = function()
    {
@@ -22,7 +24,12 @@ function ClientSessionComponentBuilder()
    /** {@inheritDoc} */
    this.getInstance = function(services)
    {
-      return new ClientSessionComponent(services);
+      var options =
+      {
+         security: this.options.security || {}
+      };
+
+      return new ClientSessionComponent(services, options);
    };
 }
 util.inherits(ClientSessionComponentBuilder, ComponentBuilder);

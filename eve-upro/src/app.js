@@ -75,10 +75,22 @@ nconf.defaults(
 
    'upro':
    {
-      profiles: [ 'http-client', 'eveapi' ]
+      profiles: [ 'http-client', 'eveapi' ],
+      security:
+      {
+         allowed:
+         {
+            characterIds: [],
+            corporationIds: []
+         },
+         denied:
+         {
+            characterIds: [],
+            corporationIds: []
+         }
+      }
    },
-   'client':
-   {
+   'client': {
 
    }
 });
@@ -149,7 +161,12 @@ var serviceControl = new ServiceControl();
 }
 { // client-session
    var builder = new ClientSessionComponentBuilder();
+   var options =
+   {
+      security: nconf.get('upro').security
+   };
 
+   builder.options = options;
    serviceControl.setBuilder(builder);
 }
 { // character-agent
