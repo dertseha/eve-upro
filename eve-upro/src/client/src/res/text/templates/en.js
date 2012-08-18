@@ -25,33 +25,33 @@ upro.res.text.templates["en"] =
    /** Decrease priority of the routing rule */
    "routing.rules.down": "Decrease Priority",
 
-   /** Menu label for MinSecurity */
-   "routing.rules.rule[MinSecurity].menuLabel": "Minimum Security",
-   /** tip for MinSecurity at limit */
-   "routing.rules.rule[MinSecurity].paramLimit": "Minimum Security at {0}",
-   /** tip for settable MinSecurity */
-   "routing.rules.rule[MinSecurity].paramSet": "Minimum Security at {0} - Set to {1}",
+   /** Menu label for minSecurity */
+   "routing.rules.rule[minSecurity].menuLabel": "Minimum Security",
+   /** tip for minSecurity at limit */
+   "routing.rules.rule[minSecurity].paramLimit": "Minimum Security at {0}",
+   /** tip for settable minSecurity */
+   "routing.rules.rule[minSecurity].paramSet": "Minimum Security at {0} - Set to {1}",
 
-   /** Menu label for MaxSecurity */
-   "routing.rules.rule[MaxSecurity].menuLabel": "Maximum Security",
-   /** tip for MaxSecurity at limit */
-   "routing.rules.rule[MaxSecurity].paramLimit": "Use Security below {0}",
-   /** tip for settable MaxSecurity */
-   "routing.rules.rule[MaxSecurity].paramSet": "Use Security below {0} - Set to {1}",
+   /** Menu label for maxSecurity */
+   "routing.rules.rule[maxSecurity].menuLabel": "Maximum Security",
+   /** tip for maxSecurity at limit */
+   "routing.rules.rule[maxSecurity].paramLimit": "Use Security below {0}",
+   /** tip for settable maxSecurity */
+   "routing.rules.rule[maxSecurity].paramSet": "Use Security below {0} - Set to {1}",
 
-   /** Menu label for Jumps */
-   "routing.rules.rule[Jumps].menuLabel": "Jump Count",
-   /** tip for Jumps at limit */
-   "routing.rules.rule[Jumps].paramLimit": "Jump Count Margin at {0}",
-   /** tip for settable Jumps */
-   "routing.rules.rule[Jumps].paramSet": "Jump Count Margin at {0} - Set to {1}",
+   /** Menu label for jumps */
+   "routing.rules.rule[jumps].menuLabel": "Jump Count",
+   /** tip for jumps at limit */
+   "routing.rules.rule[jumps].paramLimit": "Jump Count Margin at {0}",
+   /** tip for settable jumps */
+   "routing.rules.rule[jumps].paramSet": "Jump Count Margin at {0} - Set to {1}",
 
-   /** Menu label for JumpFuel */
-   "routing.rules.rule[JumpFuel].menuLabel": "Jump Fuel (Distance)",
-   /** tip for JumpFuel at limit */
-   "routing.rules.rule[JumpFuel].paramLimit": "Distance Margin at {0}ly",
-   /** tip for settable JumpFuel */
-   "routing.rules.rule[JumpFuel].paramSet": "Distance Margin at {0}ly - Set to {1}ly",
+   /** Menu label for jumpFuel */
+   "routing.rules.rule[jumpFuel].menuLabel": "Jump Fuel (Distance)",
+   /** tip for jumpFuel at limit */
+   "routing.rules.rule[jumpFuel].paramLimit": "Distance Margin at {0}ly",
+   /** tip for settable jumpFuel */
+   "routing.rules.rule[jumpFuel].paramSet": "Distance Margin at {0}ly - Set to {1}ly",
 
    /** Toggling of jump gate capability */
    "routing.caps.jumpGates.toggle": "Turn Jump Gate Capability {0}",

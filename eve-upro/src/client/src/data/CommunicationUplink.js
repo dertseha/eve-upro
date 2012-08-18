@@ -8,23 +8,11 @@ upro.data.CommunicationUplink = Class.create(
     * 
     * @param listener listener interface
     */
-   initialize: function(listener, igbPingUrl)
+   initialize: function(listener)
    {
       var self = this;
 
-      /*
-       * The following is a minor hack to stop Chrome nagging about denying access to the unsafe X-JSON header. Note
-       * that this is not about circumventing the problem, but hardcoded disabling this function. This way no X-JSON
-       * access will and can be done at all.
-       */
-      Ajax.Response.prototype._getHeaderJSON = function(headerName)
-      {
-         return null;
-      };
-
       this.listener = listener;
-      this.igbPingUrl = igbPingUrl;
-      this.useIgbPing = upro.sys.isRunningInInGameBrowser();
 
       this.requestQueue = [];
       this.sessionId = null;
@@ -99,20 +87,11 @@ upro.data.CommunicationUplink = Class.create(
          contentType: 'application/json',
          onSuccess: function(response)
          {
-            var resultObj = response.responseText.evalJSON();
-
-            if (resultObj && resultObj.result && resultObj.result.eveHeadersPresence && self.useIgbPing)
-            {
-               upro.sys.log("Server notifies EVE headers presence, switching to direct communication");
-               self.useIgbPing = false;
-            }
-
             self.requestQueue = self.requestQueue.slice(1);
             if (self.requestQueue.length > 0)
             {
                self.processQueue();
             }
-
             request.callback();
          },
          onFailure: function(response)
@@ -124,44 +103,11 @@ upro.data.CommunicationUplink = Class.create(
    },
 
    /**
-    * Prepares to send a status request
+    * Issues a status request
     */
    sendStatus: function()
    {
-      if (this.useIgbPing && this.igbPingUrl)
-      {
-         var self = this;
-
-         new Ajax.Request(this.igbPingUrl,
-         {
-            method: "get",
-            onSuccess: function(response)
-            {
-               // upro.sys.log('!!!!! success response: ' + response.responseText);
-               self.sendStatusRequest(response.responseText);
-            },
-            onFailure: function(response)
-            {
-               upro.sys.log('Failed to request IGB ping');
-               self.sendStatusRequest(null);
-            }
-         });
-      }
-      else
-      {
-         this.sendStatusRequest(null);
-      }
-   },
-
-   /**
-    * Sends the actual status request
-    */
-   sendStatusRequest: function(igbPingResponse)
-   {
-      var body =
-      {
-         igbPingResponse: igbPingResponse
-      };
+      var body = {};
       var self = this;
 
       this.sendRequest("Status", body, function()

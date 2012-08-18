@@ -54,11 +54,17 @@ upro.model.UserRoutingRule = Class.create(
       return this.parameter;
    },
 
+   /**
+    * @return true if the parameter is currently below the maximum
+    */
    isBelowMaximum: function()
    {
       return this.parameter < this.template.Maximum;
    },
 
+   /**
+    * @return true if the parameter is currently above the minimum
+    */
    isAboveMinimum: function()
    {
       return this.parameter > this.template.Minimum;
@@ -72,11 +78,17 @@ upro.model.UserRoutingRule = Class.create(
       return this.getFixedValue(this.parameter);
    },
 
+   /**
+    * @returns the parameter in fixed form, incremented by one step
+    */
    getFixedParameterIncremented: function()
    {
       return this.getFixedValue(this.parameter + this.template.Increment);
    },
 
+   /**
+    * @returns the parameter in fixed form, decremented by one step
+    */
    getFixedParameterDecremented: function()
    {
       return this.getFixedValue(this.parameter - this.template.Increment);
@@ -92,41 +104,35 @@ upro.model.UserRoutingRule = Class.create(
 });
 
 upro.model.UserRoutingRule.RuleConstants = {};
-upro.model.UserRoutingRule.RuleConstants["Jumps"] =
+upro.model.UserRoutingRule.RuleConstants["jumps"] =
 {
-   Type: "Jumps",
    Increment: 1,
    Minimum: 0,
    Maximum: 10,
    Factor: 1,
    Fixed: 0
 };
-upro.model.UserRoutingRule.RuleConstants["JumpFuel"] =
+upro.model.UserRoutingRule.RuleConstants["jumpFuel"] =
 {
-   Type: "Fuel",
    Increment: 0.25,
    Minimum: 0,
    Maximum: 5,
    Factor: 1,
    Fixed: 2
 };
-upro.model.UserRoutingRule.RuleConstants["MinSecurity"] =
+upro.model.UserRoutingRule.RuleConstants["minSecurity"] =
 {
-   Type: "MinSecurity",
    Increment: 1,
    Minimum: 0,
    Maximum: 5,
    Factor: 0.1,
    Fixed: 1
 };
-upro.model.UserRoutingRule.RuleConstants["MaxSecurity"] =
+upro.model.UserRoutingRule.RuleConstants["maxSecurity"] =
 {
-   Type: "MaxSecurity",
    Increment: 1,
    Minimum: 5,
    Maximum: 10,
    Factor: 0.1,
    Fixed: 1
 };
-
-upro.model.UserRoutingRule.RuleLimit = 4;

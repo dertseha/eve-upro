@@ -39,12 +39,12 @@ upro.view.mediators.MainContextMenuMediator = Class
                               upro.res.menu.IconData.List), upro.res.text.Lang.format("routing.rules.menuLabel"));
 
                         this.ruleCommands = {};
-                        this.createRoutingRuleCommandSet(rulesMenu, 0, "MinSecurity",
+                        this.createRoutingRuleCommandSet(rulesMenu, 0, "minSecurity",
                               upro.res.menu.IconData.MinSecurity);
-                        this.createRoutingRuleCommandSet(rulesMenu, 1, "MaxSecurity",
+                        this.createRoutingRuleCommandSet(rulesMenu, 1, "maxSecurity",
                               upro.res.menu.IconData.MaxSecurity);
-                        this.createRoutingRuleCommandSet(rulesMenu, 2, "Jumps", upro.res.menu.IconData.Hash);
-                        this.createRoutingRuleCommandSet(rulesMenu, 5, "JumpFuel", upro.res.menu.IconData.Fuel);
+                        this.createRoutingRuleCommandSet(rulesMenu, 2, "jumps", upro.res.menu.IconData.Hash);
+                        this.createRoutingRuleCommandSet(rulesMenu, 5, "jumpFuel", upro.res.menu.IconData.Fuel);
                      }
                      { // capabilities
                         var capMenu = routingMenu.setSubMenu(0, this.createVectorIcon.bind(this,
