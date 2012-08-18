@@ -105,7 +105,7 @@ exports.testCharacterOnlineEventEmitted_WhenFirstSessionConnected = function(tes
 
    this.fixture.expectingCharacterOnlineEvent(test, user.characterId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientConnected,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientConnected.name,
    {
       sessionId: sessionId,
       user: user
@@ -119,7 +119,7 @@ exports.testCharacterSessionAddedEventEmitted_WhenSessionConnected = function(te
 
    this.fixture.expectingSessionAddedEvent(test, user.characterId, sessionId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientConnected,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientConnected.name,
    {
       sessionId: sessionId,
       user: user
@@ -135,7 +135,7 @@ exports.testCharacterSessionRemovedEventEmitted_WhenSessionDisconnected = functi
 
    this.fixture.expectingSessionRemovedEvent(test, user.characterId, sessionId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientDisconnected,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientDisconnected.name,
    {
       sessionId: sessionId,
       user: user
@@ -151,7 +151,7 @@ exports.testCharacterOfflineEventEmitted_WhenLastSessionDisconnected = function(
 
    this.fixture.expectingCharacterOfflineEvent(test, user.characterId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientDisconnected,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientDisconnected.name,
    {
       sessionId: sessionId,
       user: user

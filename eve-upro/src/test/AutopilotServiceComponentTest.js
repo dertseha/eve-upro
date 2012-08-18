@@ -51,7 +51,7 @@ function Fixture()
 
    this.expectingCharacterAutopilotRoute = function(test, charId, route, interest)
    {
-      this.amqp.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRoute, function(header, body)
+      this.amqp.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRoute.name, function(header, body)
       {
          test.deepEqual(body.route, route);
          if (interest)
@@ -63,7 +63,7 @@ function Fixture()
 
    this.expectingCharacterAutopilotRouteIndex = function(test, charId, nextRouteIndex, interest)
    {
-      this.amqp.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRouteIndex, function(header, body)
+      this.amqp.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRouteIndex.name, function(header, body)
       {
          test.equal(body.nextRouteIndex, nextRouteIndex);
          if (interest)
@@ -75,7 +75,7 @@ function Fixture()
 
    this.whenBroadcastCharacterLocationReceived = function(charId, solarSystemId)
    {
-      this.whenBroadcastReceived(busMessages.Broadcasts.CharacterLocationStatus, null,
+      this.whenBroadcastReceived(busMessages.Broadcasts.CharacterLocationStatus.name, null,
       {
          solarSystemId: solarSystemId
       },
@@ -110,7 +110,7 @@ exports.testCharacterAutopilotRouteEmitted_WhenAutopilotRouteRequested = functio
 
    this.fixture.expectingCharacterAutopilotRoute(test, charId, route);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute.name, sessionId,
    {
       route: route
    });
@@ -131,7 +131,7 @@ exports.testCharacterAutopilotRouteIndexResetEmitted_WhenAutopilotRouteRequested
 
    this.fixture.expectingCharacterAutopilotRouteIndex(test, charId, 0);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute.name, sessionId,
    {
       route: route
    });
@@ -211,7 +211,7 @@ exports.testCharacterAutopilotRouteIndexNextEmitted_WhenAutopilotRouteRequestedW
 
    this.fixture.expectingCharacterAutopilotRouteIndex(test, charId, 1);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute.name, sessionId,
    {
       route: route
    });
@@ -231,7 +231,7 @@ exports.testCharacterAutopilotRouteReset_WhenAutopilotRouteRequestedWithSingleEn
 
    this.fixture.expectingCharacterAutopilotRouteIndex(test, charId, -1);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetAutopilotRoute.name, sessionId,
    {
       route: route
    });

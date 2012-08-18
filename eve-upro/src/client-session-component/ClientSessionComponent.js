@@ -8,6 +8,7 @@ var Component = require('../components/Component.js');
 var UuidFactory = require('../util/UuidFactory.js');
 var clientEvents = require('../model/ClientEvents');
 var clientRequests = require('../model/ClientRequests').clientRequests;
+var clientBroadcastEvents = require('../model/ClientBroadcastEvents').clientBroadcastEvents;
 var busMessages = require('../model/BusMessages.js');
 
 var EveInfoExtractorNull = require('./EveInfoExtractorNull.js');
@@ -38,7 +39,7 @@ function ClientSessionComponent(services, options)
          self.onResponseQueue(queue);
       });
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected.name);
       this.amqp.on('broadcast', function(header, body)
       {
          self.onBroadcast(header, body);
@@ -324,8 +325,8 @@ function ClientSessionComponent(services, options)
             self.onDataPortClosed(sessionId);
          });
       }
-      this.broadcastClientConnectionStatus(busMessages.Broadcasts.ClientConnected, sessionId, dataPort.user, this.amqp
-            .getLocalQueueName());
+      this.broadcastClientConnectionStatus(busMessages.Broadcasts.ClientConnected.name, sessionId, dataPort.user,
+            this.amqp.getLocalQueueName());
    };
 
    this.onDataPortClosed = function(sessionId)
@@ -333,7 +334,7 @@ function ClientSessionComponent(services, options)
       var dataPort = this.dataPorts[sessionId];
 
       delete this.dataPorts[sessionId];
-      this.broadcastClientConnectionStatus(busMessages.Broadcasts.ClientDisconnected, sessionId, dataPort.user);
+      this.broadcastClientConnectionStatus(busMessages.Broadcasts.ClientDisconnected.name, sessionId, dataPort.user);
    };
 
    /**
@@ -431,11 +432,11 @@ function ClientSessionComponent(services, options)
       var rCode = 'OK';
       var eveInfo = this.extractEveInfo(clientRequest);
 
-      if (eveInfo && (eveInfo.trusted == 'Yes') && (eveInfo.characterId == clientRequest.user.characterId))
+      if (eveInfo && eveInfo.trusted && (eveInfo.characterId == clientRequest.user.characterId))
       {
          var header =
          {
-            type: busMessages.Broadcasts.EveStatusUpdateRequest,
+            type: busMessages.Broadcasts.EveStatusUpdateRequest.name,
             sessionId: clientRequest.header.sessionId
          };
          var body =
@@ -449,18 +450,51 @@ function ClientSessionComponent(services, options)
       return rCode;
    };
 
+   /**
+    * Extracts EVE information (IGB header data) from given client request
+    * 
+    * @param clientRequest the client request to read header data from
+    * @returns an object containing the data
+    */
    this.extractEveInfo = function(clientRequest)
    {
       var result = null;
       var extractor = new EveInfoExtractorNull();
       var headerToInfoMap =
       {
-         trusted: "trusted",
-         charid: "characterId",
-         charname: "characterName",
-         corpid: "corporationId",
-         corpname: "corporationName",
-         solarsystemid: "solarSystemId"
+         trusted:
+         {
+            name: "trusted",
+            converter: function(value)
+            {
+               return value == 'Yes';
+            }
+         },
+         charid:
+         {
+            name: "characterId",
+            converter: parseInt
+         },
+         charname:
+         {
+            name: "characterName",
+            converter: String
+         },
+         corpid:
+         {
+            name: "corporationId",
+            converter: parseInt
+         },
+         corpname:
+         {
+            name: "corporationName",
+            converter: String
+         },
+         solarsystemid:
+         {
+            name: "solarSystemId",
+            converter: parseInt
+         }
       };
 
       if (clientRequest.eveHeaders)
@@ -470,6 +504,7 @@ function ClientSessionComponent(services, options)
 
       for ( var headerName in headerToInfoMap)
       {
+         var info = headerToInfoMap[headerName];
          var value = extractor.get(headerName);
 
          if (value)
@@ -478,7 +513,7 @@ function ClientSessionComponent(services, options)
             {
                result = {};
             }
-            result[headerToInfoMap[headerName]] = value;
+            result[info.name] = info.converter(value);
          }
       }
 

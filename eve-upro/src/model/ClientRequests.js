@@ -1,4 +1,4 @@
-(function(namespace)
+(function(context)
 {
    /**
     * @returns a standard header definition
@@ -17,13 +17,6 @@
 
       return definition;
    }
-
-   var routeSchema =
-   {
-      entryType: [ 'Transit', 'Waypoint', 'Checkpoint' ],
-      solarSystemId: Number,
-      nextJumpType: [ null, 'None', 'JumpGate' ]
-   };
 
    var clientRequests =
    {
@@ -70,7 +63,7 @@
          {
             schema:
             {
-               route: Array.of(routeSchema)
+               route: Array.of(context.commonSchemata.routeSchema)
             },
             isValid: null
          }
@@ -174,6 +167,14 @@
       request.name = name;
       request.header.schema.type = name;
    }
-   namespace.clientRequests = clientRequests;
+   context.namespace.clientRequests = clientRequests;
 
-})((typeof module !== 'undefined') ? module.exports : upro.data);
+})((typeof module !== 'undefined') ?
+{
+   namespace: module.exports,
+   commonSchemata: require('./CommonSchemata.js')
+} :
+{
+   namespace: upro.data,
+   commonSchemata: upro.data
+});

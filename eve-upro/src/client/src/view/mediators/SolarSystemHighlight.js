@@ -165,15 +165,18 @@ upro.view.mediators.SolarSystemHighlight = Class.create(
     */
    setSolarSystem: function(solarSystem)
    {
-      if (this.solarSystem)
+      if (this.sceneMediator)
       {
-         this.sceneMediator.removeSolarSystemTrack(this.key, this.solarSystem);
-         this.solarSystem = null;
-      }
-      this.solarSystem = solarSystem;
-      if (this.solarSystem)
-      {
-         this.sceneMediator.addSolarSystemTrack(this.key, solarSystem, this.onProjectionChanged.bind(this));
+         if (this.solarSystem)
+         {
+            this.sceneMediator.removeSolarSystemTrack(this.key, this.solarSystem);
+            this.solarSystem = null;
+         }
+         this.solarSystem = solarSystem;
+         if (this.solarSystem)
+         {
+            this.sceneMediator.addSolarSystemTrack(this.key, solarSystem, this.onProjectionChanged.bind(this));
+         }
       }
    },
 

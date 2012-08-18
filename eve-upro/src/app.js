@@ -75,6 +75,7 @@ nconf.defaults(
 
    'upro':
    {
+      validateBroadcasts: cloudRabbit ? false : true,
       security:
       {
          allowed:
@@ -100,7 +101,8 @@ var serviceControl = new ServiceControl();
    var builder = new AmqpComponentBuilder();
    var options =
    {
-      url: nconf.get('amqp').url
+      url: nconf.get('amqp').url,
+      validateBroadcasts: nconf.get('upro').validateBroadcasts
    };
 
    builder.setOptions(options);

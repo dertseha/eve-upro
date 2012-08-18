@@ -47,13 +47,13 @@ function CharacterServiceComponent(services)
          self.onCharacterOffline(character);
       });
 
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy);
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem);
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates);
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive);
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleData);
-      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleIndex);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleData.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleIndex.name);
 
       this.mongodb.defineCollection('CharacterData', {}, function()
       {

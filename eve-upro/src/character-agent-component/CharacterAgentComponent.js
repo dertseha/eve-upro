@@ -1,8 +1,8 @@
 var util = require('util');
 
-var Component = require('../components/Component.js');
 var UuidFactory = require('../util/UuidFactory.js');
 var busMessages = require('../model/BusMessages.js');
+var Component = require('../components/Component.js');
 
 var Character = require('./Character.js');
 
@@ -18,8 +18,8 @@ function CharacterAgentComponent(services)
    /** {@inheritDoc} */
    this.start = function()
    {
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected);
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientDisconnected);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientDisconnected.name);
 
       this.onStartProgress();
    };

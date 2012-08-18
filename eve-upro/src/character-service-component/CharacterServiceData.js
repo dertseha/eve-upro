@@ -243,7 +243,7 @@ function CharacterServiceData(service, character)
          active: active
       };
 
-      this.broadcast(busMessages.Broadcasts.CharacterClientControlSelection, body, interest, queueName);
+      this.broadcast(busMessages.Broadcasts.CharacterClientControlSelection.name, body, interest, queueName);
    };
 
    /**
@@ -285,7 +285,7 @@ function CharacterServiceData(service, character)
       if (galaxyId && (this.rawData.activeGalaxyId != galaxyId))
       {
          this.rawData.activeGalaxyId = galaxyId;
-         notifier.push(busMessages.Broadcasts.CharacterActiveGalaxy);
+         notifier.push(busMessages.Broadcasts.CharacterActiveGalaxy.name);
       }
 
       return notifier;
@@ -304,7 +304,7 @@ function CharacterServiceData(service, character)
          galaxyId: this.rawData.activeGalaxyId
       };
 
-      this.broadcast(busMessages.Broadcasts.CharacterActiveGalaxy, body, interest, queueName);
+      this.broadcast(busMessages.Broadcasts.CharacterActiveGalaxy.name, body, interest, queueName);
    };
 
    /**
@@ -329,7 +329,7 @@ function CharacterServiceData(service, character)
          changed = true;
       }
 
-      return changed ? [ busMessages.Broadcasts.CharacterIgnoredSolarSystems ] : [];
+      return changed ? [ busMessages.Broadcasts.CharacterIgnoredSolarSystems.name ] : [];
    };
 
    /**
@@ -345,7 +345,7 @@ function CharacterServiceData(service, character)
          ignoredSolarSystems: this.rawData.ignoredSolarSystems
       };
 
-      this.broadcast(busMessages.Broadcasts.CharacterIgnoredSolarSystems, body, interest, queueName);
+      this.broadcast(busMessages.Broadcasts.CharacterIgnoredSolarSystems.name, body, interest, queueName);
    };
 
    /**
@@ -358,7 +358,7 @@ function CharacterServiceData(service, character)
    {
       var body = this.rawData.routingCapabilities;
 
-      this.broadcast(busMessages.Broadcasts.CharacterRoutingCapabilities, body, interest, queueName);
+      this.broadcast(busMessages.Broadcasts.CharacterRoutingCapabilities.name, body, interest, queueName);
    };
 
    /**
@@ -371,7 +371,7 @@ function CharacterServiceData(service, character)
       if (this.rawData.routingCapabilities.jumpGates.inUse != body.inUse)
       {
          this.rawData.routingCapabilities.jumpGates.inUse = body.inUse;
-         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities);
+         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities.name);
       }
 
       return notifier;
@@ -392,7 +392,7 @@ function CharacterServiceData(service, character)
       {
          this.rawData.routingCapabilities.jumpDrive.inUse = newData.inUse;
          this.rawData.routingCapabilities.jumpDrive.range = newData.range;
-         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities);
+         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities.name);
       }
 
       return notifier;
@@ -408,7 +408,7 @@ function CharacterServiceData(service, character)
    {
       var body = this.rawData.routingRules;
 
-      this.broadcast(busMessages.Broadcasts.CharacterRoutingRules, body, interest, queueName);
+      this.broadcast(busMessages.Broadcasts.CharacterRoutingRules.name, body, interest, queueName);
    };
 
    /**
@@ -429,7 +429,7 @@ function CharacterServiceData(service, character)
          {
             rule.inUse = newData.inUse;
             rule.parameter = newData.parameter;
-            notifier.push(busMessages.Broadcasts.CharacterRoutingRules);
+            notifier.push(busMessages.Broadcasts.CharacterRoutingRules.name);
          }
       }
 
@@ -475,7 +475,7 @@ function CharacterServiceData(service, character)
          {
             otherRule.index = rule.index;
             rule.index = body.index;
-            notifier.push(busMessages.Broadcasts.CharacterRoutingRules);
+            notifier.push(busMessages.Broadcasts.CharacterRoutingRules.name);
          }
       }
 

@@ -3,8 +3,9 @@ var util = require('util');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
-var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
+
+var Component = require('../components/Component.js');
 
 function AutopilotServiceComponent(services)
 {
@@ -28,8 +29,8 @@ function AutopilotServiceComponent(services)
          self.onCharacterSessionAdded(character, sessionId);
       });
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetAutopilotRoute);
-      this.registerBroadcastHandler(busMessages.Broadcasts.CharacterLocationStatus);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetAutopilotRoute.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.CharacterLocationStatus.name);
 
       this.mongodb.defineCollection('AutopilotData', {}, function()
       {
@@ -312,7 +313,7 @@ function AutopilotServiceComponent(services)
 
       var header =
       {
-         type: busMessages.Broadcasts.CharacterAutopilotRoute,
+         type: busMessages.Broadcasts.CharacterAutopilotRoute.name,
          interest: interest
       };
       var body =
@@ -336,7 +337,7 @@ function AutopilotServiceComponent(services)
 
       var header =
       {
-         type: busMessages.Broadcasts.CharacterAutopilotRouteIndex,
+         type: busMessages.Broadcasts.CharacterAutopilotRouteIndex.name,
          interest: interest
       };
       var body =

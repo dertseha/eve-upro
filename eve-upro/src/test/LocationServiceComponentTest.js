@@ -39,7 +39,7 @@ function Fixture()
    {
       this.amqp.broadcast = function(header, body)
       {
-         if (header.type == busMessages.Broadcasts.CharacterLocationStatus)
+         if (header.type == busMessages.Broadcasts.CharacterLocationStatus.name)
          {
             test.equal(body.characterInfo.characterId, charId);
             test.equal(body.solarSystemId, solarSystemId);
@@ -78,12 +78,12 @@ exports.testCharacterLocationStatusEmitted_WhenEveStatusReceived = function(test
 
    this.fixture.expectingCharacterLocationStatus(test, charId, solarSystemId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
    {
       sessionId: sessionId,
       eveInfo:
       {
-         solarsystemId: solarSystemId
+         solarSystemId: solarSystemId
       }
    });
 
@@ -101,7 +101,7 @@ exports.testCharacterLocationStatusEmittedOnlyOnce_WhenEveStatusReceivedTwiceIde
       sessionId: sessionId,
       eveInfo:
       {
-         solarsystemId: solarSystemId
+         solarSystemId: solarSystemId
       }
    };
 
@@ -109,8 +109,8 @@ exports.testCharacterLocationStatusEmittedOnlyOnce_WhenEveStatusReceivedTwiceIde
 
    this.fixture.expectingCharacterLocationStatus(test, charId, solarSystemId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId, broadcastBody);
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId, broadcastBody);
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId, broadcastBody);
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId, broadcastBody);
 
    test.expect(2);
    test.done();
@@ -124,18 +124,18 @@ exports.testCharacterLocationStatusHasCharacterScope_WhenEveStatusReceived = fun
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
-   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus.name, [
    {
       scope: 'Character',
       id: charId
    } ]);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
    {
       sessionId: sessionId,
       eveInfo:
       {
-         solarsystemId: solarSystemId
+         solarSystemId: solarSystemId
       }
    });
 
@@ -153,7 +153,7 @@ exports.testCharacterLocationStatusHasSessionScope_WhenSecondSessionEstablished 
    this.fixture.givenExistingCharacterSession(charId, sessionIdExisting);
    this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionIdExisting ]);
 
-   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus.name, [
    {
       scope: 'Session',
       id: sessionId
@@ -170,7 +170,7 @@ exports.testCharacterLocationStatusNotSent_WhenFirstSessionEstablished = functio
    var charId = 1234;
    var sessionId = UuidFactory.v4();
 
-   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus, [
+   this.fixture.expectingBroadcastInterest(test, busMessages.Broadcasts.CharacterLocationStatus.name, [
    {
       scope: 'Session',
       id: sessionId

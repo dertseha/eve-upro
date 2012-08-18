@@ -32,7 +32,7 @@ function LocationServiceComponent(services)
          self.onCharacterOffline(character);
       });
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest);
+      this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest.name);
 
       this.onStarted();
    };
@@ -160,7 +160,7 @@ function LocationServiceComponent(services)
    {
       var header =
       {
-         type: busMessages.Broadcasts.CharacterLocationStatus,
+         type: busMessages.Broadcasts.CharacterLocationStatus.name,
          interest: interest,
          characterId: character.getCharacterId()
       };

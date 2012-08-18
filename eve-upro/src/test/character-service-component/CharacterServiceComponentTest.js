@@ -45,7 +45,7 @@ function Fixture()
    {
       this.amqp.broadcast = function(header, body)
       {
-         if (header.type == busMessages.Broadcasts.CharacterClientControlSelection)
+         if (header.type == busMessages.Broadcasts.CharacterClientControlSelection.name)
          {
             if (body.active)
             {
@@ -72,7 +72,7 @@ function Fixture()
    {
       this.amqp.broadcast = function(header, body)
       {
-         if (header.type == busMessages.Broadcasts.CharacterActiveGalaxy)
+         if (header.type == busMessages.Broadcasts.CharacterActiveGalaxy.name)
          {
             test.equal(body.galaxyId, galaxyId);
             if (interest)
@@ -85,7 +85,7 @@ function Fixture()
 
    this.whenBroadcastSetIgnoredSolarSystemIsReceived = function(sessionId, solarSystemId, ignore)
    {
-      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem, sessionId,
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem.name, sessionId,
       {
          solarSystemId: solarSystemId,
          ignore: ignore
@@ -94,7 +94,7 @@ function Fixture()
 
    this.whenBroadcastSetRoutingCapabilitiyJumpGatesIsReceived = function(sessionId, inUse)
    {
-      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates, sessionId,
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates.name, sessionId,
       {
          inUse: inUse
       });
@@ -102,7 +102,7 @@ function Fixture()
 
    this.whenBroadcastSetRoutingCapabilitiyJumpDriveIsReceived = function(sessionId, inUse, range)
    {
-      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive, sessionId,
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive.name, sessionId,
       {
          inUse: inUse,
          range: range
@@ -136,7 +136,7 @@ exports.testCharacterActiveGalaxyEmitted_WhenActiveGalaxyRequested = function(te
 
    this.fixture.expectingCharacterActiveGalaxy(test, charId, galaxyId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetActiveGalaxy.name, sessionId,
    {
       galaxyId: galaxyId
    });
@@ -154,7 +154,7 @@ exports.testCharacterClientControlSelection_WhenFirstStatusMessageReceived = fun
 
    this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
    {
       sessionId: sessionId
    });
@@ -173,7 +173,7 @@ exports.testCharacterClientControlSelectionNotSentAgain_WhenStatusMessageReceive
 
    this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
    {
       sessionId: sessionId
    });
@@ -193,7 +193,7 @@ exports.testCharacterClientControlSelectionNotChanged_WhenStatusMessageReceivedF
 
    this.fixture.expectingCharacterClientControlSelection(test, charId, sessionId2);
 
-   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest, sessionId2,
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId2,
    {
       sessionId: sessionId2
    });

@@ -151,12 +151,12 @@ function AbstractServiceComponentFixture()
 
    this.whenClientConnected = function(charId, sessionId, responseQueue)
    {
-      this.broadcastClientStatus(busMessages.Broadcasts.ClientConnected, charId, sessionId, responseQueue);
+      this.broadcastClientStatus(busMessages.Broadcasts.ClientConnected.name, charId, sessionId, responseQueue);
    };
 
    this.whenClientDisconnected = function(charId, sessionId, responseQueue)
    {
-      this.broadcastClientStatus(busMessages.Broadcasts.ClientDisconnected, charId, sessionId);
+      this.broadcastClientStatus(busMessages.Broadcasts.ClientDisconnected.name, charId, sessionId);
    };
 
    this.broadcastClientStatus = function(type, charId, sessionId, responseQueue)

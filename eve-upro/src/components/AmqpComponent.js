@@ -146,10 +146,22 @@ function AmqpComponent(options)
          body: body
       };
       var routingKey = directQueueName || 'broadcast';
+      var broadcast = busMessages.Broadcasts[header.type];
 
-      if (!busMessages.Broadcasts[header.type])
+      if (!broadcast)
       {
          logger.warn('Unregistered broadcast [' + header.type + ']');
+      }
+      else if (this.options.validateBroadcasts)
+      {
+         if (!broadcast.header.isValid(header))
+         {
+            logger.warn('Broadcast header is invalid [' + header.type + ']: ' + JSON.stringify(header));
+         }
+         if (!broadcast.body.isValid(body))
+         {
+            logger.warn('Broadcast body is invalid [' + header.type + ']: ' + JSON.stringify(body));
+         }
       }
 
       this.exchange.publish(routingKey, JSON.stringify(data),
