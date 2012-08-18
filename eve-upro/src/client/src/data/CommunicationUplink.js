@@ -78,15 +78,18 @@ upro.data.CommunicationUplink = Class.create(
          },
          id: this.idCounter++
       };
+      var postBodyText = Object.toJSON(postBody);
 
       request.ajax = new Ajax.Request(requestSinkUrl,
       {
          method: "post",
          overrideMimeType: true,
-         postBody: Object.toJSON(postBody),
+         postBody: postBodyText,
          contentType: 'application/json',
          onSuccess: function(response)
          {
+            self.handleGenericResponse(response, postBodyText);
+
             self.requestQueue = self.requestQueue.slice(1);
             if (self.requestQueue.length > 0)
             {
@@ -100,6 +103,14 @@ upro.data.CommunicationUplink = Class.create(
          }
       });
 
+   },
+
+   handleGenericResponse: function(response, postBody)
+   {
+      if (response.responseText.indexOf("Invalid Request") >= 0)
+      {
+         upro.sys.log("Issued invalid request: " + postBody);
+      }
    },
 
    /**

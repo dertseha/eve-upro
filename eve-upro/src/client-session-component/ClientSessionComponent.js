@@ -2,11 +2,12 @@ var util = require('util');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger();
+var schema = require('js-schema');
 
 var Component = require('../components/Component.js');
 var UuidFactory = require('../util/UuidFactory.js');
 var clientEvents = require('../model/ClientEvents');
-var clientRequests = require('../model/ClientRequests');
+var clientRequests = require('../model/ClientRequests').clientRequests;
 var busMessages = require('../model/BusMessages.js');
 
 var EveInfoExtractorNull = require('./EveInfoExtractorNull.js');
@@ -369,8 +370,19 @@ function ClientSessionComponent(services, options)
    this.onClientRequest = function(clientRequest)
    {
       var rCode = 'OK';
+      var requestInfo = clientRequests[clientRequest.header.type];
 
-      if (clientRequests.RequestNames[clientRequest.header.type])
+      if (!requestInfo)
+      {
+         logger.warn('Unregistered client request [' + clientRequest.header.type + ']');
+         rCode = 'Unknown Request';
+      }
+      else if (!this.isRequestValid(requestInfo, clientRequest))
+      {
+         logger.warn('Invalid client request received: [' + clientRequest.header.type + ']');
+         rCode = 'Invalid Request';
+      }
+      else
       {
          var handler = this['onClientRequest' + clientRequest.header.type];
 
@@ -383,11 +395,30 @@ function ClientSessionComponent(services, options)
             this.onGenericClientRequest(clientRequest);
          }
       }
-      else
+
+      return rCode;
+   };
+
+   /**
+    * Checks whether the given request is valid according to the request information
+    * 
+    * @param requestInfo the request definition
+    * @param clientRequest the request to check
+    * @returns true if valid
+    */
+   this.isRequestValid = function(requestInfo, clientRequest)
+   {
+      var rCode = false;
+
+      if (!requestInfo.header.isValid)
       {
-         logger.warn('Unregistered client request [' + clientRequest.header.type + ']');
-         rCode = 'Unknown Request';
+         requestInfo.header.isValid = schema(requestInfo.header.schema);
       }
+      if (!requestInfo.body.isValid)
+      {
+         requestInfo.body.isValid = schema(requestInfo.body.schema);
+      }
+      rCode = requestInfo.header.isValid(clientRequest.header) && requestInfo.body.isValid(clientRequest.body);
 
       return rCode;
    };

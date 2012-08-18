@@ -1,58 +1,179 @@
-var RequestNames =
+(function(namespace)
 {
    /**
-    * Sent periodically by a connected client, this request serves as a keep-alive message and also lets the system know
-    * of the current IGB headers (such as location, ...)
+    * @returns a standard header definition
     */
-   Status: 0,
-
-   /**
-    * Set the currently active galaxy (for the view). Body: { galaxyId: int }
-    */
-   SetActiveGalaxy: 0,
-
-   /**
-    * Sets the route of the autopilot.
-    */
-   SetAutopilotRoute: 0,
-
-   /**
-    * Changes an ignored solar system
-    */
-   SetIgnoredSolarSystem: 0,
-
-   /**
-    * Set the jump gates routing capability
-    */
-   SetRoutingCapabilityJumpGates: 0,
-
-   /**
-    * Set the jump drive routing capability
-    */
-   SetRoutingCapabilityJumpDrive: 0,
-
-   /**
-    * Sets data of a routing rule
-    */
-   SetRoutingRuleData: 0,
-
-   /**
-    * Sets the index of a routing rule (priority)
-    */
-   SetRoutingRuleIndex: 0
-};
-
-function staticInit()
-{
-   for ( var name in RequestNames)
+   function getStandardHeaderDefinition()
    {
-      if (RequestNames[name] === 0)
+      var definition =
       {
-         RequestNames[name] = name;
-      }
+         schema:
+         {
+            type: null,
+            sessionId: String
+         },
+         isValid: null
+      };
+
+      return definition;
    }
-}
 
-staticInit();
+   var routeSchema =
+   {
+      entryType: [ 'Transit', 'Waypoint', 'Checkpoint' ],
+      solarSystemId: Number,
+      nextJumpType: [ null, 'None', 'JumpGate' ]
+   };
 
-module.exports.RequestNames = RequestNames;
+   var clientRequests =
+   {
+      /**
+       * Sent periodically by a connected client, this request serves as a keep-alive message and also lets the system
+       * know of the current IGB headers (such as location, ...)
+       */
+      Status:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema: {},
+            isValid: null
+         }
+      },
+
+      /**
+       * Set the currently active galaxy (for the view).
+       */
+      SetActiveGalaxy:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               galaxyId: Number
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Sets the route of the autopilot.
+       */
+      SetAutopilotRoute:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               route: Array.of(routeSchema)
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Changes an ignored solar system
+       */
+      SetIgnoredSolarSystem:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               solarSystemId: Number,
+               ignore: Boolean
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Set the jump gates routing capability
+       */
+      SetRoutingCapabilityJumpGates:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               inUse: Boolean
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Set the jump drive routing capability
+       */
+      SetRoutingCapabilityJumpDrive:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               '?inUse': Boolean,
+               '?range': Number
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Sets data of a routing rule
+       */
+      SetRoutingRuleData:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               name: String,
+               '?inUse': Boolean,
+               '?parameter': Number
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Sets the index of a routing rule (priority)
+       */
+      SetRoutingRuleIndex:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               name: String,
+               index: Number
+            },
+            isValid: null
+         }
+      }
+   };
+
+   for ( var name in clientRequests)
+   {
+      var request = clientRequests[name];
+
+      request.name = name;
+      request.header.schema.type = name;
+   }
+   namespace.clientRequests = clientRequests;
+
+})((typeof module !== 'undefined') ? module.exports : upro.data);

@@ -70,7 +70,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
       sessionProxy.sendRequest("SetActiveGalaxy",
       {
-         galaxyId: galaxyId
+         galaxyId: galaxyId | 0
       });
    },
 
