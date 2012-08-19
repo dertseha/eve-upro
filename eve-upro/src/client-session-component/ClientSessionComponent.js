@@ -6,7 +6,7 @@ var schema = require('js-schema');
 
 var Component = require('../components/Component.js');
 var UuidFactory = require('../util/UuidFactory.js');
-var clientEvents = require('../model/ClientEvents');
+var clientEvents = require('../model/ClientEvents').clientEvents;
 var clientRequests = require('../model/ClientRequests').clientRequests;
 var clientBroadcastEvents = require('../model/ClientBroadcastEvents').clientBroadcastEvents;
 var busMessages = require('../model/BusMessages.js');
@@ -79,7 +79,7 @@ function ClientSessionComponent(services, options)
             user: body.user
          };
 
-         dataPort.sendFunction(JSON.stringify(eventData), clientEvents.EventNames.Session);
+         dataPort.sendFunction(JSON.stringify(eventData), clientEvents.Session.name);
       }
    };
 
@@ -107,7 +107,7 @@ function ClientSessionComponent(services, options)
             dataPort = this.dataPorts[broadcastHeader.interest[0].id];
             if (dataPort && dataPort.character)
             {
-               dataPort.sendFunction(eventBodyString, clientEvents.EventNames.Broadcast);
+               dataPort.sendFunction(eventBodyString, clientEvents.Broadcast.name);
             }
          }
          else
@@ -117,7 +117,7 @@ function ClientSessionComponent(services, options)
                dataPort = this.dataPorts[sessionId];
                if (dataPort.character && dataPort.character.hasInterestIn(broadcastHeader.interest))
                {
-                  dataPort.sendFunction(eventBodyString, clientEvents.EventNames.Broadcast);
+                  dataPort.sendFunction(eventBodyString, clientEvents.Broadcast.name);
                }
             }
          }

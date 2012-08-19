@@ -1,15 +1,9 @@
 var schema = require('js-schema');
 
+var commonSchemata = require('./CommonSchemata.js');
 var clientRequests = require('./ClientRequests.js').clientRequests;
 var clientBroadcastEvents = require('./ClientBroadcastEvents.js').clientBroadcastEvents;
 
-var userSchema =
-{
-   characterId: Number,
-   characterName: String,
-   corporationId: Number,
-   corporationName: String
-};
 var interestSchema = [
 {
    scope: 'Session',
@@ -42,7 +36,7 @@ var broadcasts =
          {
             sessionId: String,
             responseQueue: String,
-            user: userSchema
+            user: commonSchemata.userSchema
          },
          isValid: null
       }
@@ -67,7 +61,7 @@ var broadcasts =
          schema:
          {
             sessionId: String,
-            user: userSchema
+            user: commonSchemata.userSchema
          },
          isValid: null
       }

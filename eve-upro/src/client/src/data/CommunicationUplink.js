@@ -141,27 +141,60 @@ upro.data.CommunicationUplink = Class.create(
    setupEventSource: function()
    {
       var eventSourceUrl = "eventSource";
-      var self = this;
 
       this.eventSource = new EventSource(eventSourceUrl);
-      this.eventSource.addEventListener("Timer", function(event)
+      this.registerEventHandler(upro.data.clientEvents.Timer.name);
+      this.registerEventHandler(upro.data.clientEvents.Session.name);
+      this.registerEventHandler(upro.data.clientEvents.Broadcast.name);
+   },
+
+   /**
+    * Registers an event handler at the event source
+    * 
+    * @param name name of the event
+    */
+   registerEventHandler: function(name)
+   {
+      var self = this;
+
+      this.eventSource.addEventListener(name, function(event)
       {
-         // could be used for keep-alive checks
-      }, false);
-      this.eventSource.addEventListener("Session", function(event)
-      {
-         self.onEventSession(JSON.parse(event.data));
-      }, false);
-      this.eventSource.addEventListener("Broadcast", function(event)
-      {
-         self.onEventBroadcast(JSON.parse(event.data));
+         self.onEvent(name, JSON.parse(event.data));
       }, false);
    },
 
    /**
-    * Event Handler
+    * Generic event handler; Validates event data and dispatches to handler
     * 
-    * @param data event body
+    * @param name name of the event
+    * @param data received data object
+    */
+   onEvent: function(name, data)
+   {
+      var event = upro.data.clientEvents[name];
+
+      if (event.isValid(data))
+      {
+         var handler = this['onEvent' + name];
+
+         handler.call(this, data);
+      }
+      else
+      {
+         upro.sys.log('Received invalid event [' + name + '] - Data: ' + Object.toJSON(data));
+      }
+   },
+
+   /**
+    * Event Handler
+    */
+   onEventTimer: function(data)
+   {
+
+   },
+
+   /**
+    * Event Handler
     */
    onEventSession: function(data)
    {
@@ -173,8 +206,6 @@ upro.data.CommunicationUplink = Class.create(
 
    /**
     * Event Handler
-    * 
-    * @param data event body
     */
    onEventBroadcast: function(data)
    {

@@ -1,5 +1,13 @@
 (function(context)
 {
+   context.namespace.userSchema =
+   {
+      characterId: Number,
+      characterName: String,
+      corporationId: Number,
+      corporationName: String
+   };
+
    context.namespace.routeSchema =
    {
       entryType: [ 'Transit', 'Waypoint', 'Checkpoint' ],

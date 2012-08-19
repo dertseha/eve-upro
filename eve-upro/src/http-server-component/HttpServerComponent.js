@@ -11,7 +11,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var RateLimiter = require('limiter').RateLimiter;
 
-var clientEvents = require('../model/ClientEvents.js');
+var clientEvents = require('../model/ClientEvents.js').clientEvents;
 var Component = require('../components/Component.js');
 var eveHeaders = require('../util/connect-eveheaders.js');
 var ConnectRateLimiter = require('../util/connect-rate-limit.js');
@@ -370,9 +370,9 @@ function HttpServerComponent(services, options)
             }
             if (event)
             {
-               if (!clientEvents.EventNames[event])
+               if (!clientEvents[event])
                {
-                  logger.warn('WARN: unregistered client event [' + event + ']');
+                  logger.error('Unregistered client event [' + event + ']');
                }
                block += 'event: ' + event + '\n';
             }
@@ -385,12 +385,12 @@ function HttpServerComponent(services, options)
          }
 
          // send first message, including a 2KB padding comment for IE
-         sendFunction(new Date().getTime(), clientEvents.EventNames.Timer, Array(2049).join(' '));
+         sendFunction(new Date().getTime(), clientEvents.Timer.name, Array(2049).join(' '));
 
          { // start keep-alive timer
             var timer = setInterval(function()
             {
-               sendFunction(new Date().getTime(), clientEvents.EventNames.Timer, 'timer');
+               sendFunction(new Date().getTime(), clientEvents.Timer.name, 'timer');
             }, 10000);
             res.on('close', function()
             {

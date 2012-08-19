@@ -120,24 +120,20 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
     */
    isBroadcastValid: function(header, body)
    {
+      var event = upro.data.clientBroadcastEvents[header.type];
       var rCode = false;
 
-      if (header)
+      if (event)
       {
-         var event = upro.data.clientBroadcastEvents[header.type];
-
-         if (event)
+         if (!event.header.isValid)
          {
-            if (!event.header.isValid)
-            {
-               event.header.isValid = schema(event.header.schema);
-            }
-            if (!event.body.isValid)
-            {
-               event.body.isValid = schema(event.body.schema);
-            }
-            rCode = event.header.isValid(header) && event.body.isValid(body);
+            event.header.isValid = schema(event.header.schema);
          }
+         if (!event.body.isValid)
+         {
+            event.body.isValid = schema(event.body.schema);
+         }
+         rCode = event.header.isValid(header) && event.body.isValid(body);
       }
 
       return rCode;

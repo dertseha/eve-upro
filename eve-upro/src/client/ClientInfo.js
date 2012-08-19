@@ -108,6 +108,7 @@ exports.sourceFiles = [];
    'data/data.js', //
    shareBase + 'CommonSchemata.js', //
    shareBase + 'ClientRequests.js', //
+   shareBase + 'ClientEvents.js', //
    shareBase + 'ClientBroadcastEvents.js', //
    'data/CommunicationUplink.js', //
 
