@@ -26,26 +26,3 @@ upro.sys.log = function(text)
 {
    console.log((new Date().toISOString()) + " upro: " + text);
 };
-
-/**
- * For some reason, at least the IGB fails to properly include the js-schema.
- */
-if (typeof window.schema === "undefined")
-{
-   window.schema = function()
-   {
-      return function()
-      {
-         return true;
-      };
-   };
-
-   Array.of = function()
-   {
-      return Array;
-   };
-   Number.min = function()
-   {
-      return Number;
-   };
-}
