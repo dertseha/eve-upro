@@ -10,11 +10,15 @@ var userSchema =
    corporationId: Number,
    corporationName: String
 };
-var interestSchema =
+var interestSchema = [
 {
-   scope: [ 'Session', 'Character' ],
-   id: [ Number, String ]
-};
+   scope: 'Session',
+   id: String
+},
+{
+   scope: 'Character',
+   id: Number
+} ];
 
 var broadcasts =
 {
@@ -28,7 +32,7 @@ var broadcasts =
       {
          schema:
          {
-            type: 0
+            type: String
          },
          isValid: null
       },
@@ -54,7 +58,7 @@ var broadcasts =
       {
          schema:
          {
-            type: 0
+            type: String
          },
          isValid: null
       },
@@ -80,7 +84,7 @@ var broadcasts =
       {
          schema:
          {
-            type: 0,
+            type: String,
             sessionId: String
          },
          isValid: null
@@ -104,6 +108,16 @@ var broadcasts =
    }
 };
 
+var standardClientRequestHeader =
+{
+   schema:
+   {
+      type: String,
+      sessionId: String
+   },
+   isValid: null
+};
+
 // Register all client requests.
 for ( var name in clientRequests)
 {
@@ -113,18 +127,20 @@ for ( var name in clientRequests)
    broadcasts[requestBroadcastName] =
    {
       name: 0,
-      header:
-      {
-         schema:
-         {
-            type: requestBroadcastName,
-            sessionId: String
-         },
-         isValid: null
-      },
+      header: standardClientRequestHeader,
       body: request.body
    };
 }
+
+var standardBroadcastEventHeader =
+{
+   schema:
+   {
+      type: String,
+      interest: Array.of(interestSchema)
+   },
+   isValid: null
+};
 
 // Register all broadcast events.
 for ( var name in clientBroadcastEvents)
@@ -134,15 +150,7 @@ for ( var name in clientBroadcastEvents)
    broadcasts[name] =
    {
       name: 0,
-      header:
-      {
-         schema:
-         {
-            type: name,
-            interest: Array.of(interestSchema)
-         },
-         isValid: null
-      },
+      header: standardBroadcastEventHeader,
       body: event.body
    };
 }
@@ -156,12 +164,14 @@ for ( var name in broadcasts)
    {
       broadcast.name = name;
    }
-   if (broadcast.header.schema.type == 0)
+   if (!broadcast.header.isValid)
    {
-      broadcast.header.schema.type = name;
+      broadcast.header.isValid = schema(broadcast.header.schema);
    }
-   broadcast.header.isValid = schema(broadcast.header.schema);
-   broadcast.body.isValid = schema(broadcast.body.schema);
+   if (!broadcast.body.isValid)
+   {
+      broadcast.body.isValid = schema(broadcast.body.schema);
+   }
 }
 
 module.exports.Broadcasts = broadcasts;

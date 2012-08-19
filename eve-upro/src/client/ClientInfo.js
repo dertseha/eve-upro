@@ -106,6 +106,9 @@ exports.sourceFiles = [];
    'hud/TableModelKeyboardHandler.js', //
 
    'data/data.js', //
+   shareBase + 'CommonSchemata.js', //
+   shareBase + 'ClientRequests.js', //
+   shareBase + 'ClientBroadcastEvents.js', //
    'data/CommunicationUplink.js', //
 
    'model/model.js', //

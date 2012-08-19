@@ -1,17 +1,20 @@
 (function(context)
 {
+   var standardHeaderDefinition =
+   {
+      schema:
+      {
+         type: String
+      },
+      isValid: null
+   };
+
    /**
     * @returns a standard header definition
     */
    function getStandardHeaderDefinition()
    {
-      var definition =
-      {
-         schema: {},
-         isValid: null
-      };
-
-      return definition;
+      return standardHeaderDefinition;
    }
 
    var characterInfoSchema =
@@ -184,7 +187,6 @@
       var event = clientBroadcastEvents[name];
 
       event.name = name;
-      event.header.schema.type = name;
    }
    context.namespace.clientBroadcastEvents = clientBroadcastEvents;
 

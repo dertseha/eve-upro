@@ -101,6 +101,56 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
     */
    onBroadcast: function(header, body)
    {
+      if (this.isBroadcastValid(header, body))
+      {
+         this.callBroadcastHandler(header, body);
+      }
+      else
+      {
+         upro.sys.log('Received invalid broadcast: Header = ' + Object.toJSON(header));
+      }
+   },
+
+   /**
+    * Checks whether a broadcast is valid
+    * 
+    * @param header the header of the broadcast
+    * @param body the body of the broadcast
+    * @returns {Boolean} true if the broadcast matches the definition
+    */
+   isBroadcastValid: function(header, body)
+   {
+      var rCode = false;
+
+      if (header)
+      {
+         var event = upro.data.clientBroadcastEvents[header.type];
+
+         if (event)
+         {
+            if (!event.header.isValid)
+            {
+               event.header.isValid = schema(event.header.schema);
+            }
+            if (!event.body.isValid)
+            {
+               event.body.isValid = schema(event.body.schema);
+            }
+            rCode = event.header.isValid(header) && event.body.isValid(body);
+         }
+      }
+
+      return rCode;
+   },
+
+   /**
+    * Calls the broadcast handler
+    * 
+    * @param header broadcast header
+    * @param body broadcast body
+    */
+   callBroadcastHandler: function(header, body)
+   {
       var handlerList = this.broadcastHandler[header.type];
       var self = this;
 

@@ -1,21 +1,21 @@
 (function(context)
 {
+   var standardHeaderDefinition =
+   {
+      schema:
+      {
+         type: String,
+         sessionId: String
+      },
+      isValid: null
+   };
+
    /**
     * @returns a standard header definition
     */
    function getStandardHeaderDefinition()
    {
-      var definition =
-      {
-         schema:
-         {
-            type: null,
-            sessionId: String
-         },
-         isValid: null
-      };
-
-      return definition;
+      return standardHeaderDefinition;
    }
 
    var clientRequests =
@@ -165,7 +165,6 @@
       var request = clientRequests[name];
 
       request.name = name;
-      request.header.schema.type = name;
    }
    context.namespace.clientRequests = clientRequests;
 
