@@ -105,10 +105,6 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
       {
          this.callBroadcastHandler(header, body);
       }
-      else
-      {
-         upro.sys.log('Received invalid broadcast: Header = ' + Object.toJSON(header));
-      }
    },
 
    /**
@@ -125,15 +121,25 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
 
       if (event)
       {
+         rCode = true;
          if (!event.header.isValid)
          {
             event.header.isValid = schema(event.header.schema);
+         }
+         if (!event.header.isValid(header))
+         {
+            upro.sys.log('Broadcast header is invalid [' + header.type + ']: ' + Object.toJSON(header));
+            rCode = false;
          }
          if (!event.body.isValid)
          {
             event.body.isValid = schema(event.body.schema);
          }
-         rCode = event.header.isValid(header) && event.body.isValid(body);
+         if (!event.body.isValid(body))
+         {
+            upro.sys.log('Broadcast body is invalid [' + header.type + ']: ' + Object.toJSON(body));
+            rCode = false;
+         }
       }
 
       return rCode;

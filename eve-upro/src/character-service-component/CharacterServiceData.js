@@ -82,6 +82,9 @@ function CharacterServiceData(service, character)
    this.applyCharacterData = function(data)
    {
       this.rawData = this.mergeData(this.rawData, data);
+
+      // applying legacy conversions
+      this.rawData.activeGalaxyId |= 0; // Was sent as string before introducing schemata. Was during Alpha stage
    };
 
    /**
@@ -282,7 +285,7 @@ function CharacterServiceData(service, character)
       var notifier = [];
       var galaxyId = body.galaxyId;
 
-      if (galaxyId && (this.rawData.activeGalaxyId != galaxyId))
+      if (galaxyId && (this.rawData.activeGalaxyId !== galaxyId))
       {
          this.rawData.activeGalaxyId = galaxyId;
          notifier.push(busMessages.Broadcasts.CharacterActiveGalaxy.name);
