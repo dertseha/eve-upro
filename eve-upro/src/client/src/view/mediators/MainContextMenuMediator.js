@@ -82,6 +82,18 @@ upro.view.mediators.MainContextMenuMediator = Class
                               this.commandRoutingCapJumpDriveLess);
                      }
                   }
+                  { // view
+                     var viewMenu = menu.setSubMenu(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.View),
+                           upro.res.text.Lang.format("view.menuLabel"));
+
+                     this.commandUiView = new upro.hud.SimpleCommandAdapter(function()
+                     {
+                        mediator.notify(upro.app.Notifications.SetUserInterfaceVisible);
+                        mediator.cancel();
+                     }, upro.res.text.Lang.format("view.setUiVisible"));
+                     viewMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Windows),
+                           this.commandUiView);
+                  }
                },
 
                /**

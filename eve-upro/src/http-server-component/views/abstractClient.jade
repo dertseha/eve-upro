@@ -9,6 +9,7 @@ block pre-scripts
 block content
    canvas(id='scene')
    div(id='hud')
+   div(id='ui')
 
 block post-scripts
    script(type='text/javascript', charset='utf-8', src='/javascripts/igbFixes.js')
@@ -19,6 +20,7 @@ block post-scripts
    script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/puremvc-multicore-prototypejs-1.0.js')
    script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/raphael.js')
    script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/scale.raphael.js')
+   script(type='text/javascript', charset='utf-8', src='/javascripts/#{runtime}/uki.js')
 
    if runtime == 'debug'   
       script(type='text/javascript', charset='utf-8', src='/javascripts/upro-full.js')

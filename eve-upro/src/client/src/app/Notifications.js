@@ -12,6 +12,11 @@ upro.app.Notifications =
    /** A session has been successfully created. Param: null */
    SessionLoggedIn: 0,
 
+   /** To show the user interface */
+   SetUserInterfaceVisible: 0,
+   /** To hide the user interface */
+   SetUserInterfaceInvisible: 0,
+
    /** When permission for IGB control has been changed. Param: boolean */
    ActiveInGameBrowserControlChanged: 0,
 

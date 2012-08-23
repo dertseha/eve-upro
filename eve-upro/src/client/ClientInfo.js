@@ -96,6 +96,7 @@ exports.sourceFiles = [];
    'hud/SubMenuCommandAdapter.js', //
    'hud/HudSystem.js', //
    'hud/Button.js', //
+   'hud/IconCreatorFactory.js', //
    'hud/RadialMenuContext.js', //
    'hud/RadialMenu.js', //
    'hud/MenuEntry.js', //
@@ -134,6 +135,8 @@ exports.sourceFiles = [];
    'control/commands/SetupModelCommand.js', //
    'control/commands/SetupViewCommand.js', //
    'control/commands/InitApplicationCommand.js', //
+   'control/commands/NotifiedSetUserInterfaceVisibleCommand.js', //
+   'control/commands/NotifiedSetUserInterfaceInvisibleCommand.js', //
    'control/commands/NotifiedActiveInGameBrowserControlChangedCommand.js', //
    'control/commands/NotifiedAutopilotRouteChangedCommand.js', //
    'control/commands/NotifiedAutopilotNextRouteIndexChangedCommand.js', //
@@ -169,10 +172,13 @@ exports.sourceFiles = [];
    'view/SceneObjectRotationOperation.js', //
    'view/OrientedMoveOperation.js', //
    'view/IdlePointerOperation.js', //
+   'view/UiTheme.js', //
+   'view/UiPanelLayout.js', //
    'view/ZoomMoveOperation.js', //
 
    'view/mediators/mediators.js', //
    'view/mediators/AbstractMediator.js', //
+   'view/mediators/AbstractSideButtonMediator.js', //
    'view/mediators/DocumentMouseMediator.js', //
    'view/mediators/HudMediator.js', //
    'view/mediators/InGameBrowserMediator.js', //
@@ -182,6 +188,8 @@ exports.sourceFiles = [];
    'view/mediators/AbstractContextMenuMediator.js', //
    'view/mediators/SolarSystemContextMenuMediator.js', //
    'view/mediators/MainContextMenuMediator.js', //
+   'view/mediators/UiMediator.js', //
+   'view/mediators/HideUiSideButtonMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

@@ -1,6 +1,5 @@
 /**
- * A menu entry creates and destroys a button on request
- * and binds the button to a command adapter.
+ * A menu entry creates and destroys a button on request and binds the button to a command adapter.
  */
 upro.hud.MenuEntry = Class.create(
 {
@@ -12,7 +11,7 @@ upro.hud.MenuEntry = Class.create(
       this.button = null;
    },
 
-   show: function(hudSystem, x, y)
+   show: function(context, x, y)
    {
       var icon = null;
 
@@ -21,8 +20,8 @@ upro.hud.MenuEntry = Class.create(
       {
          icon = this.iconCreator();
       }
-      this.button = new upro.hud.Button(hudSystem, x, y, icon,
-         this.commandAdapter.isCommandPossible(), this.commandAdapter.isCommandActive());
+      this.button = new upro.hud.Button(context, x, y, icon, this.commandAdapter.isCommandPossible(),
+            this.commandAdapter.isCommandActive());
       this.button.setLabel(this.commandAdapter.getLabel());
       this.button.clickedCallback = this.onClicked.bind(this);
       this.commandAdapter.registerListener(this.commandAdapterListener);

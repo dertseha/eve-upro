@@ -81,5 +81,12 @@ upro.res.text.templates["en"] =
    /** Toggle the ignore status of given solar system */
    "solarSystem.routing.toggleIgnore": "Ignore Solar System",
    /** Remove the solar system from the route */
-   "solarSystem.routing.remove": "Remove from Route"
+   "solarSystem.routing.remove": "Remove from Route",
+
+   /** view menu label */
+   "view.menuLabel": "View...",
+   /** show the UI */
+   "view.setUiVisible": "Show UI",
+   /** hide the UI */
+   "view.setUiInvisible": "Hide UI"
 };

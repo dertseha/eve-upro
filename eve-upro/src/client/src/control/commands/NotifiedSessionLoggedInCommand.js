@@ -2,6 +2,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 {
    execute: function(notification)
    {
+      var uiMediator = this.facade().retrieveMediator(upro.view.mediators.UiMediator.NAME);
+
       this.facade().registerProxy(new upro.model.proxies.UniverseProxy());
       this.facade().registerProxy(new upro.model.proxies.UserViewDataProxy());
       this.facade().registerProxy(new upro.model.proxies.LocationTrackerProxy());
@@ -27,6 +29,10 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
          var scene = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
 
          scene.createGalaxies();
+      }
+      else
+      {
+         uiMediator.setVisible(true);
       }
    },
 

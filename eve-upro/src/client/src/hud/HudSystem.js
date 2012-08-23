@@ -1,19 +1,20 @@
-
 upro.hud.HudSystem = Class.create(
 {
    /**
     * Initializes the HUD.
+    * 
     * @param resizableContext the context that will hold the Raphael paper;
     * @param width expected standard width - default: screen.width
     * @param height expected standard height - default: screen.height
     */
    initialize: function(resizableContext, width, height)
    {
-      var temp = ScaleRaphael(resizableContext.getHolderName(), width ? width : screen.width, height ? height : screen.height);
+      var temp = ScaleRaphael(resizableContext.getHolderName(), width ? width : screen.width, height ? height
+            : screen.height);
 
       this.context = resizableContext;
       this.paper = temp;
-      {  // initial resize setup
+      { // initial resize setup
          this.context.getFrame().addEventListener("resize", this.onResize.bind(this), false);
          // call resize now - twice, as one call sometimes doesn't help (?)
          this.onResize();
@@ -24,11 +25,16 @@ upro.hud.HudSystem = Class.create(
 
       this.debugMessageTexts = [];
       this.debugMessageElements = [];
-      for (var i = 0; i < 10; i++)
+      for ( var i = 0; i < 10; i++)
       {
          var elem = temp.text(10, 10 + (20 * (i + 1)), "");
 
-         elem.attr( { "fill": "#FFF", "font-size": 20, "text-anchor": "start" });
+         elem.attr(
+         {
+            "fill": "#FFF",
+            "font-size": 20,
+            "text-anchor": "start"
+         });
          this.debugMessageElements.push(elem);
          this.debugMessageTexts.push("");
       }
@@ -37,11 +43,12 @@ upro.hud.HudSystem = Class.create(
       this.keyFocus = null;
 
       // debugging
-      //temp.rect(0, 0, temp.w, temp.h).attr("stroke", "#FF0000");
+      // temp.rect(0, 0, temp.w, temp.h).attr("stroke", "#FF0000");
    },
 
    /**
     * Returns the keyboard handler for the HUD System
+    * 
     * @return the keyboard handler for the HUD System
     */
    getKeyboardHandler: function()
@@ -51,6 +58,7 @@ upro.hud.HudSystem = Class.create(
 
    /**
     * This method calculates a screen space pixel to a real value with 0,0 at the center
+    * 
     * @param pixelX x value, typically from mouse event
     * @param pixelY y value, typically from mouse event
     * @return {x,y} structure
@@ -67,9 +75,9 @@ upro.hud.HudSystem = Class.create(
    },
 
    /**
-    * This method calculates an offset in real values to absolute pixel values
-    * _of the original scale_ internal Raphael uses. So, the returned x/y pair
-    * are not pixel coordinates, but internal view coordinates.
+    * This method calculates an offset in real values to absolute pixel values _of the original scale_ internal Raphael
+    * uses. So, the returned x/y pair are not pixel coordinates, but internal view coordinates.
+    * 
     * @param real an x/y pair in real values
     * @return an x/y pair of view coordinates
     */
@@ -124,6 +132,7 @@ upro.hud.HudSystem = Class.create(
 
    /**
     * Sets the keyboard focus (registers a keyboard handler)
+    * 
     * @param handler KeyboardHandler instance to return true if handled
     */
    setKeyFocus: function(handler)
@@ -145,6 +154,7 @@ upro.hud.HudSystem = Class.create(
 
    /**
     * Removes the key focus if given handler had it
+    * 
     * @param handler to remove if set
     */
    removeKeyFocus: function(handler)
@@ -169,7 +179,7 @@ upro.hud.HudSystem = Class.create(
    {
       var temp;
 
-      for (var i = this.debugMessageTexts.length - 1; i > 0; i--)
+      for ( var i = this.debugMessageTexts.length - 1; i > 0; i--)
       {
          this.debugMessageTexts[i] = temp = this.debugMessageTexts[i - 1];
          this.debugMessageElements[i].attr("text", temp);
@@ -180,36 +190,32 @@ upro.hud.HudSystem = Class.create(
 
    createHexagon: function(scale)
    {
-      var diagFactor = upro.hud.HudSystem.HexagonDiagFactor;
-      var basePath =
-         "M0,-" + (2 * scale) +
-         "L" + (diagFactor * scale) + ",-" + scale +
-         "V" + scale +
-         "L0," + (2 * scale) +
-         "L-" + (diagFactor * scale) + "," + scale +
-         "V-" + scale +
-         "Z";
-/* This one has 'edges' on the left and right sides
-      var basePath =
-         "M-" + (2 * scale) + ",0" +
-         "L-" + scale + ",-" + (diagFactor * scale) +
-         "H" + scale +
-         "L" + (2 * scale) + ",0" +
-         "L" + scale + "," + (diagFactor * scale) +
-         "H-" + scale +
-         "Z";
-*/
-      var hexagon = this.paper.path(basePath);
-
-      hexagon.attr({fill: "#423f22", "fill-opacity": 0.5, stroke: "#741", "stroke-width": 2, "stroke-opacity": 0.8});
-
-      return hexagon;
+      return upro.hud.HudSystem.createHexagon(this.paper, scale);
    }
 
 });
 
 /**
- * The factor for the diagonals to create a hexagon;
- * Result of sqrt(3) of side length 1.
+ * The factor for the diagonals to create a hexagon; Result of sqrt(3) of side length 1.
  */
 upro.hud.HudSystem.HexagonDiagFactor = 1.732050808;
+
+upro.hud.HudSystem.createHexagon = function(paper, scale)
+{
+   var diagFactor = upro.hud.HudSystem.HexagonDiagFactor;
+   var basePath = "M0,-" + (2 * scale) + "L" + (diagFactor * scale) + ",-" + scale + "V" + scale + "L0," + (2 * scale)
+         + "L-" + (diagFactor * scale) + "," + scale + "V-" + scale + "Z";
+
+   var hexagon = paper.path(basePath);
+
+   hexagon.attr(
+   {
+      fill: "#423f22",
+      "fill-opacity": 0.5,
+      stroke: "#741",
+      "stroke-width": 2,
+      "stroke-opacity": 0.8
+   });
+
+   return hexagon;
+};

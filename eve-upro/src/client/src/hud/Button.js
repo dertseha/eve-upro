@@ -1,28 +1,27 @@
 /**
- * A button is a simple GUI element that requests to execute a
- * command (callback) when activated (clicked).
- * The button itself is represented by a hexagon and an optional
- * icon (which can be any element registered in raphael).
+ * A button is a simple GUI element that requests to execute a command (callback) when activated (clicked). The button
+ * itself is represented by a hexagon and an optional icon (which can be any element registered in raphael).
  */
 upro.hud.Button = Class.create(
 {
    /**
     * Initializes the button.
-    * @param hudSystem the HUD system to run in
+    * 
+    * @param context the context to run in. Is an object of { paper: (raphael paper) }
     * @param x horizontal (view coordinates) position
     * @param y vertical (view coordinates) position
     * @icon optional icon element. The button takes ownership of the object.
     */
-   initialize: function(hudSystem, x, y, icon, initialEnabled, initialActive)
+   initialize: function(context, x, y, icon, initialEnabled, initialActive)
    {
-      this.hudSystem = hudSystem;
+      this.context = context;
 
       this.clickedCallback = null;
 
       this.enabled = (initialEnabled !== undefined) ? initialEnabled : true;
       this.active = (initialActive !== undefined) ? initialActive : false;
 
-      this.wholeSet = this.hudSystem.paper.set();
+      this.wholeSet = this.context.paper.set();
       this.createBase();
       this.wholeSet.translate(x, y);
 
@@ -53,8 +52,8 @@ upro.hud.Button = Class.create(
    },
 
    /**
-    * Marks this button unusable. Will detach any handler and prepare the
-    * GUI elements to be destroyed (after an animation)
+    * Marks this button unusable. Will detach any handler and prepare the GUI elements to be destroyed (after an
+    * animation)
     */
    destroy: function()
    {
@@ -62,12 +61,19 @@ upro.hud.Button = Class.create(
 
       this.clickedCallback = null;
       wholeSet.toBack();
-      wholeSet.animate({"fill-opacity": 0.2, "stroke-opacity": 0.3}, 200, ">", function() { wholeSet.remove(); });
+      wholeSet.animate(
+      {
+         "fill-opacity": 0.2,
+         "stroke-opacity": 0.3
+      }, 200, ">", function()
+      {
+         wholeSet.remove();
+      });
    },
 
    /**
-    * Enables or disables the button. If disabled, the icon is made semi-transparent and
-    * clicking the button is ignored.
+    * Enables or disables the button. If disabled, the icon is made semi-transparent and clicking the button is ignored.
+    * 
     * @param value: boolean whether to enable the button
     */
    setEnabled: function(value)
@@ -85,6 +91,7 @@ upro.hud.Button = Class.create(
 
    /**
     * Returns true if the button is enabled
+    * 
     * @return true if the button is enabled
     */
    isEnabled: function()
@@ -107,6 +114,7 @@ upro.hud.Button = Class.create(
 
    /**
     * Returns true if the button is active
+    * 
     * @return true if the button is active
     */
    isActive: function()
@@ -116,6 +124,7 @@ upro.hud.Button = Class.create(
 
    /**
     * Sets the label (tooltip) for this button
+    * 
     * @param text to set
     */
    setLabel: function(text)
@@ -133,9 +142,14 @@ upro.hud.Button = Class.create(
     */
    createBase: function()
    {
-      var base = this.hudSystem.createHexagon(upro.hud.Button.Scale).hide();
+      var base = upro.hud.HudSystem.createHexagon(this.context.paper, upro.hud.Button.Scale).hide();
 
-      base.attr({fill: "#423f22", stroke: "#741", "stroke-width": 2});
+      base.attr(
+      {
+         fill: "#423f22",
+         stroke: "#741",
+         "stroke-width": 2
+      });
       base.attr(upro.hud.Button.States.Active[this.active].BaseAttr);
 
       this.base = base;
@@ -153,13 +167,13 @@ upro.hud.Button = Class.create(
 });
 
 /**
- * Scale for the buttons. Hand-picked value.
- * A circle that encloses a button has a radius of this value.
+ * Scale for the buttons. Hand-picked value. A circle that encloses a button has a radius of this value.
  */
 upro.hud.Button.Scale = 10;
 
 /**
  * Returns the unit shift for the diagonal side
+ * 
  * @param padding to apply
  * @return {x,y} pair
  */
@@ -176,6 +190,7 @@ upro.hud.Button.getShiftHalf = function(padding)
 
 /**
  * Returns the unit shift for the 'flat' side
+ * 
  * @param padding to apply
  * @return {x,y} pair
  */
@@ -194,23 +209,101 @@ upro.hud.Button.States = {};
 
 upro.hud.Button.States.Enabled = {};
 upro.hud.Button.States.Enabled[true] = {};
-upro.hud.Button.States.Enabled[true].IconAttr = {"fill-opacity": 1.0, "stroke-opacity": 1.0};
+upro.hud.Button.States.Enabled[true].IconAttr =
+{
+   "fill-opacity": 1.0,
+   "stroke-opacity": 1.0
+};
 upro.hud.Button.States.Enabled[false] = {};
-upro.hud.Button.States.Enabled[false].IconAttr = {"fill-opacity": 0.2, "stroke-opacity": 0.3};
+upro.hud.Button.States.Enabled[false].IconAttr =
+{
+   "fill-opacity": 0.2,
+   "stroke-opacity": 0.3
+};
 
 upro.hud.Button.States.Active = {};
 upro.hud.Button.States.Active[true] = {};
-upro.hud.Button.States.Active[true].BaseAttr = {"fill-opacity": 0.9, "stroke-opacity": 1.0};
+upro.hud.Button.States.Active[true].BaseAttr =
+{
+   "fill-opacity": 0.9,
+   "stroke-opacity": 1.0
+};
 upro.hud.Button.States.Active[false] = {};
-upro.hud.Button.States.Active[false].BaseAttr = {"fill-opacity": 0.5, "stroke-opacity": 0.8};
+upro.hud.Button.States.Active[false].BaseAttr =
+{
+   "fill-opacity": 0.5,
+   "stroke-opacity": 0.8
+};
 
 /**
  * An array of 6 functions that return the offset for the 6 sides
  */
 upro.hud.Button.getOffset = [];
-upro.hud.Button.getOffset.push(function(padding) { var temp = upro.hud.Button.getShiftHalf(padding); return { x: temp.x, y: -temp.y }; });
-upro.hud.Button.getOffset.push(function(padding) { var temp = upro.hud.Button.getShiftFull(padding); return { x: temp.x, y: temp.y }; });
-upro.hud.Button.getOffset.push(function(padding) { var temp = upro.hud.Button.getShiftHalf(padding); return { x: temp.x, y: temp.y }; });
-upro.hud.Button.getOffset.push(function(padding) { var temp = upro.hud.Button.getShiftHalf(padding); return { x: -temp.x, y: temp.y }; });
-upro.hud.Button.getOffset.push(function(padding) { var temp = upro.hud.Button.getShiftFull(padding); return { x: -temp.x, y: temp.y }; });
-upro.hud.Button.getOffset.push(function(padding) { var temp = upro.hud.Button.getShiftHalf(padding); return { x: -temp.x, y: -temp.y }; });
+upro.hud.Button.getOffset.push(function(padding)
+{
+   var temp = upro.hud.Button.getShiftHalf(padding);
+   var result =
+   {
+      x: temp.x,
+      y: -temp.y
+   };
+
+   return result;
+
+});
+upro.hud.Button.getOffset.push(function(padding)
+{
+   var temp = upro.hud.Button.getShiftFull(padding);
+   var result =
+   {
+      x: temp.x,
+      y: temp.y
+   };
+
+   return result;
+});
+upro.hud.Button.getOffset.push(function(padding)
+{
+   var temp = upro.hud.Button.getShiftHalf(padding);
+   var result =
+   {
+      x: temp.x,
+      y: temp.y
+   };
+
+   return result;
+});
+upro.hud.Button.getOffset.push(function(padding)
+{
+   var temp = upro.hud.Button.getShiftHalf(padding);
+   var result =
+   {
+      x: -temp.x,
+      y: temp.y
+   };
+
+   return result;
+});
+upro.hud.Button.getOffset.push(function(padding)
+{
+   var temp = upro.hud.Button.getShiftFull(padding);
+   var result =
+   {
+      x: -temp.x,
+      y: temp.y
+   };
+
+   return result;
+});
+upro.hud.Button.getOffset.push(function(padding)
+{
+   var temp = upro.hud.Button.getShiftHalf(padding);
+   var result =
+   {
+      x: -temp.x,
+      y: -temp.y
+   };
+
+   return result;
+
+});

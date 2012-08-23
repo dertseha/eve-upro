@@ -23,7 +23,7 @@ function createDestroyButton(index)
    {
       button.destroy();
       createDestroyButton((index + 3) % 6);
-   }
+   };
 }
 
 function testButtonDestroy()
@@ -88,7 +88,11 @@ function testContextMenu()
    mainContextMenu.setCommand(0, createIconMinmatar, commandContextMenu0);
 
    var subMenu = mainContextMenu.setSubMenu(2, createIconCaldari);
-   commandContextMenu1 = new upro.hud.SimpleCommandAdapter( function() { onContextMenu1(); subMenu.cancel(); });
+   commandContextMenu1 = new upro.hud.SimpleCommandAdapter(function()
+   {
+      onContextMenu1();
+      subMenu.cancel();
+   });
    subMenu.setCommand(5, createIconMinmatar, commandContextMenu1);
 }
 
@@ -98,7 +102,7 @@ function testButtonOffsets()
 
    createLabel(500, "Button Offsets");
    new upro.hud.Button(hudSystem, 300, 500);
-   for (var i = 0; i < 6; i++)
+   for ( var i = 0; i < 6; i++)
    {
       createOffsetButton(300, 500, i, padding);
    }
@@ -142,12 +146,13 @@ function testIcons()
 {
    var i = 0, x, y;
 
-   for (var pathName in upro.res.menu.IconData)
+   for ( var pathName in upro.res.menu.IconData)
    {
       x = 500 + (i % 16) * 40;
       y = 200 + Math.floor(i / 16) * 40;
       i++;
-      new upro.hud.Button(hudSystem, x, y, createIcon(upro.res.menu.IconData[pathName]));
+      var button = new upro.hud.Button(hudSystem, x, y, createIcon(upro.res.menu.IconData[pathName]));
+      button.setLabel(pathName);
    }
 }
 
