@@ -120,10 +120,6 @@ upro.view.UiPanelLayout = Class.create(
          div.setAttribute("id", id);
          this.knownCells[id] = div;
       }
-      else
-      {
-         cell.update("&nbsp;");
-      }
 
       return cell;
    },

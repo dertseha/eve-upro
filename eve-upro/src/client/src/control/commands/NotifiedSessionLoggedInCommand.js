@@ -25,6 +25,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade().registerMediator(new upro.view.mediators.SolarSystemContextMenuMediator());
 
+      this.setupRouteListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
 
       if (upro.scene.SceneSystem.SUPPORTED)
@@ -41,6 +42,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.facade().sendNotification(upro.app.Notifications.DebugMessage, "SessionLoggedIn complete");
 
       uiMediator.showBaseView("swCtrl", "debug"); // for now, always show debugging output
+      uiMediator.showBaseView("wList", "autopilotRoute");
    },
 
    setupHoverPosHighlight: function(highlightMediator)
@@ -80,6 +82,16 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       };
 
       highlightMediator.addHighlight("CurLocation", textOptions, bracketOptions);
+   },
+
+   setupRouteListMenu: function(uiMediator)
+   {
+      var panelId = "wList";
+
+      uiMediator.setSubMenu(panelId, "route", 0, upro.res.menu.IconData.Routing, upro.res.text.Lang
+            .format("routeList.menuLabel"));
+
+      this.facade().registerMediator(new upro.view.mediators.AutopilotRoutePanelMediator(panelId, panelId + ".route"));
    },
 
    setupSettingsMenu: function(uiMediator)

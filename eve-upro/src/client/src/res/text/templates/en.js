@@ -94,5 +94,10 @@ upro.res.text.templates["en"] =
    "settings.menuLabel": "Settings",
 
    /** Debug Panel menu label */
-   "panels.debug.menuLabel": "Debug"
+   "panels.debug.menuLabel": "Debug",
+
+   /** Routes menu label */
+   "routeList.menuLabel": "Routes",
+   /** Autopilot Route Panel menu label */
+   "panels.autopilot.route.menuLabel": "Autopilot Route"
 };

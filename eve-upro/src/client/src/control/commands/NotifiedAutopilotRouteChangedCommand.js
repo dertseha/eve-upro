@@ -9,6 +9,7 @@ upro.ctrl.cmd.NotifiedAutopilotRouteChangedCommand = Class.create(SimpleCommand,
             {
                this.displayRouteOnMap(route);
             }
+            this.displayRouteInList(route);
             this.clearClientRoute();
          },
 
@@ -54,6 +55,13 @@ upro.ctrl.cmd.NotifiedAutopilotRouteChangedCommand = Class.create(SimpleCommand,
                lastEntry = routeEntry;
                lastSystem = solarSystem;
             }
+         },
+
+         displayRouteInList: function(route)
+         {
+            var listMediator = this.facade().retrieveMediator(upro.view.mediators.AutopilotRoutePanelMediator.NAME);
+
+            listMediator.setRoute(route);
          },
 
          /**

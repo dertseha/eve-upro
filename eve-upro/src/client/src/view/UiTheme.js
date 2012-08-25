@@ -20,10 +20,7 @@ upro.view.UiTheme = Class
 
          getBackgroundCss: function(opacity)
          {
-            // return '#423f22;opacity:0.' + opacity + ';';
-            return '#423f22;'
-                  + ((uki.browser.cssFilter() && uki.image.needAlphaFix) ? 'filter:Alpha(opacity=' + opacity + '0);'
-                        : 'opacity:0.' + opacity + ';');
+            return upro.view.UiTheme.getBackgroundCss(opacity);
          },
 
          getBackgrounds: function()
@@ -32,6 +29,11 @@ upro.view.UiTheme = Class
             var self = this;
             var block =
             {
+               'simpleFrame': function()
+               {
+                  return new uki.background.CssBox(defaultCss
+                        + 'border-width:2px;border-style:solid;padding:2px;border-color:' + self.getBackgroundCss(7));
+               },
                'box': function()
                {
                   return new uki.background.CssBox(defaultCss
@@ -45,9 +47,7 @@ upro.view.UiTheme = Class
                   return new uki.background.CssBox(defaultCss
                         + 'border:2px solid #704010;background:#423f22;'
                         + (uki.browser.cssFilter() && uki.image.needAlphaFix ? 'filter:Alpha(opacity=90);'
-                              : 'opacity:0.9;')// ,
-                  // { inset: '-2 -2', zIndex: -2 }
-                  );
+                              : 'opacity:0.9;'));
                },
                list: function(rowHeight)
                {
@@ -60,20 +60,7 @@ upro.view.UiTheme = Class
 
          getTemplates: function()
          {
-            var T = '';
-            var block =
-            {
-               'route-render': function()
-               {
-                  return [
-                        '<div style="height:35px;text-align:left;font-size:13px;line-height:16px;margin:2px 0;position:relative;border-bottom:1px solid #EEE;color:#333">'
-                              + '<img style="position:absolute;left:7px;top:2px;border:1px solid #CCC;width:27px;height:27px;" src="',
-                        T, '" />' + '<div style="margin:0 116px 0 104px;height:32px;overflow:hidden;">', T,
-                        ' &ndash; <span style="color:#999">', T,
-                        '</span></div>' + '<div style="position:absolute;right:0;width:88px;top:0;">', T,
-                        '<div style="color:#999">', T, '</div></div></div>' ];
-               }
-            };
+            var block = {};
 
             return block;
          },
@@ -100,3 +87,10 @@ upro.view.UiTheme = Class
          }
 
       });
+
+upro.view.UiTheme.getBackgroundCss = function(opacity)
+{
+   return '#423f22;'
+         + ((uki.browser.cssFilter() && uki.image.needAlphaFix) ? 'filter:Alpha(opacity=' + opacity + '0);'
+               : 'opacity:0.' + opacity + ';');
+};
