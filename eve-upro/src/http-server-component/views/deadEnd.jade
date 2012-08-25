@@ -1,0 +1,38 @@
+title= "upro"
+
+extends layout
+
+block title
+   title="upro :: dead end"
+
+block pre-scripts
+   link(rel='stylesheet', href='/stylesheets/style.css')
+
+block content
+   div(class="message")
+      if !message
+         p
+            | You have reached this page for reasons unknown. 
+            a(href="/")
+               | Try to go back to the beginning 
+      if (message == 'unsupportedBrowser')
+         p
+            | Your browser has been determined to be not compatible.
+         p
+            | This is most likely an Internet Explorer, which does not support WebGL (for reasons the 
+            a(href="http://www.readwriteweb.com/hack/2011/06/developer-silverlight-has-the.php") Web
+            |  
+            a(href="http://my.opera.com/haavard/blog/2011/06/22/microsoft") can
+            | 
+            a(href="http://www.theregister.co.uk/2011/06/20/webgl_/") not
+            | 
+            a(href="http://games.greggman.com/game/webgl-security-and-microsoft-bullshit/") understand
+            | ) nor an easy layout for the GUI (see the 
+            a(href="https://github.com/dertseha/eve-upro/issues/64") bug report
+            | ).
+         p
+            | Please download a better browser instead. Preferably 
+            a(href="http://chrome.google.com") Chrome
+            | .
+      else
+         p #{message}

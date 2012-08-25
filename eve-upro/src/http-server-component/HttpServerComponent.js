@@ -232,6 +232,11 @@ function HttpServerComponent(services, options)
          self.onGetIndex(req, res);
       });
 
+      expressServer.get('/deadEnd', function(req, res)
+      {
+         self.onGetDeadEnd(req, res);
+      });
+
       expressServer.get('/login', function(req, res)
       {
          self.onGetLogin(req, res);
@@ -322,17 +327,33 @@ function HttpServerComponent(services, options)
       }
    };
 
+   this.onGetDeadEnd = function(req, res)
+   {
+      var message = req.query.message;
+
+      res.render('deadEnd.jade',
+      {
+         message: message
+      });
+   };
+
    this.onGetLogin = function(req, res)
    {
+      var userAgent = req.headers['user-agent'];
+      var isInGameBrowser = userAgent && (userAgent.indexOf('EVE-IGB') >= 0);
+      var isInternetExplorer = userAgent && (userAgent.indexOf('MSIE') >= 0);
+
       if (req.user)
       {
          res.redirect('/');
       }
+      else if (isInternetExplorer)
+      {
+         res.redirect('/deadEnd?message=unsupportedBrowser');
+      }
       else
       {
          var message = req.query.message;
-         var userAgent = req.headers['user-agent'];
-         var isInGameBrowser = userAgent && (userAgent.indexOf('EVE-IGB') >= 0);
          var hasInGameBrowserTrust = req.eveHeaders && (req.eveHeaders['trusted'] == 'Yes');
          var isSslConnection = !!req.headers['sslsessionid'];
 

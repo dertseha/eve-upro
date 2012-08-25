@@ -45,9 +45,18 @@ upro.view.UiPanelLayout = Class.create(
       baseRow.setStyle(defaultStyle);
       baseTable.appendChild(baseRow);
 
-      baseRow.appendChild(this.createTableCell("westBar", {}, verticalBarStyle));
-      baseRow.appendChild(this.createTableCell(null, {}, defaultStyle).appendChild(this.createNestedTable()));
-      baseRow.appendChild(this.createTableCell("eastBar", {}, verticalBarStyle));
+      {
+         baseRow.appendChild(this.createTableCell("westBar", {}, verticalBarStyle));
+      }
+      {
+         var middleCell = this.createTableCell(null, {}, defaultStyle);
+
+         middleCell.appendChild(this.createNestedTable());
+         baseRow.appendChild(middleCell);
+      }
+      {
+         baseRow.appendChild(this.createTableCell("eastBar", {}, verticalBarStyle));
+      }
 
       return baseTable;
    },
