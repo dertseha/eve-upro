@@ -1,40 +1,42 @@
 /**
- * A radial menu context is the hook a radial menu and any sub menu
- * run and register themselves in
+ * A radial menu context is the hook a radial menu and any sub menu run and register themselves in
  */
 upro.hud.RadialMenuContext = Class.create(
 {
    /**
     * Initializes the context
+    * 
     * @param mainMenu The main menu to run
-    * @param hudSystem the system the menu should be shown in
-    * @param realPos the position to show the menu at
+    * @param paperContext the paper context the menu should be shown in
+    * @param viewCoord the view coordinates to show the menu at
     */
-   initialize: function(mainMenu, hudSystem, realPos)
+   initialize: function(mainMenu, paperContext, viewCoord)
    {
       this.mainMenu = mainMenu;
-      this.hudSystem = hudSystem;
-      this.realPos = realPos;
+      this.paperContext = paperContext;
+      this.viewCoord = viewCoord;
 
       this.activeMenu = null;
    },
 
    /**
     * Returns the position
+    * 
     * @return the position
     */
-   getRealPos: function()
+   getViewCoord: function()
    {
-      return this.realPos;
+      return this.viewCoord;
    },
 
    /**
-    * Returns the HUD System
-    * @return the HUD System
+    * Returns the paper context
+    * 
+    * @return the paper context
     */
-   getHudSystem: function()
+   getPaperContext: function()
    {
-      return this.hudSystem;
+      return this.paperContext;
    },
 
    /**
@@ -46,8 +48,7 @@ upro.hud.RadialMenuContext = Class.create(
    },
 
    /**
-    * Cancels the menu stack.
-    * Calls cancel() while there is an active menu
+    * Cancels the menu stack. Calls cancel() while there is an active menu
     */
    cancel: function()
    {
@@ -58,8 +59,8 @@ upro.hud.RadialMenuContext = Class.create(
    },
 
    /**
-    * Sets the currently active menu. The calling code must
-    * ensure not to overlap calling this method.
+    * Sets the currently active menu. The calling code must ensure not to overlap calling this method.
+    * 
     * @param menu to set as active one
     */
    setActiveMenu: function(menu)

@@ -1,8 +1,7 @@
 /**
- * This abstract mediator provides support for a context menu and
- * handes the common operations; First and foremost, creating
- * the base menu and handling its removal.
- *
+ * This abstract mediator provides support for a context menu and handes the common operations; First and foremost,
+ * creating the base menu and handling its removal.
+ * 
  * The stored ViewComponent is the base menu.
  */
 upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediators.AbstractMediator,
@@ -17,6 +16,7 @@ upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediato
 
    /**
     * Returns the notification body set during show()
+    * 
     * @return the notification body
     */
    getNotifyBody: function()
@@ -26,6 +26,7 @@ upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediato
 
    /**
     * Returns true if the context menu is currently shown
+    * 
     * @return true if the context menu is currently shown
     */
    isVisible: function()
@@ -34,8 +35,9 @@ upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediato
    },
 
    /**
-    * Requests to show the context menu at given position. If the context menu
-    * is already shown, it will be cancelled first.
+    * Requests to show the context menu at given position. If the context menu is already shown, it will be cancelled
+    * first.
+    * 
     * @param realPos the position to display the menu at
     * @param notifyBody the body to use for notifications
     */
@@ -43,7 +45,8 @@ upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediato
    {
       var hudSystem = this.facade().retrieveMediator(upro.view.mediators.HudMediator.NAME).getViewComponent();
       var menu = this.getViewComponent();
-      var context = new upro.hud.RadialMenuContext(menu, hudSystem, realPos);
+      var viewCoord = hudSystem.realToViewCoordinates(realPos);
+      var context = new upro.hud.RadialMenuContext(menu, hudSystem, viewCoord);
 
       this.cancel();
       this.activeContext = context;
@@ -67,6 +70,7 @@ upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediato
 
    /**
     * Creates a vector icon from given path data. Meant to be bound as icon creators
+    * 
     * @param pathData the path data for the icon
     * @return a path object from the hud system
     */
@@ -82,6 +86,7 @@ upro.view.mediators.AbstractContextMenuMediator = Class.create(upro.view.mediato
 
    /**
     * Sends a notification of given event, passing the currently stored notify body
+    * 
     * @param event to send
     * @param body optional body that overwrites getNotifyBody()
     */

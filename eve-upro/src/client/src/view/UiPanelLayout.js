@@ -187,7 +187,6 @@ upro.view.UiPanelLayout = Class.create(
          var center = this.createTableCell("center", centerAttr);
 
          row.appendChild(center);
-         center.hide();
       }
       {
          row = new Element("tr");

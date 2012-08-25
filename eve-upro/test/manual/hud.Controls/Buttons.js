@@ -42,7 +42,8 @@ function createOffsetButton(x, y, index, padding)
 function createContextMenu(event)
 {
    var real = hudSystem.pixelToReal(event.pointerX(), event.pointerY());
-   var context = new upro.hud.RadialMenuContext(mainContextMenu, hudSystem, real);
+   var viewCoord = hudSystem.realToViewCoordinates(real);
+   var context = new upro.hud.RadialMenuContext(mainContextMenu, hudSystem, viewCoord);
 
    hudSystem.setActiveContextMenu(context);
    context.show();

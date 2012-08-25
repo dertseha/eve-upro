@@ -1,13 +1,12 @@
 /**
- * A radial menu has a base button and up to 6 surrounding buttons, all
- * bound to a certain command.
- * The surrounding buttons are bound to a command adapter while the base
- * button cancels the menu.
+ * A radial menu has a base button and up to 6 surrounding buttons, all bound to a certain command. The surrounding
+ * buttons are bound to a command adapter while the base button cancels the menu.
  */
 upro.hud.RadialMenu = Class.create(
 {
    /**
     * Initializes the menu.
+    * 
     * @param iconCreator to create the center icon
     * @param cancelCallback called when the menu is cancelled
     */
@@ -15,8 +14,8 @@ upro.hud.RadialMenu = Class.create(
    {
       this.iconCreator = iconCreator;
 
-      this.cancelEntry = new upro.hud.MenuEntry(iconCreator,
-         new upro.hud.SimpleCommandAdapter(this.onCancel.bind(this, cancelCallback)));
+      this.cancelEntry = new upro.hud.MenuEntry(iconCreator, new upro.hud.SimpleCommandAdapter(this.onCancel.bind(this,
+            cancelCallback)));
       this.commands = {};
 
       this.context = null;
@@ -24,6 +23,7 @@ upro.hud.RadialMenu = Class.create(
 
    /**
     * Sets a command entry for given index
+    * 
     * @param index 0..5 the slot to set the command in
     * @param iconCreator the creator function that returns a new icon instance
     * @param commandAdapter the adapter for the corresponding command
@@ -35,6 +35,7 @@ upro.hud.RadialMenu = Class.create(
 
    /**
     * Sets a submenu entry for a given index
+    * 
     * @param index 0..5 the slot to set the command in
     * @param iconCreator the creator function that returns a new icon instance
     * @return a RadiaMenu representing the sub menu
@@ -49,24 +50,24 @@ upro.hud.RadialMenu = Class.create(
    },
 
    /**
-    * Shows the radial menu based on given context. If the menu was shown in another,
-    * it is reset before.
+    * Shows the radial menu based on given context. If the menu was shown in another, it is reset before.
+    * 
     * @param context A RadialMenuContext instance to work with
     */
    show: function(context)
    {
-      var hudSystem = context.getHudSystem();
-      var viewCoord = hudSystem.realToViewCoordinates(context.getRealPos());
+      var paperContext = context.getPaperContext();
+      var viewCoord = context.getViewCoord();
       var offset = null;
 
       this.hide();
       this.context = context;
       this.context.setActiveMenu(this);
-      this.cancelEntry.show(hudSystem, viewCoord.x, viewCoord.y);
-      for (var index in this.commands)
+      this.cancelEntry.show(paperContext, viewCoord.x, viewCoord.y);
+      for ( var index in this.commands)
       {
          offset = upro.hud.Button.getOffset[index](upro.hud.RadialMenu.PADDING);
-         this.commands[index].show(hudSystem, viewCoord.x + offset.x, viewCoord.y + offset.y);
+         this.commands[index].show(paperContext, viewCoord.x + offset.x, viewCoord.y + offset.y);
       }
    },
 
@@ -104,7 +105,7 @@ upro.hud.RadialMenu = Class.create(
          this.context = null;
       }
       this.cancelEntry.hide();
-      for (var index in this.commands)
+      for ( var index in this.commands)
       {
          this.commands[index].hide();
       }
