@@ -24,6 +24,9 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.facade().registerProxy(new upro.model.proxies.UserSettingsProxy());
 
       this.facade().registerMediator(new upro.view.mediators.SolarSystemContextMenuMediator());
+
+      this.setupSettingsMenu(uiMediator);
+
       if (upro.scene.SceneSystem.SUPPORTED)
       {
          var scene = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
@@ -34,6 +37,10 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       {
          uiMediator.setVisible(true);
       }
+
+      this.facade().sendNotification(upro.app.Notifications.DebugMessage, "SessionLoggedIn complete");
+
+      uiMediator.showBaseView("swCtrl", "debug"); // for now, always show debugging output
    },
 
    setupHoverPosHighlight: function(highlightMediator)
@@ -73,6 +80,16 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       };
 
       highlightMediator.addHighlight("CurLocation", textOptions, bracketOptions);
+   },
+
+   setupSettingsMenu: function(uiMediator)
+   {
+      var panelId = "swCtrl";
+
+      uiMediator.setSubMenu(panelId, "settings", 4, upro.res.menu.IconData.Settings, upro.res.text.Lang
+            .format("settings.menuLabel"));
+
+      this.facade().registerMediator(new upro.view.mediators.DebugPanelMediator(panelId, panelId + ".settings"));
    }
 
 });

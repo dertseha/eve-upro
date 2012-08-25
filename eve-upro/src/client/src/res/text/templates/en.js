@@ -88,5 +88,11 @@ upro.res.text.templates["en"] =
    /** show the UI */
    "view.setUiVisible": "Show UI",
    /** hide the UI */
-   "view.setUiInvisible": "Hide UI"
+   "view.setUiInvisible": "Hide UI",
+
+   /** Settings menu label */
+   "settings.menuLabel": "Settings",
+
+   /** Debug Panel menu label */
+   "panels.debug.menuLabel": "Debug"
 };

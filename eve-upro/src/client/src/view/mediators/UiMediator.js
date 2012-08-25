@@ -10,6 +10,15 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
 
       this.paperContextByPanelId = {};
       this.menuContextByPanelId = {};
+      this.menuEntriesByPath = {};
+      this.baseViewsByPanelId = {};
+
+      var panelIds = [ "westBar", "eastBar", "nwCtrl", "swCtrl", "neCtrl", "seCtrl" ];
+      var self = this;
+      panelIds.forEach(function(panelId)
+      {
+         self.baseViewsByPanelId[panelId] = {};
+      });
    },
 
    onRegister: function()
@@ -19,8 +28,6 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
 
       this.setViewComponent(layout);
 
-      var pointerHandler = new upro.sys.PointerHandler();
-      new upro.sys.MouseListener(pointerHandler, layout.baseTable);
       this.createPaperContext("westBar");
       this.setupCenterContext();
 
@@ -43,11 +50,80 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
       if (visible)
       {
          temp.show();
+         this.onResize();
+         for ( var panelId in this.baseViewsByPanelId)
+         {
+            var baseViews = this.baseViewsByPanelId[panelId];
+
+            for ( var viewId in baseViews)
+            {
+               var viewEntry = baseViews[viewId];
+
+               viewEntry.view.parent().layout();
+            }
+         }
       }
       else
       {
          temp.hide();
       }
+   },
+
+   setSubMenu: function(menuPath, menuName, index, iconPath, label)
+   {
+      var paperContext = this.getPaperContext("center");
+      var iconCreatorFactory = new upro.hud.IconCreatorFactory(paperContext, iconPath);
+      var baseMenu = this.menuEntriesByPath[menuPath];
+      var menuEntry =
+      {
+         radialMenu: baseMenu.radialMenu.setSubMenu(index, iconCreatorFactory.getIconCreator(), label)
+      };
+
+      this.menuEntriesByPath[menuPath + '.' + menuName] = menuEntry;
+   },
+
+   setMenuCommand: function(menuPath, index, iconPath, commandAdapter)
+   {
+      var paperContext = this.getPaperContext("center");
+      var iconCreatorFactory = new upro.hud.IconCreatorFactory(paperContext, iconPath);
+      var baseMenu = this.menuEntriesByPath[menuPath];
+
+      baseMenu.radialMenu.setCommand(index, iconCreatorFactory.getIconCreator(), commandAdapter);
+   },
+
+   setBaseView: function(panelId, menuPath, index, iconPath, label, viewId, view)
+   {
+      var baseViews = this.baseViewsByPanelId[panelId];
+      var viewEntry =
+      {
+         iconPath: iconPath,
+         commandAdapter: new upro.hud.SimpleCommandAdapter(this.showBaseView.bind(this, panelId, viewId), label),
+         view: view
+      };
+
+      view.visible(false);
+      baseViews[viewId] = viewEntry;
+      this.setMenuCommand(menuPath, index, iconPath, viewEntry.commandAdapter);
+   },
+
+   showBaseView: function(panelId, viewId)
+   {
+      var baseViews = this.baseViewsByPanelId[panelId];
+
+      for ( var otherId in baseViews)
+      {
+         this.setViewVisible(panelId, otherId, false);
+      }
+      this.setViewVisible(panelId, viewId, true);
+      this.cancelOpenMenus();
+   },
+
+   setViewVisible: function(panelId, viewId, visible)
+   {
+      var viewEntry = this.baseViewsByPanelId[panelId][viewId];
+
+      viewEntry.view.visible(visible);
+      viewEntry.commandAdapter.setActive(visible);
    },
 
    createPaperContext: function(panelId)
@@ -121,39 +197,40 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
       { // west menu
          var rescaleFunc = this.getRescaleFunction(funcScaleNone, funcScaleByDimension);
 
-         this.menuContextByPanelId["westBar"] = this.createMenuContext(paperContext, sideButtonBaseValues,
-               upro.res.menu.IconData.Left, rescaleFunc);
+         this
+               .createMenuContext("westBar", paperContext, sideButtonBaseValues, upro.res.menu.IconData.Left,
+                     rescaleFunc);
 
       }
       { // east menu
          var rescaleFunc = this.getRescaleFunction(funcScaleByOffset, funcScaleByDimension);
 
-         this.menuContextByPanelId["eastBar"] = this.createMenuContext(paperContext, sideButtonBaseValues,
-               upro.res.menu.IconData.Right, rescaleFunc);
+         this.createMenuContext("eastBar", paperContext, sideButtonBaseValues, upro.res.menu.IconData.Right,
+               rescaleFunc);
       }
       { // northwest menu
          var rescaleFunc = this.getRescaleFunction(funcScaleByDimension, funcScaleNone);
 
-         this.menuContextByPanelId["nwCtrl"] = this.createMenuContext(paperContext, westControlButtonBaseValues,
-               upro.res.menu.IconData.Up, rescaleFunc);
+         this.createMenuContext("nwCtrl", paperContext, westControlButtonBaseValues, upro.res.menu.IconData.Up,
+               rescaleFunc);
       }
       { // southwest menu
          var rescaleFunc = this.getRescaleFunction(funcScaleByDimension, funcScaleByOffset);
 
-         this.menuContextByPanelId["swCtrl"] = this.createMenuContext(paperContext, westControlButtonBaseValues,
-               upro.res.menu.IconData.Down, rescaleFunc);
+         this.createMenuContext("swCtrl", paperContext, westControlButtonBaseValues, upro.res.menu.IconData.Down,
+               rescaleFunc);
       }
       { // northeast menu
          var rescaleFunc = this.getRescaleFunction(funcScaleByDimension, funcScaleNone);
 
-         this.menuContextByPanelId["neCtrl"] = this.createMenuContext(paperContext, eastControlButtonBaseValues,
-               upro.res.menu.IconData.Up, rescaleFunc);
+         this.createMenuContext("neCtrl", paperContext, eastControlButtonBaseValues, upro.res.menu.IconData.Up,
+               rescaleFunc);
       }
       { // southeast menu
          var rescaleFunc = this.getRescaleFunction(funcScaleByDimension, funcScaleByOffset);
 
-         this.menuContextByPanelId["seCtrl"] = this.createMenuContext(paperContext, eastControlButtonBaseValues,
-               upro.res.menu.IconData.Down, rescaleFunc);
+         this.createMenuContext("seCtrl", paperContext, eastControlButtonBaseValues, upro.res.menu.IconData.Down,
+               rescaleFunc);
       }
 
       window.addEventListener("resize", this.onResize.bind(this), false);
@@ -169,7 +246,7 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
     * @param rescaleFunc function for rescaling the actual view coordinates from the base coordinates
     * @returns menu context object
     */
-   createMenuContext: function(paperContext, baseCoord, iconPath, rescaleFunc)
+   createMenuContext: function(panelId, paperContext, baseCoord, iconPath, rescaleFunc)
    {
       var menuContext =
       {
@@ -183,9 +260,11 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
       };
       var iconCreatorFactory = new upro.hud.IconCreatorFactory(paperContext, iconPath);
       var iconCreator = iconCreatorFactory.getIconCreator();
+      var self = this;
 
       menuContext.baseCommand = new upro.hud.SimpleCommandAdapter(function()
       {
+         self.cancelOpenMenus();
          menuContext.baseMenu.hide();
          menuContext.radialMenuContext = new upro.hud.RadialMenuContext(menuContext.radialMenu, paperContext,
                menuContext.viewCoord);
@@ -194,11 +273,29 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
       menuContext.baseMenu = new upro.hud.MenuEntry(null, menuContext.baseCommand);
       menuContext.radialMenu = new upro.hud.RadialMenu(iconCreator, function()
       {
+         menuContext.radialMenuContext = null;
          menuContext.radialMenu.hide();
          menuContext.baseMenu.show(paperContext, menuContext.viewCoord.x, menuContext.viewCoord.y);
       });
 
-      return menuContext;
+      this.menuContextByPanelId[panelId] = menuContext;
+      this.menuEntriesByPath[panelId] =
+      {
+         radialMenu: menuContext.radialMenu
+      };
+   },
+
+   cancelOpenMenus: function()
+   {
+      for ( var panelId in this.menuContextByPanelId)
+      {
+         var menuContext = this.menuContextByPanelId[panelId];
+
+         if (menuContext.radialMenuContext)
+         {
+            menuContext.radialMenuContext.cancel();
+         }
+      }
    },
 
    /**
@@ -214,7 +311,10 @@ upro.view.mediators.UiMediator = Class.create(upro.view.mediators.AbstractMediat
       {
          var menuContext = this.menuContextByPanelId[panelId];
 
-         menuContext.radialMenu.cancel();
+         if (menuContext.radialMenuContext)
+         {
+            menuContext.radialMenuContext.cancel();
+         }
          menuContext.baseMenu.hide();
          menuContext.viewCoord = menuContext.rescaleFunc(menuContext.baseCoord, dimension);
          menuContext.baseMenu.show(paperContext, menuContext.viewCoord.x, menuContext.viewCoord.y);

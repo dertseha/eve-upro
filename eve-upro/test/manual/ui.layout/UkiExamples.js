@@ -161,3 +161,21 @@ function createDirectAccessBar(panelId)
    };
 
 }
+
+function createTextArea(panelId)
+{
+   var element = $(panelId);
+   var dimension = element.getDimensions();
+
+   var temp = uki(
+   {
+      view: 'MultilineTextField',
+      rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
+      anchors: 'top left right bottom',
+      background: 'theme(box)',
+      id: 'uki' + panelId
+
+   });
+
+   temp.attachTo(element);
+}

@@ -11,8 +11,6 @@ upro.sys.MouseListener = Class.create(
     */
    initialize: function(handler, context)
    {
-      var ignored = this.onIgnored.bind(this);
-
       this.handler = handler;
       this.context = context || document;
 
@@ -24,16 +22,37 @@ upro.sys.MouseListener = Class.create(
       };
       this.buttons = [ false, false, false ];
 
-      Element.observe(this.context, 'click', ignored);
-      Element.observe(this.context, 'dblclick', ignored);
-      Element.observe(this.context, 'contextmenu', ignored);
+      this.ignoredHandler = this.onIgnored.bind(this);
+      this.mouseDownHandler = this.onMouseDown.bind(this);
+      this.mouseUpHandler = this.onMouseUp.bind(this);
+      this.mouseMoveHandler = this.onMouseMove.bind(this);
+      this.mouseWheelHandler = this.onMouseWheel.bind(this);
 
-      Element.observe(this.context, 'mousedown', this.onMouseDown.bind(this));
-      Element.observe(this.context, 'mouseup', this.onMouseUp.bind(this));
-      Element.observe(this.context, 'mousemove', this.onMouseMove.bind(this));
+      this.startObserving();
+   },
 
-      Element.observe(this.context, 'mousewheel', this.onMouseWheel.bind(this));
-      Element.observe(this.context, 'DOMMouseScroll', this.onMouseWheel.bind(this));
+   callObserveFunction: function(func)
+   {
+      func.call(Element, this.context, 'click', this.ignoredHandler);
+      func.call(Element, this.context, 'dblclick', this.ignoredHandler);
+      func.call(Element, this.context, 'contextmenu', this.ignoredHandler);
+
+      func.call(Element, this.context, 'mousedown', this.mouseDownHandler);
+      func.call(Element, this.context, 'mouseup', this.mouseUpHandler);
+      func.call(Element, this.context, 'mousemove', this.mouseMoveHandler);
+
+      func.call(Element, this.context, 'mousewheel', this.mouseWheelHandler);
+      func.call(Element, this.context, 'DOMMouseScroll', this.mouseWheelHandler);
+   },
+
+   startObserving: function()
+   {
+      this.callObserveFunction(Element.observe);
+   },
+
+   stopObserving: function()
+   {
+      this.callObserveFunction(Element.stopObserving);
    },
 
    /**
