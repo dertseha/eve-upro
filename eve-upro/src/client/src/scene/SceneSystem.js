@@ -141,7 +141,7 @@ upro.scene.SceneSystem = Class.create(
          var now = upro.sys.Time.tickMSec();
          var timeDiffMSec = now - this.lastRenderTick;
 
-         this.lastRender = now;
+         this.lastRenderTick = now;
          this.draw(timeDiffMSec);
       }
    },
@@ -149,7 +149,15 @@ upro.scene.SceneSystem = Class.create(
    draw: function(timeDiffMSec)
    {
       var modifiedCamera = this.camera.isOrientationModified();
+      var updatedCameraTargets = false;
 
+      this.updatedTargets = false;
+      if (this.camera.updateTargets(timeDiffMSec))
+      {
+         modifiedCamera = true;
+         updatedCameraTargets = true;
+         this.updatedTargets = true;
+      }
       this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
       mat4.identity(this.mvMatrix);
@@ -161,6 +169,10 @@ upro.scene.SceneSystem = Class.create(
       // render all registered bodies
       this.bodies.each(function(body)
       {
+         if (body.updateTargets(timeDiffMSec))
+         {
+            this.updatedTargets = true;
+         }
          if (modifiedCamera)
          {
             body.setOrientationModified(true);
@@ -168,7 +180,7 @@ upro.scene.SceneSystem = Class.create(
          body.render(timeDiffMSec);
          body.setOrientationModified(false);
       }, this);
-      this.camera.setOrientationModified(false);
+      this.camera.setOrientationModified(updatedCameraTargets);
    },
 
    onResize: function()

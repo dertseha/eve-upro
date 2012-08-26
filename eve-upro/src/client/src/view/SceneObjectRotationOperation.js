@@ -30,17 +30,25 @@ upro.view.SceneObjectRotationOperation = Class.create(upro.sys.PointerOperation,
       var realPos = this.sceneSystem.pixelToReal(position.x, position.y);
       var temp = vec3.set([ -realPos.y, realPos.x, 0 ], this.temp);
       var diff = vec3.subtract(this.lastPos, temp);
+      var objRotation = this.obj.rotationTarget;
 
       vec3.scale(diff, 5);
 
-      vec3.add(this.obj.rotation, diff);
+      vec3.add(objRotation, diff);
 
-      this.obj.rotation[0] = this.rotateValue(this.obj.rotation[0]);
-      this.obj.rotation[0] = this.limitValueMax(this.obj.rotation[0], 0);
-      this.obj.rotation[0] = this.limitValueMin(this.obj.rotation[0], Math.PI / -2);
-      this.obj.rotation[1] = this.rotateValue(this.obj.rotation[1]);
-      this.obj.rotation[2] = this.rotateValue(this.obj.rotation[2]);
+      objRotation[0] = this.rotateValue(objRotation[0]);
+      objRotation[0] = this.limitValueMax(objRotation[0], Math.PI / 8);
+      objRotation[0] = this.limitValueMin(objRotation[0], Math.PI / -2);
       this.obj.setOrientationModified(true);
+      if (this.obj.isAtTargets())
+      { // reset the rotation values to not run into some overflow after years...
+         var objRotationAct = this.obj.rotation;
+
+         objRotation[1] = this.rotateValue(objRotation[1]);
+         objRotationAct[1] = this.rotateValue(objRotationAct[1]);
+         objRotation[2] = this.rotateValue(objRotation[2]);
+         objRotationAct[2] = this.rotateValue(objRotationAct[2]);
+      }
 
       vec3.set(temp, this.lastPos);
    },

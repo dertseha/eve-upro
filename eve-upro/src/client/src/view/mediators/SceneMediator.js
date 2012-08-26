@@ -26,8 +26,9 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       var sceneSystem = this.getViewComponent();
 
       // start with a top down view
-      vec3.set([ 0, 0, 10 ], sceneSystem.camera.position);
-      vec3.set([ Math.PI / -2, 0, 0 ], sceneSystem.camera.rotation);
+      vec3.set([ 0, 0, 10 ], sceneSystem.camera.positionTarget);
+      vec3.set([ Math.PI / -2, 0, 0 ], sceneSystem.camera.rotationTarget);
+      vec3.set(sceneSystem.camera.rotationTarget, sceneSystem.camera.rotation);
    },
 
    createGalaxies: function()
@@ -206,15 +207,19 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
    onHover: function(realPos)
    {
       var sceneSystem = this.getViewComponent();
-      var result = sceneSystem.pickAt(realPos);
 
-      if (result)
+      if (!sceneSystem.updatedTargets)
       {
-         this.facade().sendNotification(upro.app.Notifications.SetHighlightedObject, result.getRefObject());
-      }
-      else
-      {
-         this.facade().sendNotification(upro.app.Notifications.SetHighlightedObject, null);
+         var result = sceneSystem.pickAt(realPos);
+
+         if (result)
+         {
+            this.facade().sendNotification(upro.app.Notifications.SetHighlightedObject, result.getRefObject());
+         }
+         else
+         {
+            this.facade().sendNotification(upro.app.Notifications.SetHighlightedObject, null);
+         }
       }
    },
 
@@ -226,7 +231,8 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
    addZoom: function(delta)
    {
       var sceneSystem = this.getViewComponent();
-      var finalValue = sceneSystem.camera.position[2] + delta;
+      var position = sceneSystem.camera.positionTarget;
+      var finalValue = position[2] + delta;
 
       if (finalValue > 20)
       {
@@ -236,7 +242,7 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       {
          finalValue = 2.5;
       }
-      sceneSystem.camera.position[2] = finalValue;
+      position[2] = finalValue;
       sceneSystem.camera.setOrientationModified(true);
 
    },
@@ -247,31 +253,33 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       {
          var galaxyRender = this.galaxies[this.visibleGalaxyId];
          // scale the movement according to distance to center - faster if farther out
-         var scale = vec3.length(galaxyRender.position) / 1.5;
+         var position = galaxyRender.positionTarget;
+         var scale = vec3.length(position) / 1.5;
 
          if (scale < 5)
          {
             scale = 5;
          }
          var translation = vec3.scale(vec, scale, vec3.create());
-         vec3.add(galaxyRender.position, translation);
+         vec3.add(position, translation);
 
-         var distance = vec3.length(galaxyRender.position);
+         var distance = vec3.length(position);
 
-         if (galaxyRender.position[1] > 4)
+         if (position[1] > 4)
          {
-            galaxyRender.position[1] = 4;
+            position[1] = 4;
          }
-         if (galaxyRender.position[1] < -4)
+         if (position[1] < -4)
          {
-            galaxyRender.position[1] = -4;
+            position[1] = -4;
          }
 
          if (distance > 30)
          {
-            vec3.normalize(galaxyRender.position);
-            vec3.scale(galaxyRender.position, 30);
+            vec3.normalize(position);
+            vec3.scale(position, 30);
          }
+         // vec3.set(position, galaxyRender.position);
          galaxyRender.setOrientationModified(true);
       }
    },
