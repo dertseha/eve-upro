@@ -27,6 +27,8 @@ upro.app.Notifications =
    SetActiveGalaxy: 0,
    /** The active galaxy has changed. Param: galaxyId */
    ActiveGalaxyChanged: 0,
+   /** The camera has been rotated a full circle */
+   CameraRotatedFullCircle: 0,
 
    /** Requests to highlight an object */
    SetHighlightedObject: 0,

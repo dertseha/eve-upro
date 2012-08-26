@@ -161,7 +161,8 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       registry.registerOperation([ true, true, false ], zoomOp);
 
       {
-         var rotOp = new upro.view.SceneObjectRotationOperation(sceneSystem, sceneSystem.camera);
+         var rotOp = new upro.view.SceneObjectRotationOperation(sceneSystem, sceneSystem.camera, this.onCameraCircle
+               .bind(this));
 
          registry.registerOperation([ true, false, false ], rotOp);
       }
@@ -282,6 +283,11 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
          // vec3.set(position, galaxyRender.position);
          galaxyRender.setOrientationModified(true);
       }
+   },
+
+   onCameraCircle: function()
+   {
+      this.facade().sendNotification(upro.app.Notifications.CameraRotatedFullCircle);
    },
 
    onNotifyActiveGalaxyChanged: function(galaxyId)
