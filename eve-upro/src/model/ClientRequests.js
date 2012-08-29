@@ -157,6 +157,97 @@
             },
             isValid: null
          }
+      },
+
+      /**
+       * Leave a group of which the sender is a member
+       */
+      LeaveGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Join a group for which the sender has an advertisement
+       */
+      JoinGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Create a new group
+       */
+      CreateGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               name: String
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Destroy a group
+       */
+      DestroyGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType
+            },
+            isValid: null
+         }
+      },
+
+      AdvertiseGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               interest: Array.of([
+               {
+                  scope: 'Character',
+                  id: Number
+               },
+               {
+                  scope: 'Corporation',
+                  id: Number
+               } ])
+            },
+            isValid: null
+         }
       }
    };
 

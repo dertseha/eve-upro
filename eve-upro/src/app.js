@@ -17,6 +17,7 @@ var EveApiComponentBuilder = require('./eveapi-component/EveApiComponentBuilder.
 var HttpServerComponentBuilder = require('./http-server-component/HttpServerComponentBuilder.js');
 var CharacterAgentComponentBuilder = require('./character-agent-component/CharacterAgentComponentBuilder.js');
 var ClientSessionComponentBuilder = require('./client-session-component/ClientSessionComponentBuilder.js');
+var GroupServiceComponentBuilder = require('./group-service-component/GroupServiceComponentBuilder.js');
 var LocationServiceComponentBuilder = require('./location-service-component/LocationServiceComponentBuilder.js');
 var CharacterServiceComponentBuilder = require('./character-service-component/CharacterServiceComponentBuilder.js');
 var AutopilotServiceComponentBuilder = require('./autopilot-service-component/AutopilotServiceComponentBuilder.js');
@@ -172,6 +173,11 @@ var serviceControl = new ServiceControl();
 }
 { // character-agent
    var builder = new CharacterAgentComponentBuilder();
+
+   serviceControl.setBuilder(builder);
+}
+{ // group-service
+   var builder = new GroupServiceComponentBuilder();
 
    serviceControl.setBuilder(builder);
 }

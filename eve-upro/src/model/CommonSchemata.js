@@ -1,5 +1,7 @@
 (function(context)
 {
+   context.namespace.uuidSchema = /^([a-f]|[0-9]){32}$/;
+
    context.namespace.userSchema =
    {
       characterId: Number,
@@ -15,10 +17,15 @@
       nextJumpType: [ null, 'None', 'JumpGate', 'JumpDrive', 'JumpBridge', 'StaticWormhole', 'DynamicWormhole' ]
    };
 
+   context.namespace.groupIdType = context.namespace.uuidSchema;
+   context.namespace.groupOwnerSchema = Array.of(Number);
+
 })((typeof module !== 'undefined') ?
 {
-   namespace: module.exports
+   namespace: module.exports,
+   schema: require('js-schema')
 } :
 {
-   namespace: upro.data
+   namespace: upro.data,
+   schema: schema
 });

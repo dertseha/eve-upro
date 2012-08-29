@@ -55,7 +55,7 @@ function CharacterServiceComponent(services)
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleData.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleIndex.name);
 
-      this.mongodb.defineCollection('CharacterData', {}, function()
+      this.mongodb.defineCollection('CharacterData', [], function()
       {
          self.onStarted();
       });

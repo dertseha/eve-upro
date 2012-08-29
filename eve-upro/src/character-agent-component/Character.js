@@ -18,6 +18,14 @@ function Character(charId, charName, corpId, corpName)
    };
 
    /**
+    * @returns the corporation ID of the character
+    */
+   this.getCorporationId = function()
+   {
+      return this.corporationId;
+   };
+
+   /**
     * @returns an information structure with most relevant character information
     */
    this.getCharacterInfo = function()

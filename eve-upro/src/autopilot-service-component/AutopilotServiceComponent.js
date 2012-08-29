@@ -32,7 +32,7 @@ function AutopilotServiceComponent(services)
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetAutopilotRoute.name);
       this.registerBroadcastHandler(busMessages.Broadcasts.CharacterLocationStatus.name);
 
-      this.mongodb.defineCollection('AutopilotData', {}, function()
+      this.mongodb.defineCollection('AutopilotData', [], function()
       {
          self.onStarted();
       });

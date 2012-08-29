@@ -12,6 +12,10 @@ var interestSchema = [
 {
    scope: 'Character',
    id: Number
+},
+{
+   scope: 'Group',
+   id: commonSchemata.groupIdType
 } ];
 
 var broadcasts =

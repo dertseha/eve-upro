@@ -30,6 +30,12 @@
       inUse: Boolean,
       parameter: Number
    };
+   var groupDataSchema =
+   {
+      name: String,
+      owner: context.commonSchemata.groupOwnerSchema
+   };
+   var groupMemberSchema = Number;
 
    var clientBroadcastEvents =
    {
@@ -176,6 +182,52 @@
                maxSecurity: routingRuleSchema,
                jumps: routingRuleSchema,
                jumpFuel: routingRuleSchema
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Notifies the list of added or removed members of a group. When members are added, the group data is also
+       * transmitted to allow new members to know about the group.
+       */
+      GroupMembership:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               '?added':
+               {
+                  groupData: groupDataSchema,
+                  members: Array.of(groupMemberSchema)
+               },
+               '?removed':
+               {
+                  members: Array.of(groupMemberSchema)
+               }
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Notifies the advertisement of a group. If the optional group data is absent, the advertisement is revoked for
+       * the receiver.
+       */
+      GroupAdvertisement:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               '?groupData': groupDataSchema
             },
             isValid: null
          }

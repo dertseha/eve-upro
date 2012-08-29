@@ -63,6 +63,10 @@ function AbstractServiceComponentFixture()
       {
          callback(null);
       };
+      this.delData = function(collectionName, criteria, callback)
+      {
+         callback(null);
+      };
 
       this.returnData = function(collectionName, callback)
       {
@@ -84,14 +88,14 @@ function AbstractServiceComponentFixture()
       amqp: this.amqp
    });
 
-   this.givenExistingCharacterSession = function(charId, sessionId)
+   this.givenExistingCharacterSession = function(charId, sessionId, corpId)
    {
-      this.givenExistingCharacterSessions(charId, [ sessionId ]);
+      this.givenExistingCharacterSessions(charId, [ sessionId ], corpId);
    };
 
-   this.givenExistingCharacterSessions = function(charId, sessionIds)
+   this.givenExistingCharacterSessions = function(charId, sessionIds, corpId)
    {
-      var character = new Character(charId, 'name');
+      var character = new Character(charId, 'name', corpId, 'OmniCorp');
       var self = this;
 
       this.characterAgent.characters[charId] = character;

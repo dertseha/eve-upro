@@ -97,6 +97,15 @@ function MongoDbComponent(options)
          }
          else
          {
+            logger.info('Defined collection [' + collectionName + ']');
+            indexDef.forEach(function(def)
+            {
+               collection.ensureIndex(def, function(err)
+               {
+                  logger.info('Ensured index for [' + collectionName + ']: ' + JSON.stringify(def) + ', error: ['
+                        + JSON.stringify(err) + ']');
+               });
+            });
             self.onCollection(collection, callback);
          }
       });
@@ -135,10 +144,33 @@ function MongoDbComponent(options)
       }
    };
 
+   this.delData = function(collectionName, criteria)
+   {
+      var collection = this.collections[collectionName];
+
+      if (collection)
+      {
+         collection.findAndModify(criteria, null, null,
+         {
+            remove: true
+         }, function(err, updated)
+         {
+            callback(err);
+         });
+      }
+      else
+      {
+         process.nextTick(function()
+         {
+            callback('Collection <' + collectionName + '> not initialized');
+         });
+      }
+   };
+
    /**
     * Retrieves data from a collection
     */
-   this.getData = function(collectionName, filter, callback)
+   this.getData = function(collectionName, filter, callback, fields)
    {
       var collection = this.collections[collectionName];
 
@@ -146,7 +178,7 @@ function MongoDbComponent(options)
       {
          var self = this;
 
-         var cursor = collection.find(filter);
+         var cursor = collection.find(filter, fields);
 
          cursor.each(function(err, document)
          {
