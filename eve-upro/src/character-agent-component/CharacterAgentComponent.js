@@ -20,6 +20,7 @@ function CharacterAgentComponent(services)
    {
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected.name);
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientDisconnected.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.GroupMembership.name);
 
       this.onStartProgress();
    };
@@ -113,6 +114,39 @@ function CharacterAgentComponent(services)
             delete this.characters[charId];
             this.emit('CharacterOffline', character);
          }
+      }
+   };
+
+   /**
+    * Broadcast handler.
+    */
+   this.onBroadcastGroupMembership = function(header, body)
+   {
+      var self = this;
+
+      if (body.added)
+      {
+         body.added.members.forEach(function(memberId)
+         {
+            var character = self.characters[memberId];
+
+            if (character && character.addInterestForGroup(body.groupId))
+            {
+               self.emit('CharacterGroupMemberAdded', character, body.groupId);
+            }
+         });
+      }
+      if (body.removed)
+      {
+         body.removed.members.forEach(function(memberId)
+         {
+            var character = self.characters[memberId];
+
+            if (character && character.removeInterestForGroup(body.groupId))
+            {
+               self.emit('CharacterGroupMemberRemoved', character, body.groupId);
+            }
+         });
       }
    };
 }

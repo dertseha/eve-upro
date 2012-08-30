@@ -39,48 +39,14 @@ function ClientSessionComponent(services, options)
          self.onResponseQueue(queue);
       });
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected.name);
       this.amqp.on('broadcast', function(header, body)
       {
          self.onBroadcast(header, body);
       });
-
       this.characterAgent.on('SessionAdded', function(character, sessionId)
       {
          self.onCharacterSessionAdded(character, sessionId);
       });
-   };
-
-   this.registerBroadcastHandler = function(broadcastName)
-   {
-      var self = this;
-      var handler = this['onBroadcast' + broadcastName];
-
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
-      {
-         handler.call(self, header, body);
-      });
-   };
-
-   /**
-    * Broadcast handler. If the client is known to this session component, the client is notified of its allocated
-    * session ID. This is done in the handler here to ensure the system knows about the session ID before the client is
-    * able to start using it.
-    */
-   this.onBroadcastClientConnected = function(header, body)
-   {
-      var dataPort = this.dataPorts[body.sessionId];
-
-      if (dataPort)
-      {
-         var eventData =
-         {
-            sessionId: body.sessionId,
-            user: body.user
-         };
-
-         dataPort.sendFunction(JSON.stringify(eventData), clientEvents.Session.name);
-      }
    };
 
    /**
@@ -125,7 +91,9 @@ function ClientSessionComponent(services, options)
    };
 
    /**
-    * Character state handler
+    * Character state handler. If the client is known to this session component, the client is notified of its allocated
+    * session ID. This is done in the handler here to ensure the system knows about the session ID before the client is
+    * able to start using it.
     */
    this.onCharacterSessionAdded = function(character, sessionId)
    {
@@ -133,7 +101,14 @@ function ClientSessionComponent(services, options)
 
       if (dataPort)
       {
+         var eventData =
+         {
+            sessionId: sessionId,
+            user: dataPort.user
+         };
+
          dataPort.character = character;
+         dataPort.sendFunction(JSON.stringify(eventData), clientEvents.Session.name);
       }
    };
 

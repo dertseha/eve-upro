@@ -23,6 +23,11 @@ function Fixture()
       character.addClientSession(sessionId);
    };
 
+   this.givenCharacterHasInterestInGroups = function(charId, groups)
+   {
+      this.component.characters[charId].groupMemberships = groups;
+   };
+
    this.expectingCharacterOnlineEvent = function(test, charId)
    {
       this.component.on('CharacterOnline', function(character)
@@ -87,6 +92,14 @@ function Fixture()
       };
 
       return user;
+   };
+
+   this.thenHasInterestInShouldReturn = function(test, charId, interestList, expected)
+   {
+      var character = this.component.characters[charId];
+      var result = character.hasInterestIn(interestList);
+
+      test.equal(result, expected);
    };
 }
 
@@ -156,4 +169,62 @@ exports.testCharacterOfflineEventEmitted_WhenLastSessionDisconnected = function(
       sessionId: sessionId,
       user: user
    });
+};
+
+exports.testCharacterInterestModified_WhenGroupMembershipAdded = function(test)
+{
+   var sessionId = UuidFactory.v4();
+   var groupId = UuidFactory.v4();
+   var charId = 4567;
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.GroupMembership.name,
+   {
+      groupId: groupId,
+      added:
+      {
+         groupData:
+         {
+            name: 'test',
+            owner: []
+         },
+         members: [ charId ]
+      }
+   });
+
+   this.fixture.thenHasInterestInShouldReturn(test, charId, [
+   {
+      scope: 'Group',
+      id: groupId
+   } ], true);
+
+   test.done();
+};
+
+exports.testCharacterInterestModified_WhenGroupMembershipRemoved = function(test)
+{
+   var sessionId = UuidFactory.v4();
+   var groupId = UuidFactory.v4();
+   var charId = 4567;
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterHasInterestInGroups(charId, [ groupId ]);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.GroupMembership.name,
+   {
+      groupId: groupId,
+      removed:
+      {
+         members: [ charId ]
+      }
+   });
+
+   this.fixture.thenHasInterestInShouldReturn(test, charId, [
+   {
+      scope: 'Group',
+      id: groupId
+   } ], false);
+
+   test.done();
 };

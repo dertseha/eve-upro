@@ -161,6 +161,11 @@ var serviceControl = new ServiceControl();
 
    serviceControl.setBuilder(builder);
 }
+{ // character-agent
+   var builder = new CharacterAgentComponentBuilder();
+
+   serviceControl.setBuilder(builder);
+}
 { // client-session
    var builder = new ClientSessionComponentBuilder();
    var options =
@@ -169,11 +174,6 @@ var serviceControl = new ServiceControl();
    };
 
    builder.options = options;
-   serviceControl.setBuilder(builder);
-}
-{ // character-agent
-   var builder = new CharacterAgentComponentBuilder();
-
    serviceControl.setBuilder(builder);
 }
 { // group-service
