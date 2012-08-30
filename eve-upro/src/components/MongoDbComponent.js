@@ -150,20 +150,26 @@ function MongoDbComponent(options)
 
       if (collection)
       {
-         collection.findAndModify(criteria, null, null,
+         var sort = {};
+         var update = {};
+
+         collection.findAndModify(criteria, sort, update,
          {
             remove: true
          }, function(err, updated)
          {
-            callback(err);
+            if (err)
+            {
+               logger.error('Could not delete data from ' + collectionName + ': ' + JSON.stringify(err));
+            }
          });
       }
       else
       {
-         process.nextTick(function()
-         {
-            callback('Collection <' + collectionName + '> not initialized');
-         });
+         var message = 'Could not delete data from ' + collectionName + ': Collection not initialized';
+
+         logger.error(message);
+         throw new Error(message);
       }
    };
 
@@ -177,8 +183,8 @@ function MongoDbComponent(options)
       if (collection)
       {
          var self = this;
-
-         var cursor = collection.find(filter, fields);
+         var options = {};
+         var cursor = collection.find(filter, fields, options);
 
          cursor.each(function(err, document)
          {
@@ -220,7 +226,7 @@ function MongoDbComponent(options)
       {
          if (document)
          {
-            callback(null, document.id, document.data);
+            callback(null, document._id, document.data);
          }
          else
          {

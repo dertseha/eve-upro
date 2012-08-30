@@ -8,6 +8,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.facade().registerProxy(new upro.model.proxies.UserViewDataProxy());
       this.facade().registerProxy(new upro.model.proxies.LocationTrackerProxy());
 
+      this.facade().registerProxy(new upro.model.proxies.GroupProxy());
       this.facade().registerProxy(new upro.model.proxies.AutopilotProxy());
       this.facade().registerProxy(new upro.model.proxies.ActiveRouteProxy());
 
@@ -27,6 +28,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.setupRouteListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
+      this.setupGroupListMenu(uiMediator);
 
       if (upro.scene.SceneSystem.SUPPORTED)
       {
@@ -102,6 +104,16 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             .format("settings.menuLabel"));
 
       this.facade().registerMediator(new upro.view.mediators.DebugPanelMediator(panelId, panelId + ".settings"));
+   },
+
+   setupGroupListMenu: function(uiMediator)
+   {
+      var panelId = "wList";
+
+      uiMediator.setSubMenu(panelId, "groupList", 1, upro.res.menu.IconData.Group, upro.res.text.Lang
+            .format("groupList.menuLabel"));
+
+      this.facade().registerMediator(new upro.view.mediators.GroupListPanelMediator(panelId, panelId + ".groupList"));
    }
 
 });

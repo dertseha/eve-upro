@@ -90,7 +90,12 @@ upro.app.Notifications =
    /** A new route for the autopilot was received */
    AutopilotRouteChanged: 0,
    /** The index of the next route entry has changed */
-   AutopilotNextRouteIndexChanged: 0
+   AutopilotNextRouteIndexChanged: 0,
+
+   /** Creation of a group has been requested */
+   GroupCreateRequest: 0,
+   /** notification about the creation of a group */
+   GroupCreated: 0
 };
 
 /**

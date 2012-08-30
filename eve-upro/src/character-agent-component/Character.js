@@ -26,6 +26,14 @@ function Character(charId, charName, corpId, corpName)
    };
 
    /**
+    * @returns string presentation for logs
+    */
+   this.toString = function()
+   {
+      return this.characterId + ' [' + this.characterName + ']';
+   };
+
+   /**
     * @returns an information structure with most relevant character information
     */
    this.getCharacterInfo = function()

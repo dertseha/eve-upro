@@ -1,5 +1,8 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var UuidFactory = require('../util/UuidFactory.js');
 
 var Group = require('./Group.js');
@@ -64,6 +67,12 @@ function PendingGroupDataProcessingState(service, groupId)
     */
    this.onFirstDataResult = function(data)
    {
+      if (data && !Group.documentIsValid(data))
+      {
+         logger.warn('DB data of group with ID ' + this.groupId + 'is not valid according to schema. Deleting.');
+         Group.erase(this.service.mongodb, this.groupId);
+         data = null;
+      }
       if (data)
       {
          var group = new Group(this.groupId, data);

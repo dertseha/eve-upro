@@ -1,5 +1,8 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var UuidFactory = require('../util/UuidFactory.js');
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
@@ -88,17 +91,18 @@ function GroupServiceComponent(services, groupFactory)
    this.onCharacterOnline = function(character)
    {
       var self = this;
+      var characterId = character.getCharacterId();
       var filter =
       {
          $or: [
          {
-            members: character.getCharacterId()
+            "data.members": characterId
          },
          {
-            adCharacter: character.getCharacterId()
+            "data.adCharacter": characterId
          },
          {
-            adCorporation: character.getCorporationId()
+            "data.adCorporation": characterId
          } ]
       };
 
@@ -157,12 +161,9 @@ function GroupServiceComponent(services, groupFactory)
       if (character)
       {
          var characterId = character.getCharacterId();
-         var group = this.groupFactory.create(body.name, [
-         {
-            scope: 'Character',
-            id: characterId
-         } ]);
+         var group = this.groupFactory.create(body.name, [ characterId ]);
 
+         logger.info('Character ' + character.toString() + ' creates group ' + group.toString());
          this.groupDataProcessingStatesById[group.getId()] = new ActiveGroupDataProcessingState(this, group);
          group.addMember(characterId);
          group.saveToStorage(this.mongodb);
@@ -208,6 +209,7 @@ function GroupServiceComponent(services, groupFactory)
 
       if (character && group.allowsControllingActionsFrom(character))
       {
+         logger.info('Character ' + character.toString() + ' destroys group ' + group.toString());
          group.deleteFromStorage(this.mongodb);
          delete this.groupDataProcessingStatesById[group.getId()];
 
@@ -221,8 +223,11 @@ function GroupServiceComponent(services, groupFactory)
     */
    this.processClientRequestLeaveGroup = function(group, characterId, body)
    {
-      if (group.removeMember(characterId))
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && group.removeMember(characterId))
       {
+         logger.info('Character ' + character.toString() + ' leaves group ' + group.toString());
          this.broadcastGroupMembersRemoved(group, [ characterId ]);
          if (group.isEmpty())
          {
@@ -245,6 +250,7 @@ function GroupServiceComponent(services, groupFactory)
 
       if (character && group.isCharacterInvited(character) && group.addMember(characterId))
       {
+         logger.info('Character ' + character.toString() + ' joins group ' + group.toString());
          group.saveToStorage(this.mongodb);
          this.broadcastGroupMembersAdded(group, [ characterId ]);
       }

@@ -166,7 +166,7 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
             }
             catch (ex)
             {
-               upro.sys.log("Error handling broadcast: " + ex);
+               upro.sys.log("Error handling broadcast [" + header.type + "]: " + ex);
                self.facade().sendNotification(upro.app.Notifications.DebugMessage, "Error: " + ex);
             }
          });

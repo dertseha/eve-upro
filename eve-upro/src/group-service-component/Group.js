@@ -1,5 +1,7 @@
 var util = require('util');
 
+var schema = require('js-schema');
+
 var UuidFactory = require('../util/UuidFactory.js');
 var commonSchemata = require('../model/CommonSchemata.js');
 
@@ -24,6 +26,14 @@ function Group(id, initData)
       scope: 'Group',
       id: id
    } ];
+
+   /**
+    * @returns string presentation for logs
+    */
+   this.toString = function()
+   {
+      return this.id + ' [' + this.groupData.name + ']';
+   };
 
    /**
     * @returns the id of the group
@@ -275,15 +285,7 @@ function Group(id, initData)
 
    this.deleteFromStorage = function(storage)
    {
-      var criteria =
-      {
-         _id: UuidFactory.toMongoId(this.id)
-      };
-
-      storage.delData(Group.CollectionName, criteria, function(err)
-      {
-
-      });
+      Group.erase(storage, this.id);
    };
 };
 
@@ -300,6 +302,19 @@ Group.create = function(name, owner)
    return group;
 };
 
+Group.erase = function(storage, id)
+{
+   var criteria =
+   {
+      _id: UuidFactory.toMongoId(id)
+   };
+
+   storage.delData(Group.CollectionName, criteria, function(err)
+   {
+
+   });
+}
+
 Group.DocumentSchema =
 {
    name: String,
@@ -308,6 +323,7 @@ Group.DocumentSchema =
    adCharacter: Array.of(Number),
    adCorporation: Array.of(Number)
 };
+Group.documentIsValid = schema(Group.DocumentSchema);
 
 Group.CollectionName = 'Groups';
 

@@ -118,8 +118,10 @@ exports.sourceFiles = [];
    shareBase + 'navigation/RoutingCapabilities.js', //
    'model/LocationTracker.js', //
    'model/UserRoutingRule.js', //
+   'model/GroupInfo.js', //
 
    'model/proxies/proxies.js', //
+   'model/proxies/AbstractProxy.js', //
    'model/proxies/SessionControlProxy.js', //
    'model/proxies/LocationTrackerProxy.js', //
    'model/proxies/UserSessionProxy.js', //
@@ -128,6 +130,7 @@ exports.sourceFiles = [];
    'model/proxies/UserViewDataProxy.js', //
    'model/proxies/ActiveRouteProxy.js', //
    'model/proxies/AutopilotProxy.js', //
+   'model/proxies/GroupProxy.js', //
 
    'control/ctrl.js', //
    'control/commands/cmd.js', //
@@ -167,6 +170,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedNewCorridorSetExitCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareWormholeCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareJumpBridgeCommand.js', //
+   'control/commands/NotifiedGroupCreateRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
@@ -192,6 +196,7 @@ exports.sourceFiles = [];
    'view/mediators/HideUiSideButtonMediator.js', //
    'view/mediators/AutopilotRoutePanelMediator.js', //
    'view/mediators/DebugPanelMediator.js', //
+   'view/mediators/GroupListPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

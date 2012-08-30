@@ -36,18 +36,24 @@ upro.view.UiTheme = Class
                },
                'box': function()
                {
-                  return new uki.background.CssBox(defaultCss
-                        + 'border:2px solid #704010;background:#423f22;'
-                        + (uki.browser.cssFilter() && uki.image.needAlphaFix ? 'filter:Alpha(opacity=70);'
-                              : 'opacity:0.7;'));
+                  return new uki.background.CssBox(defaultCss + 'border:2px solid #704010;background:'
+                        + self.getBackgroundCss(7));
                },
                // basic button
                'button-normal': function()
                {
-                  return new uki.background.CssBox(defaultCss
-                        + 'border:2px solid #704010;background:#423f22;'
-                        + (uki.browser.cssFilter() && uki.image.needAlphaFix ? 'filter:Alpha(opacity=90);'
-                              : 'opacity:0.9;'));
+                  return new uki.background.CssBox(defaultCss + 'border:2px solid #704010;background:'
+                        + self.getBackgroundCss(7));
+               },
+               'button-hover': function()
+               {
+                  return new uki.background.CssBox(defaultCss + 'border:2px solid #704010;background:'
+                        + self.getBackgroundCss(8));
+               },
+               'button-down': function()
+               {
+                  return new uki.background.CssBox(defaultCss + 'border:2px solid #704010;background:'
+                        + self.getBackgroundCss(9));
                },
                list: function(rowHeight)
                {
