@@ -17,8 +17,8 @@ function AbstractServiceComponentFixture()
    this.amqp = new EventEmitter();
    this.amqp.broadcast = function(header, body)
    {
-      this.emit('broadcast', header, body);
       this.emit('broadcast:' + header.type, header, body);
+      this.emit('broadcast', header, body);
    };
 
    this.amqp.on('broadcast', function(header, body)
@@ -149,8 +149,7 @@ function AbstractServiceComponentFixture()
          logger.warn('TEST: Unregistered broadcast [' + header.type + ']');
       }
 
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + header.type, header, body);
+      this.amqp.broadcast(header, body);
    };
 
    this.whenClientConnected = function(charId, sessionId, responseQueue)

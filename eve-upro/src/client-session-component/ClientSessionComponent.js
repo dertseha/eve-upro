@@ -47,6 +47,10 @@ function ClientSessionComponent(services, options)
       {
          self.onCharacterSessionAdded(character, sessionId);
       });
+      this.characterAgent.on('CharacterGroupMemberRemoved', function(character, groupId)
+      {
+         self.onCharacterGroupMemberRemoved(character, groupId);
+      });
    };
 
    /**
@@ -109,6 +113,42 @@ function ClientSessionComponent(services, options)
 
          dataPort.character = character;
          dataPort.sendFunction(JSON.stringify(eventData), clientEvents.Session.name);
+      }
+   };
+
+   /**
+    * Character state handler. This one is necessary as the CharacterAgentComponent already removes the group membership
+    * from the Character before this broadcast is handled and sent in the general broadcast handler. Since this is a
+    * local problem of the ClientSessionComponent, it is handled here.
+    */
+   this.onCharacterGroupMemberRemoved = function(character, groupId)
+   {
+      var characterId = character.getCharacterId();
+      var eventBody =
+      {
+         header:
+         {
+            type: busMessages.Broadcasts.GroupMembership.name
+         },
+         body:
+         {
+            groupId: groupId,
+            removed:
+            {
+               members: [ characterId ]
+            }
+         }
+      };
+      var eventBodyString = JSON.stringify(eventBody);
+      var dataPort = null;
+
+      for ( var sessionId in this.dataPorts)
+      {
+         dataPort = this.dataPorts[sessionId];
+         if (dataPort.character && (dataPort.character.getCharacterId() == characterId))
+         {
+            dataPort.sendFunction(eventBodyString, clientEvents.Broadcast.name);
+         }
       }
    };
 

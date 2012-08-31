@@ -21,7 +21,10 @@ function Fixture()
 
    this.amqp.allocateResponseQueue = function(callback)
    {
-      callback(self);
+      process.nextTick(function()
+      {
+         callback(self);
+      });
    };
 
    this.subscribe = function()
@@ -41,6 +44,52 @@ function Fixture()
       'eveapi-msg': this,
       'http-server': this
    }, options);
+
+   this.givenCharacterHasInterestInGroups = function(charId, groups)
+   {
+      this.characterAgent.characters[charId].groupMemberships = groups;
+   };
+
+   this.givenExistingDataPort = function(charId, sessionId)
+   {
+      var self = this;
+      var character = this.characterAgent.characters[charId];
+      var user =
+      {
+         characterId: character.getCharacterId(),
+         corporationId: character.getCorporationId()
+      };
+      var dataPort =
+      {
+         user: user,
+         sendFunction: function(body, name)
+         {
+            self.sendFunction(body, name);
+         },
+         character: character
+      };
+
+      this.clientSession.dataPorts[sessionId] = dataPort;
+   };
+
+   this.sendFunction = function(eventString, name)
+   {
+      this.lastSentEventString = eventString;
+   };
+
+   this.thenLastSentEventShouldHaveBeen = function(test, type, body)
+   {
+      var event =
+      {
+         header:
+         {
+            type: type
+         },
+         body: body
+      };
+
+      test.deepEqual(this.lastSentEventString, JSON.stringify(event));
+   };
 
    this.whenSecurityConfigIs = function(security)
    {
@@ -253,5 +302,71 @@ exports.testUserIsDenied_WhenMixedInBothLists = function(test)
    };
 
    this.fixture.testUserSecurity(test, security, 2345, 45623, false);
+   test.done();
+};
+
+exports.testGroupMembershipShouldBeSent_WhenBecomingMember = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+   var groupId = UuidFactory.v4();
+   var messageBody =
+   {
+      groupId: groupId,
+      added:
+      {
+         groupData:
+         {
+            name: 'test',
+            owner: []
+         },
+         members: [ charId ]
+      }
+   };
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenExistingDataPort(charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.GroupMembership.name, undefined, messageBody,
+   {
+      interest: [
+      {
+         scope: 'Group',
+         id: groupId
+      } ]
+   });
+
+   this.fixture.thenLastSentEventShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name, messageBody);
+   test.done();
+};
+
+exports.testGroupMembershipShouldBeSent_WhenDroppingMember = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+   var groupId = UuidFactory.v4();
+   var messageBody =
+   {
+      groupId: groupId,
+      removed:
+      {
+         members: [ charId ]
+      }
+   };
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterHasInterestInGroups(charId, groupId);
+   this.fixture.givenExistingDataPort(charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.GroupMembership.name, undefined, messageBody,
+   {
+      interest: [
+      {
+         scope: 'Group',
+         id: groupId
+      } ]
+   });
+
+   this.fixture.thenLastSentEventShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name, messageBody);
    test.done();
 };
