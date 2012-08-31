@@ -12,6 +12,9 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
       this.textField = null;
       this.createButton = null;
+
+      this.selectionTimer = upro.sys.Timer.getSingleTimer(this.onSelectionTimer.bind(this));
+      this.selection = null;
    },
 
    onRegister: function()
@@ -32,7 +35,8 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
             rect: '0 0 ' + (dimension.width - 30) + ' ' + 25,
             anchors: 'left top right',
             background: 'theme(box)',
-            id: 'groupList_text'
+            id: 'groupList_text',
+            placeholder: upro.res.text.Lang.format("panels.group.list.textHint")
          },
          {
             view: 'Button',
@@ -87,25 +91,44 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       this.textField.bind('keydown keyup', this.onTextChange.bind(this));
    },
 
+   getImageForMembership: function(group)
+   {
+      var image = +'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ'
+            + 'AAGvRYgsAAAAAElFTkSuQmCC';
+
+      if (group.isClientMember())
+      {
+         image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAVklEQVR42mNgGHLg////84H4PBDz"
+               + "k6sZBkgzBE0z3BBKNIPAfJgCfqiT5lOiGVWCGM1QReexKSBKMwFbCGsm0ZD55IY0Yc0EDJlPSWqb"
+               + "T0l6n0+XzAUAB/N36Dezi8oAAAAASUVORK5CYII=";
+      }
+
+      return image;
+   },
+
    listRenderer: function(data, rect, index)
    {
-      var result = JSON.stringify(data);
+      var result = '';
 
-      // result = '<table style="width:100%;height:100%"><tr>';
-      // result += '<td style="width:16px;">' + '<div style="height:16px;background:'
-      // + this.getColorBySecurityLevel(data.solarSystem) + ';"></div>' + '</td>';
-      // result += '<td style="width:16px;">' + '<div style="height:16px;">'
-      // + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForEntryType(data.routeEntry)
-      // + '">' + '</img></div>' + '</td>';
-      // result += '<td>' + data.solarSystem.name + '</td>';
-      // result += '</tr></table>';
+      result = '<table style="width:100%;height:100%"><tr>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">'
+            + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForMembership(data.group) + '">'
+            + '</img></div>' + '</td>';
+      result += '<td>' + data.group.getName() + '</td>';
+      result += '</tr></table>';
 
       return result;
    },
 
-   setSelected: function(item, data, state, hasFocus)
+   setSelected: function(container, data, state, hasFocus)
    {
+      data.state = state;
+      data.hasFocus = hasFocus;
+      container.style['font-weight'] = data.state ? 'bold' : 'normal';
+      container.style['background'] = data.state ? '#704010' : '';
 
+      this.selection = data.state ? data.group.getId() : null;
+      this.selectionTimer.start(50);
    },
 
    onTextChange: function()
@@ -121,17 +144,50 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       }
    },
 
-   onNotifyGroupCreated: function(newGroup)
+   onSelectionTimer: function()
+   {
+      this.facade().sendNotification(upro.app.Notifications.GroupSelectionRequest, this.selection);
+      this.selection = null;
+   },
+
+   onNotifyGroupListChanged: function()
    {
       var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      var selectedGroupId = groupProxy.getSelectedGroupId();
       var data = [];
+      var selectedIndex = -1;
 
       groupProxy.forEachGroup(function(group)
       {
-         console.log('iterating: ' + group.getName());
-         data.push(group);
+         var listEntry =
+         {
+            state: 0,
+            hasFocus: false,
+            group: group
+         };
+
+         data.push(listEntry);
       });
-      uki('#groupList_list').data(data);
+      data.sort(function(listEntryA, listEntryB)
+      {
+         return listEntryA.group.getName().localeCompare(listEntryB.group.getName());
+      });
+      if (selectedGroupId)
+      {
+         for ( var i = 0; (selectedIndex < 0) && (i < data.length); i++)
+         {
+            var listEntry = data[i];
+
+            if (listEntry.group.getId() == selectedGroupId)
+            {
+               selectedIndex = i;
+            }
+         }
+      }
+
+      var groupList = uki('#groupList_list');
+      groupList.data(data);
+      groupList.selectedIndex(selectedIndex);
    }
 });
 

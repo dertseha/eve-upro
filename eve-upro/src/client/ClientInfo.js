@@ -170,7 +170,11 @@ exports.sourceFiles = [];
    'control/commands/NotifiedNewCorridorSetExitCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareWormholeCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareJumpBridgeCommand.js', //
+   'control/commands/NotifiedGroupSelectionRequestCommand.js', //
    'control/commands/NotifiedGroupCreateRequestCommand.js', //
+   'control/commands/NotifiedGroupJoinRequestCommand.js', //
+   'control/commands/NotifiedGroupLeaveRequestCommand.js', //
+   'control/commands/NotifiedGroupDestroyRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
@@ -197,6 +201,7 @@ exports.sourceFiles = [];
    'view/mediators/AutopilotRoutePanelMediator.js', //
    'view/mediators/DebugPanelMediator.js', //
    'view/mediators/GroupListPanelMediator.js', //
+   'view/mediators/GroupEditPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

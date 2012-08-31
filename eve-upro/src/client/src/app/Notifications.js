@@ -94,8 +94,20 @@ upro.app.Notifications =
 
    /** Creation of a group has been requested */
    GroupCreateRequest: 0,
-   /** notification about the creation of a group */
-   GroupCreated: 0
+   /** notification about the change of the group list */
+   GroupListChanged: 0,
+   /** List of members changed */
+   GroupMemberListChanged: 0,
+   /** Group selection request */
+   GroupSelectionRequest: 0,
+   /** Group selected */
+   GroupSelected: 0,
+   /** Group join request */
+   GroupJoinRequest: 0,
+   /** Group leave request */
+   GroupLeaveRequest: 0,
+   /** Group destroy request */
+   GroupDestroyRequest: 0
 };
 
 /**

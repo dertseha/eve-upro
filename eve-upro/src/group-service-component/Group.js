@@ -205,7 +205,7 @@ function Group(id, initData)
     */
    this.isCharacterOwner = function(character)
    {
-      return this.groupData.owner.indexOf(character.getCharacterId()) > 0;
+      return this.groupData.owner.indexOf(character.getCharacterId()) >= 0;
    };
 
    /**

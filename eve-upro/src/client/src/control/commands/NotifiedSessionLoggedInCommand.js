@@ -29,6 +29,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.setupRouteListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
       this.setupGroupListMenu(uiMediator);
+      this.setupGroupEditMenu(uiMediator);
 
       if (upro.scene.SceneSystem.SUPPORTED)
       {
@@ -114,6 +115,15 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             .format("groupList.menuLabel"));
 
       this.facade().registerMediator(new upro.view.mediators.GroupListPanelMediator(panelId, panelId + ".groupList"));
-   }
+   },
 
+   setupGroupEditMenu: function(uiMediator)
+   {
+      var panelId = "nwCtrl";
+
+      uiMediator.setSubMenu(panelId, "groupEdit", 1, upro.res.menu.IconData.Group, upro.res.text.Lang
+            .format("groupEdit.menuLabel"));
+
+      this.facade().registerMediator(new upro.view.mediators.GroupEditPanelMediator(panelId, panelId + ".groupEdit"));
+   }
 });

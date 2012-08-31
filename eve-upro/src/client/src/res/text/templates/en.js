@@ -99,5 +99,23 @@ upro.res.text.templates["en"] =
    /** Routes menu label */
    "routeList.menuLabel": "Routes",
    /** Autopilot Route Panel menu label */
-   "panels.autopilot.route.menuLabel": "Autopilot Route"
+   "panels.autopilot.route.menuLabel": "Autopilot Route",
+
+   /** Groups menu label (list) */
+   "groupList.menuLabel": "Groups",
+   /** List of the groups */
+   "panels.group.list.menuLabel": "Group List",
+   /** Hint for the text field */
+   "panels.group.list.textHint": "New Group name",
+
+   /** Groups menu label (edit) */
+   "groupEdit.menuLabel": "Groups",
+   /** edit panel */
+   "panels.group.edit.menuLabel": "Edit Group",
+   /** Join a group command */
+   "panels.group.edit.join": "Join",
+   /** Leave a group command */
+   "panels.group.edit.leave": "Leave",
+   /** Destroy a group command */
+   "panels.group.edit.destroy": "Destroy"
 };
