@@ -15,6 +15,6 @@ upro.model.UnknownBodyName = Class.create(upro.model.AbstractBodyName,
    {
       this.requester.requestBodyName(this.type, this.getId());
 
-      return this.getId();
+      return '' + this.getId();
    }
 });

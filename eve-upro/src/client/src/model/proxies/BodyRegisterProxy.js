@@ -23,8 +23,17 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
 
    onRegister: function()
    {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+      var characterInfo = sessionProxy.getCharacterInfo();
+
       this.registerBroadcast(upro.data.clientBroadcastEvents.FindBodyResult.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GetNameOfBodyReply.name);
+
+      // register the already known data
+      this.bodyNamesByType["Character"][characterInfo.characterId] = new upro.model.ResolvedBodyName(
+            characterInfo.characterId, characterInfo.characterName);
+      this.bodyNamesByType["Corporation"][characterInfo.corporationId] = new upro.model.ResolvedBodyName(
+            characterInfo.corporationId, characterInfo.corporationName);
    },
 
    /**

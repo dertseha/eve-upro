@@ -283,7 +283,6 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
          this.destroyButton.disabled(true);
       }
    }
-
 });
 
 upro.view.mediators.GroupListPanelMediator.NAME = "GroupListPanel";

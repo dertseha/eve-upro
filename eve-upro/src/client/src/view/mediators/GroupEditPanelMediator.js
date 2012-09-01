@@ -15,6 +15,8 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       this.searchButton = null;
       this.addInvitationButton = null;
       this.removeInvitationButton = null;
+
+      this.invitationList = null;
    },
 
    onRegister: function()
@@ -103,7 +105,8 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
                {
                   render: this.listRenderer.bind(this),
                   setSelected: this.setSelectedInvitationList.bind(this)
-               }
+               },
+               multiselect: true
             } ]
          },
          {
@@ -139,6 +142,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       this.removeInvitationButton = uki('#groupEdit_removeInvitation');
       this.removeInvitationButton.disabled(true);
       this.removeInvitationButton.bind('click', this.onRemoveInvitationButton.bind(this));
+      this.invitationList = uki('#groupEdit_invitationList');
    },
 
    getImageForBody: function(listEntry)
@@ -182,12 +186,21 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       container.style['background'] = state ? '#704010' : '';
    },
 
-   onSearchTextChange: function()
+   onSearchTextChange: function(event)
    {
-      var value = this.searchTextField.value();
-      var isValidForSearch = upro.model.proxies.BodyRegisterProxy.isValidNameSearchText(value);
+      var key = event.which || event.keyCode;
 
-      this.searchButton.disabled(!isValidForSearch);
+      if (key == 13)
+      {
+         this.onSearchButton();
+      }
+      else
+      {
+         var value = this.searchTextField.value();
+         var isValidForSearch = upro.model.proxies.BodyRegisterProxy.isValidNameSearchText(value);
+
+         this.searchButton.disabled(!isValidForSearch);
+      }
    },
 
    onSearchButton: function()
@@ -234,10 +247,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
          this.extractFindBodyResult(data, "Character", result.characters);
          this.extractFindBodyResult(data, "Corporation", result.corporations);
 
-         data.sort(function(listEntryA, listEntryB)
-         {
-            return listEntryA.bodyName.getName().localeCompare(listEntryB.bodyName.getName());
-         });
+         this.sortListData(data);
 
          var resultList = uki('#groupEdit_searchResultList');
          resultList.data(data);
@@ -258,6 +268,14 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       });
    },
 
+   sortListData: function(data)
+   {
+      data.sort(function(listEntryA, listEntryB)
+      {
+         return listEntryA.bodyName.getName().localeCompare(listEntryB.bodyName.getName());
+      });
+   },
+
    onNotifyGroupSelected: function(group)
    {
       if (group)
@@ -266,12 +284,50 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
          this.addInvitationButton.disabled(!isOwner);
          this.removeInvitationButton.disabled(!isOwner);
+         this.fillInvitationList();
       }
       else
       {
          this.addInvitationButton.disabled(true);
          this.removeInvitationButton.disabled(true);
+         this.invitationList.data([]);
       }
+   },
+
+   fillInvitationList: function()
+   {
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      var group = groupProxy.getSelectedGroup();
+      var invitationData = [];
+
+      if (group)
+      {
+         var bodyRegisterProxy = this.facade().retrieveProxy(upro.model.proxies.BodyRegisterProxy.NAME);
+         var advertisements = group.getAdvertisements();
+
+         advertisements.forEach(function(ad)
+         {
+            var listEntry =
+            {
+               type: ad.scope,
+               bodyName: bodyRegisterProxy.getBodyName(ad.scope, ad.id)
+            };
+
+            invitationData.push(listEntry);
+         });
+         this.sortListData(invitationData);
+      }
+      this.invitationList.data(invitationData);
+   },
+
+   onNotifyKnownCharactersChanged: function()
+   {
+      this.fillInvitationList();
+   },
+
+   onNotifyKnownCorporationsChanged: function()
+   {
+      this.fillInvitationList();
    }
 
 });

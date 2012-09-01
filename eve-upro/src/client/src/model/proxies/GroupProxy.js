@@ -18,6 +18,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       this.characterInfo = sessionProxy.getCharacterInfo();
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupMembership.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupAdvertisement.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.GroupAdvertisementList.name);
    },
 
    forEachGroup: function(callback)
@@ -194,6 +195,21 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       if (changed && this.handleGroupDataChange(group))
       {
          this.facade().sendNotification(upro.app.Notifications.GroupListChanged);
+      }
+   },
+
+   onGroupAdvertisementList: function(broadcastBody)
+   {
+      var group = this.groups[broadcastBody.groupId];
+
+      if (group)
+      {
+         console.log('interest: ' + Object.toJSON(broadcastBody.interest));
+         group.setAdvertisements(broadcastBody.interest);
+         if (this.selectedGroupId == group.getId())
+         { // re-notify the selected group
+            this.notifyGroupSelected();
+         }
       }
    },
 

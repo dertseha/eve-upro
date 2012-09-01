@@ -9,6 +9,7 @@ upro.model.GroupInfo = Class.create(
       this.groupData = groupData;
       this.clientCharacterId = clientCharacterId;
       this.members = [];
+      this.advertisements = [];
       this.clientAdvertised = false;
    },
 
@@ -100,6 +101,16 @@ upro.model.GroupInfo = Class.create(
    isClientMember: function()
    {
       return this.isCharacterMember(this.clientCharacterId);
+   },
+
+   setAdvertisements: function(list)
+   {
+      this.advertisements = list;
+   },
+
+   getAdvertisements: function()
+   {
+      return this.advertisements;
    },
 
    setClientAdvertised: function(value)
