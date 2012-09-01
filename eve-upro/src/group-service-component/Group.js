@@ -313,7 +313,7 @@ Group.erase = function(storage, id)
 
    storage.delData(Group.CollectionName, criteria, function(err)
    {
-      logger.info('Group with ID ' + id + ' deletion result, err: ' + JSON.stringify(err));
+      logger.info('Group ' + id + ' deletion result');
    });
 };
 

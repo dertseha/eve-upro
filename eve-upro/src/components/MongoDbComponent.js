@@ -144,7 +144,7 @@ function MongoDbComponent(options)
       }
    };
 
-   this.delData = function(collectionName, criteria)
+   this.delData = function(collectionName, criteria, callback)
    {
       var collection = this.collections[collectionName];
 
@@ -161,6 +161,10 @@ function MongoDbComponent(options)
             if (err)
             {
                logger.error('Could not delete data from ' + collectionName + ': ' + JSON.stringify(err));
+            }
+            if (callback)
+            {
+               callback(err);
             }
          });
       }
