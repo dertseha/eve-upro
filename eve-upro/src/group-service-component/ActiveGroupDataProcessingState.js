@@ -19,6 +19,7 @@ function ActiveGroupDataProcessingState(service, group)
       if (this.group.hasMember(character.getCharacterId()))
       {
          this.service.broadcastGroupMembersAdded(this.group, this.group.getMembers(), interest, responseQueue);
+         this.service.broadcastGroupAdvertisementList(this.group, interest, responseQueue);
       }
    };
 

@@ -263,6 +263,9 @@
          }
       },
 
+      /**
+       * Add advertisements for a group (invite others to the group)
+       */
       AdvertiseGroup:
       {
          name: 0,
@@ -272,15 +275,25 @@
             schema:
             {
                groupId: context.commonSchemata.groupIdType,
-               interest: Array.of([
-               {
-                  scope: 'Character',
-                  id: Number
-               },
-               {
-                  scope: 'Corporation',
-                  id: Number
-               } ])
+               interest: Array.of(context.commonSchemata.groupAdvertisementInterestSchema)
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Remove advertisements for a group (revoke invitations)
+       */
+      RemoveGroupAdvertisements:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               interest: Array.of(context.commonSchemata.groupAdvertisementInterestSchema)
             },
             isValid: null
          }

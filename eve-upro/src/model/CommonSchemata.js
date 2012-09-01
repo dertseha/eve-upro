@@ -19,6 +19,15 @@
 
    context.namespace.groupIdType = context.namespace.uuidSchema;
    context.namespace.groupOwnerSchema = Array.of(Number);
+   context.namespace.groupAdvertisementInterestSchema = [
+   {
+      scope: 'Character',
+      id: Number
+   },
+   {
+      scope: 'Corporation',
+      id: Number
+   } ];
 
 })((typeof module !== 'undefined') ?
 {

@@ -277,6 +277,7 @@ function GroupServiceComponent(services, groupFactory)
          if (change)
          {
             group.saveToStorage(this.mongodb);
+            this.broadcastGroupAdvertisementList(group);
             this.broadcastGroupAdvertisements(group, true);
          }
       }
@@ -291,6 +292,7 @@ function GroupServiceComponent(services, groupFactory)
    {
       this.broadcastGroupAdvertisements(group, true);
       this.broadcastGroupMembersAdded(group, group.getMembers());
+      this.broadcastGroupAdvertisementList(group);
    };
 
    /**
@@ -363,6 +365,22 @@ function GroupServiceComponent(services, groupFactory)
       {
          body.groupData = group.getGroupData();
       }
+
+      this.amqp.broadcast(header, body, queueName);
+   };
+
+   this.broadcastGroupAdvertisementList = function(group, interest, queueName)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupAdvertisementList.name,
+         interest: interest || group.getInterest()
+      };
+      var body =
+      {
+         groupId: group.getId(),
+         interest: group.getAdvertisementInterest()
+      };
 
       this.amqp.broadcast(header, body, queueName);
    };

@@ -260,6 +260,24 @@
       },
 
       /**
+       * Notifies the current list of advertisements
+       */
+      GroupAdvertisementList:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               interest: Array.of(context.commonSchemata.groupAdvertisementInterestSchema)
+            },
+            isValid: null
+         }
+      },
+
+      /**
        * Notifies the advertisement of a group. If the optional group data is absent, the advertisement is revoked for
        * the receiver.
        */
