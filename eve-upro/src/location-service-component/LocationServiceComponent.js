@@ -13,28 +13,26 @@ function LocationServiceComponent(services)
    /** {@inheritDoc} */
    this.start = function()
    {
-      var self = this;
-
-      this.characterAgent.on('CharacterOnline', function(character)
-      {
-         self.onCharacterOnline(character);
-      });
-      this.characterAgent.on('SessionAdded', function(character, sessionId)
-      {
-         self.onCharacterSessionAdded(character, sessionId);
-      });
-      this.characterAgent.on('SessionRemoved', function(character, sessionId)
-      {
-         self.onCharacterSessionRemoved(character, sessionId);
-      });
-      this.characterAgent.on('CharacterOffline', function(character)
-      {
-         self.onCharacterOffline(character);
-      });
+      this.registerCharacterHandler('CharacterOnline', '');
+      this.registerCharacterHandler('CharacterOffline', '');
+      this.registerCharacterHandler('SessionAdded', 'Character');
+      this.registerCharacterHandler('SessionRemoved', 'Character');
 
       this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest.name);
 
       this.onStarted();
+   };
+
+   this.registerCharacterHandler = function(eventName, infix)
+   {
+      var self = this;
+
+      this.characterAgent.on(eventName, function()
+      {
+         var handler = self['on' + infix + eventName];
+
+         handler.apply(self, arguments);
+      });
    };
 
    this.registerBroadcastHandler = function(broadcastName)
@@ -54,13 +52,18 @@ function LocationServiceComponent(services)
    this.onBroadcastEveStatusUpdateRequest = function(header, body)
    {
       var character = this.characterAgent.getCharacterBySession(header.sessionId);
-      var newLocation = body.eveInfo.solarSystemId;
 
-      if (character && (character.lastKnownLocation != newLocation))
+      if (character)
       {
-         character.lastKnownLocation = newLocation;
-         character.locationsBySessionId[header.sessionId] = newLocation;
-         this.broadcastLocationStatus(character, this.getLocationInterest(character));
+         var serviceData = character.serviceData['location-service'];
+         var newLocation = body.eveInfo.solarSystemId;
+
+         if (serviceData.lastKnownLocation != newLocation)
+         {
+            serviceData.lastKnownLocation = newLocation;
+            serviceData.locationsBySessionId[header.sessionId] = newLocation;
+            this.broadcastLocationStatus(character, this.getLocationInterest(character));
+         }
       }
    };
 
@@ -69,8 +72,11 @@ function LocationServiceComponent(services)
     */
    this.onCharacterOnline = function(character)
    {
-      character.lastKnownLocation = null;
-      character.locationsBySessionId = {};
+      character.serviceData['location-service'] =
+      {
+         lastKnownLocation: null,
+         locationsBySessionId: {}
+      };
    };
 
    /**
@@ -88,9 +94,10 @@ function LocationServiceComponent(services)
 
       this.characterAgent.forEachCharacter(function(existingCharacter)
       {
+         var existingServiceData = existingCharacter.serviceData['location-service'];
          var existingInterest = self.getLocationInterest(existingCharacter);
 
-         if (existingCharacter.lastKnownLocation && character.hasInterestIn(existingInterest))
+         if (existingServiceData.lastKnownLocation && character.hasInterestIn(existingInterest))
          {
             self.broadcastLocationStatus(existingCharacter, interest, responseQueue);
          }
@@ -102,21 +109,22 @@ function LocationServiceComponent(services)
     */
    this.onCharacterSessionRemoved = function(character, sessionId)
    {
-      if (character.lastKnownLocation)
+      var serviceData = character.serviceData['location-service'];
+
+      if (serviceData.lastKnownLocation)
       {
-         if (character.locationsBySessionId[sessionId])
+         if (serviceData.locationsBySessionId[sessionId])
          {
             var amount = 0;
 
-            delete character.locationsBySessionId[sessionId];
-            for (existingId in character.locationsBySessionId)
+            delete serviceData.locationsBySessionId[sessionId];
+            for (existingId in serviceData.locationsBySessionId)
             {
                amount++;
             }
             if (amount == 0)
             {
-               delete character.lastKnownLocation;
-               this.broadcastLocationStatus(character, this.getLocationInterest(character));
+               this.onCharacterLocationUnknown(character);
             }
          }
       }
@@ -127,11 +135,20 @@ function LocationServiceComponent(services)
     */
    this.onCharacterOffline = function(character)
    {
-      if (character.lastKnownLocation)
+      var serviceData = character.serviceData['location-service'];
+
+      if (serviceData.lastKnownLocation)
       {
-         delete character.lastKnownLocation;
-         this.broadcastLocationStatus(character, this.getLocationInterest(character));
+         this.onCharacterLocationUnknown(character);
       }
+   };
+
+   this.onCharacterLocationUnknown = function(character)
+   {
+      var serviceData = character.serviceData['location-service'];
+
+      serviceData.lastKnownLocation = null;
+      this.broadcastLocationStatus(character, this.getLocationInterest(character));
    };
 
    /**
@@ -158,6 +175,7 @@ function LocationServiceComponent(services)
     */
    this.broadcastLocationStatus = function(character, interest, queueName)
    {
+      var serviceData = character.serviceData['location-service'];
       var header =
       {
          type: busMessages.Broadcasts.CharacterLocationStatus.name,
@@ -167,7 +185,7 @@ function LocationServiceComponent(services)
       var body =
       {
          characterInfo: character.getCharacterInfo(),
-         solarSystemId: character.lastKnownLocation
+         solarSystemId: serviceData.lastKnownLocation
       };
 
       this.amqp.broadcast(header, body, queueName);

@@ -20,18 +20,18 @@ function Fixture()
 
    this.initCharacterServiceData = function(character)
    {
-      character.lastKnownLocation = null;
-      character.locationsBySessionId = {};
+      this.locationService.onCharacterOnline(character);
    };
 
    this.givenCharacterIsAt = function(charId, solarSystemId, notifyingSessions)
    {
       var character = this.characterAgent.getCharacterById(charId);
+      var serviceData = character.serviceData['location-service'];
 
-      character.lastKnownLocation = solarSystemId;
+      serviceData.lastKnownLocation = solarSystemId;
       notifyingSessions.forEach(function(sessionId)
       {
-         character.locationsBySessionId[sessionId] = solarSystemId;
+         serviceData.locationsBySessionId[sessionId] = solarSystemId;
       });
    };
 
