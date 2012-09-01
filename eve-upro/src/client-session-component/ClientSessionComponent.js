@@ -85,7 +85,8 @@ function ClientSessionComponent(services, options)
             for ( var sessionId in this.dataPorts)
             {
                dataPort = this.dataPorts[sessionId];
-               if (dataPort.character && dataPort.character.hasInterestIn(broadcastHeader.interest))
+               if (dataPort.character && dataPort.character.hasInterestIn(broadcastHeader.interest)
+                     && !dataPort.character.hasInterestIn(broadcastHeader.disinterest))
                {
                   dataPort.sendFunction(eventBodyString, clientEvents.Broadcast.name);
                }

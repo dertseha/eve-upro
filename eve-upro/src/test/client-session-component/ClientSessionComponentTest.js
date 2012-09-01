@@ -91,6 +91,11 @@ function Fixture()
       test.deepEqual(this.lastSentEventString, JSON.stringify(event));
    };
 
+   this.thenNoEventShouldHaveBeenSent = function(test)
+   {
+      test.equal(this.lastSentEventString, null);
+   };
+
    this.whenSecurityConfigIs = function(security)
    {
       this.clientSession.options.security = security;
@@ -368,5 +373,91 @@ exports.testGroupMembershipShouldBeSent_WhenDroppingMember = function(test)
    });
 
    this.fixture.thenLastSentEventShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name, messageBody);
+   test.done();
+};
+
+exports.testMessageShouldBeSent_WhenInterestMatchAndDisinterestNotMatch = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+   var messageBody = {};
+   var messageType = 'test';
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenExistingDataPort(charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(messageType, undefined, messageBody,
+   {
+      interest: [
+      {
+         scope: 'Character',
+         id: charId
+      } ],
+      disinterest: [
+      {
+         scope: 'Character',
+         id: 9999
+      } ]
+   });
+
+   this.fixture.thenLastSentEventShouldHaveBeen(test, messageType, messageBody);
+   test.done();
+};
+
+exports.testMessageShouldNotBeSent_WhenInterestMatchAndDisinterestMatchGreater = function(test)
+{
+   var charId = 1234;
+   var corpId = 1020;
+   var sessionId = UuidFactory.v4();
+   var messageBody = {};
+   var messageType = 'test';
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId, corpId);
+   this.fixture.givenExistingDataPort(charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(messageType, undefined, messageBody,
+   {
+      interest: [
+      {
+         scope: 'Character',
+         id: charId
+      } ],
+      disinterest: [
+      {
+         scope: 'Corporation',
+         id: corpId
+      } ]
+   });
+
+   this.fixture.thenNoEventShouldHaveBeenSent(test);
+   test.done();
+};
+
+exports.testMessageShouldNotBeSent_WhenInterestMatchAndDisinterestMatchSmaller = function(test)
+{
+   var charId = 1234;
+   var corpId = 1020;
+   var sessionId = UuidFactory.v4();
+   var messageBody = {};
+   var messageType = 'test';
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId, corpId);
+   this.fixture.givenExistingDataPort(charId, sessionId);
+
+   this.fixture.whenBroadcastReceived(messageType, undefined, messageBody,
+   {
+      interest: [
+      {
+         scope: 'Corporation',
+         id: corpId
+      } ],
+      disinterest: [
+      {
+         scope: 'Character',
+         id: charId
+      } ],
+   });
+
+   this.fixture.thenNoEventShouldHaveBeenSent(test);
    test.done();
 };
