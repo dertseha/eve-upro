@@ -107,7 +107,16 @@ upro.app.Notifications =
    /** Group leave request */
    GroupLeaveRequest: 0,
    /** Group destroy request */
-   GroupDestroyRequest: 0
+   GroupDestroyRequest: 0,
+
+   /** List of known characters has changed */
+   KnownCharactersChanged: 0,
+   /** List of known corporations has changed */
+   KnownCorporationsChanged: 0,
+   /** request to find bodies by name */
+   FindBodyByNameRequest: 0,
+   /** result of a body search */
+   FindBodyResult: 0
 };
 
 /**

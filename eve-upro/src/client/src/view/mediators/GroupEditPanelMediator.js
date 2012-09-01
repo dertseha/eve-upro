@@ -63,6 +63,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
                rect: '0 0 ' + (halfWidth - 6) + ' ' + (dimension.height - 60),
                anchors: 'top left right bottom',
                id: 'groupEdit_searchResultList',
+               // background: 'rows(64, #FF0000)',
                style:
                {
                   fontSize: '12px',
@@ -72,7 +73,8 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
                {
                   render: this.listRenderer.bind(this),
                   setSelected: this.setSelectedSearchList.bind(this)
-               }
+               },
+               multiselect: true
             } ]
          },
          {
@@ -91,7 +93,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
                view: 'List',
                rect: '0 0 ' + (halfWidth - 6) + ' ' + (dimension.height - 60),
                anchors: 'top left right bottom',
-               id: 'groupEdit_searchResultList',
+               id: 'groupEdit_invitationList',
                style:
                {
                   fontSize: '12px',
@@ -130,44 +132,70 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       this.searchTextField.bind('keydown keyup', this.onSearchTextChange.bind(this));
       this.searchButton = uki('#groupEdit_searchEntities');
       this.searchButton.disabled(true);
+      this.searchButton.bind('click', this.onSearchButton.bind(this));
       this.addInvitationButton = uki('#groupEdit_addInvitation');
-      this.addInvitationButton.disabled(true);
+      // this.addInvitationButton.disabled(true);
+      this.addInvitationButton.bind('click', this.onAddInvitationButton.bind(this));
       this.removeInvitationButton = uki('#groupEdit_removeInvitation');
-      this.removeInvitationButton.disabled(true);
+      // this.removeInvitationButton.disabled(true);
+      this.removeInvitationButton.bind('click', this.onRemoveInvitationButton.bind(this));
+   },
+
+   getImageForBody: function(listEntry)
+   {
+      var link = "";
+
+      if (listEntry.type == "Character")
+      {
+         link = "http://image.eveonline.com/Character/" + listEntry.bodyName.getId() + "_32.jpg";
+      }
+      else if (listEntry.type == "Corporation")
+      {
+         link = "http://image.eveonline.com/Corporation/" + listEntry.bodyName.getId() + "_32.png";
+      }
+
+      return link;
    },
 
    listRenderer: function(data, rect, index)
    {
-      var result = Object.toJSON(data);
+      var result = "";
 
-      // result = '<table style="width:100%;height:100%"><tr>';
-      // result += '<td style="width:16px;">' + '<div style="height:16px;">'
-      // + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForMembership(data.group) + '">'
-      // + '</img></div>' + '</td>';
-      // result += '<td>' + data.group.getName() + '</td>';
-      // result += '</tr></table>';
+      result = '<table style="width:100%;height:100%"><tr>';
+      result += '<td style="width:32px;">' + '<div style="height:32px;">' + '<img style="height:32px;" src="'
+            + this.getImageForBody(data) + '">' + '</img></div>' + '</td>';
+      result += '<td>' + data.bodyName.getName() + '</td>';
+      result += '</tr></table>';
 
       return result;
    },
 
    setSelectedSearchList: function(container, data, state, hasFocus)
    {
-
+      container.style['font-weight'] = state ? 'bold' : 'normal';
+      container.style['background'] = state ? '#704010' : '';
    },
 
    setSelectedInvitationList: function(container, data, state, hasFocus)
    {
-
+      container.style['font-weight'] = state ? 'bold' : 'normal';
+      container.style['background'] = state ? '#704010' : '';
    },
 
    onSearchTextChange: function()
    {
-      this.searchButton.disabled(this.searchTextField.value().length < 3);
+      var value = this.searchTextField.value();
+      var isValidForSearch = upro.model.proxies.BodyRegisterProxy.isValidNameSearchText(value);
+
+      this.searchButton.disabled(!isValidForSearch);
    },
 
    onSearchButton: function()
    {
-
+      if (!this.searchButton.disabled())
+      {
+         this.facade().sendNotification(upro.app.Notifications.FindBodyByNameRequest, this.searchTextField.value());
+      }
    },
 
    onAddInvitationButton: function()
@@ -178,6 +206,36 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
    onRemoveInvitationButton: function()
    {
 
+   },
+
+   onNotifyFindBodyResult: function(result)
+   {
+      var value = this.searchTextField.value();
+
+      if (value == result.query.searchText)
+      {
+         var data = [];
+
+         this.extractFindBodyResult(data, "Character", result.characters);
+         this.extractFindBodyResult(data, "Corporation", result.corporations);
+
+         var resultList = uki('#groupEdit_searchResultList');
+         resultList.data(data);
+      }
+   },
+
+   extractFindBodyResult: function(data, type, bodyNames)
+   {
+      bodyNames.forEach(function(bodyName)
+      {
+         var listEntry =
+         {
+            type: type,
+            bodyName: bodyName
+         };
+
+         data.push(listEntry);
+      });
    }
 
 });

@@ -119,6 +119,9 @@ exports.sourceFiles = [];
    'model/LocationTracker.js', //
    'model/UserRoutingRule.js', //
    'model/GroupInfo.js', //
+   'model/AbstractBodyName.js', //
+   'model/UnknownBodyName.js', //
+   'model/ResolvedBodyName.js', //
 
    'model/proxies/proxies.js', //
    'model/proxies/AbstractProxy.js', //
@@ -131,6 +134,7 @@ exports.sourceFiles = [];
    'model/proxies/ActiveRouteProxy.js', //
    'model/proxies/AutopilotProxy.js', //
    'model/proxies/GroupProxy.js', //
+   'model/proxies/BodyRegisterProxy.js', //
 
    'control/ctrl.js', //
    'control/commands/cmd.js', //
@@ -175,6 +179,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedGroupJoinRequestCommand.js', //
    'control/commands/NotifiedGroupLeaveRequestCommand.js', //
    'control/commands/NotifiedGroupDestroyRequestCommand.js', //
+   'control/commands/NotifiedFindBodyByNameRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
