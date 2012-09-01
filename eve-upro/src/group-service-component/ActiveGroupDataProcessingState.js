@@ -7,6 +7,12 @@ function ActiveGroupDataProcessingState(service, group)
    this.service = service;
    this.group = group;
 
+   /** {@inheritDoc} */
+   this.registerSyncState = function(dataSync)
+   {
+      dataSync.onPendingGroupLoaded(this.group.getId());
+   };
+
    /**
     * Character state handler
     */

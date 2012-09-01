@@ -4,6 +4,14 @@
 function GroupDataProcessingState()
 {
    /**
+    * Called for groups that are accessed for a character
+    */
+   this.registerSyncState = function(dataSync)
+   {
+
+   };
+
+   /**
     * Character state handler
     */
    this.onCharacterSessionAdded = function(character, interest, responseQueue)

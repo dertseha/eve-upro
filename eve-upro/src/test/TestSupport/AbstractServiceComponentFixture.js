@@ -41,6 +41,7 @@ function AbstractServiceComponentFixture()
    {
       this.storedData = {}; // containing the documents to return per collection name
       this.delayedData = {}; // containing the events per collection name
+      this.callbackLists = {}; // containing the callbacks in sequence to call
 
       this.defineCollection = function(name, indexDef, callback)
       {
@@ -52,12 +53,7 @@ function AbstractServiceComponentFixture()
 
          if (delayEvent)
          {
-            var self = this;
-
-            delayEvent.on('event', function()
-            {
-               self.returnData(collectionName, callback);
-            });
+            this.callbackLists[collectionName].push(callback);
          }
          else
          {
@@ -124,8 +120,18 @@ function AbstractServiceComponentFixture()
 
    this.givenStorageReturnsDataDelayed = function(collectionName, documents, emitter)
    {
+      var emitterToUse = emitter || new EventEmitter();
+      var self = this;
+
       this.mongodb.storedData[collectionName] = documents;
-      this.mongodb.delayedData[collectionName] = emitter || new EventEmitter();
+      this.mongodb.delayedData[collectionName] = emitterToUse;
+      this.mongodb.callbackLists[collectionName] = [];
+      emitterToUse.on('event', function()
+      {
+         var callback = self.mongodb.callbackLists[collectionName].shift();
+
+         self.mongodb.returnData(collectionName, callback);
+      });
    };
 
    this.whenStorageReturnsData = function(collectionName)

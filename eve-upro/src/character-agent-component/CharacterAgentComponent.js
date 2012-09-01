@@ -1,5 +1,8 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var UuidFactory = require('../util/UuidFactory.js');
 var busMessages = require('../model/BusMessages.js');
 var Component = require('../components/Component.js');
@@ -21,6 +24,7 @@ function CharacterAgentComponent(services)
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientConnected.name);
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientDisconnected.name);
       this.registerBroadcastHandler(busMessages.Broadcasts.GroupMembership.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.CharacterGroupDataSyncState.name);
 
       this.onStartProgress();
    };
@@ -147,6 +151,18 @@ function CharacterAgentComponent(services)
                self.emit('CharacterGroupMemberRemoved', character, body.groupId);
             }
          });
+      }
+   };
+
+   this.onBroadcastCharacterGroupDataSyncState = function(header, body)
+   {
+      var character = this.characters[body.characterId];
+
+      if (character && character.handleGroupDataSyncState(body.syncId, body.finished))
+      {
+         logger.info('Character ' + character.toString() + ' completed group sync, member of '
+               + character.groupMemberships.length + ' group(s)');
+         this.emit('CharacterGroupSyncFinished', character);
       }
    };
 }

@@ -211,7 +211,10 @@ exports.testGroupMembershipEmitted_WhenLeaveGroupRequestedOnLoadedData = functio
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
    this.fixture.whenBroadcastLeaveGroupIsReceived(sessionId, groupId);
-   this.fixture.whenStorageReturnsData(Group.CollectionName);
+
+   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID member query
+   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID ad query
+   this.fixture.whenStorageReturnsData(Group.CollectionName); // the data query
 
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,
    {
@@ -399,7 +402,8 @@ exports.testGroupMembershipEmitted_WhenCharacterOnlineAsMemberOfLoadedGroup = fu
    this.fixture.givenExistingGroupWithMembersInDatabase(groupId, groupName, [ charId ]);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID query
+   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID member query
+   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID ad query
    this.fixture.whenStorageReturnsData(Group.CollectionName); // the data query
 
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,

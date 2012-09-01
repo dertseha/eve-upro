@@ -7,6 +7,7 @@ function Character(charId, charName, corpId, corpName)
 
    this.clients = {};
    this.groupMemberships = [];
+   this.groupSyncId = null;
 
    this.serviceData = {};
 
@@ -120,6 +121,29 @@ function Character(charId, charName, corpId, corpName)
       }
 
       return responseQueue;
+   };
+
+   /**
+    * Handles the group sync state by given parameters.
+    * 
+    * @param syncId the group sync ID to consider
+    * @param finished boolean to indicate whether syncing has started or is finished
+    */
+   this.handleGroupDataSyncState = function(syncId, finished)
+   {
+      var rCode = false;
+
+      if (!finished)
+      {
+         this.groupSyncId = syncId;
+      }
+      else if (this.groupSyncId == syncId)
+      {
+         this.groupSyncId = null;
+         rCode = true;
+      }
+
+      return rCode;
    };
 
    this.addInterestForGroup = function(groupId)

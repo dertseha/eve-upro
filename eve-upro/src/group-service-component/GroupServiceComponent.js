@@ -7,6 +7,7 @@ var UuidFactory = require('../util/UuidFactory.js');
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
+var CharacterGroupDataSync = require('./CharacterGroupDataSync.js');
 var Group = require('./Group.js');
 var PendingGroupDataProcessingState = require('./PendingGroupDataProcessingState.js');
 var ActiveGroupDataProcessingState = require('./ActiveGroupDataProcessingState.js');
@@ -93,12 +94,40 @@ function GroupServiceComponent(services, groupFactory)
    {
       var self = this;
       var characterId = character.getCharacterId();
+      var syncState = new CharacterGroupDataSync(this.amqp, characterId);
+      var filter =
+      {
+         "data.members": characterId
+      };
+
+      syncState.broadcastStateMessage(false);
+      this.mongodb.getData(Group.CollectionName, filter, function(err, id, data)
+      {
+         if (id)
+         {
+            var groupId = UuidFactory.fromMongoId(id);
+
+            syncState.addPendingGroup(groupId);
+            var state = self.ensureGroupDataProcessingState(groupId);
+            state.registerSyncState(syncState);
+         }
+         else
+         {
+            syncState.finishPendingGroupList();
+         }
+      },
+      {
+         _id: true
+      });
+      this.searchReferencesInAdvertisementsForCharacter(characterId);
+   };
+
+   this.searchReferencesInAdvertisementsForCharacter = function(characterId)
+   {
+      var self = this;
       var filter =
       {
          $or: [
-         {
-            "data.members": characterId
-         },
          {
             "data.adCharacter": characterId
          },
@@ -111,17 +140,14 @@ function GroupServiceComponent(services, groupFactory)
       {
          if (id)
          {
-            self.onReferencedGroupFound(UuidFactory.fromMongoId(id));
+            var groupId = UuidFactory.fromMongoId(id);
+
+            self.ensureGroupDataProcessingState(groupId);
          }
       },
       {
          _id: true
       });
-   };
-
-   this.onReferencedGroupFound = function(groupId)
-   {
-      this.ensureGroupDataProcessingState(groupId);
    };
 
    /**

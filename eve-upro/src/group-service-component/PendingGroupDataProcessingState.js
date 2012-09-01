@@ -15,7 +15,14 @@ function PendingGroupDataProcessingState(service, groupId)
    this.service = service;
    this.groupId = groupId;
 
+   this.syncStateQueue = [];
    this.broadcastQueue = [];
+
+   /** {@inheritDoc} */
+   this.registerSyncState = function(dataSync)
+   {
+      this.syncStateQueue.push(dataSync);
+   };
 
    /** {@inheritDoc} */
    this.onCharacterSessionAdded = function(character, interest, responseQueue)
@@ -83,6 +90,10 @@ function PendingGroupDataProcessingState(service, groupId)
          this.broadcastQueue.forEach(function(broadcast)
          {
             newState.processBroadcast(broadcast.characterId, broadcast.header, broadcast.body);
+         });
+         this.syncStateQueue.forEach(function(syncState)
+         {
+            newState.registerSyncState(syncState);
          });
 
          this.service.setGroupDataProcessingState(this.groupId, newState);
