@@ -297,6 +297,25 @@
             },
             isValid: null
          }
+      },
+
+      /**
+       * Modify properties about a location status group
+       */
+      ModifyCharacterLocationStatusGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               '?sendLocation': Boolean,
+               '?displayLocation': Boolean
+            },
+            isValid: null
+         }
       }
    };
 

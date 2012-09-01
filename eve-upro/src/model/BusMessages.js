@@ -14,6 +14,10 @@ var interestSchema = [
    id: Number
 },
 {
+   scope: 'Corporation',
+   id: Number
+},
+{
    scope: 'Group',
    id: commonSchemata.groupIdType
 } ];
@@ -103,6 +107,44 @@ var broadcasts =
          },
          isValid: null
       }
+   },
+
+   /**
+    * This broadcast is sent by the group service component at least once for an online character.
+    * 
+    * When a character comes online, a message with a new syncId and finished = false will be sent. A group enabled
+    * receiver must keep this syncId for this character. When GroupServiceComponent has loaded all groups the given
+    * character is a member of (and has distributed corresponding membership messages), a second message is sent. This
+    * second message has the same syncId and finished will be set to true.
+    * 
+    * The group enabled receiver can then query the character object which groups it is a member of - and any excess
+    * groups the receiver believed the character to be in can safely be removed. This is done to ensure consistency for
+    * the related data if the character was removed from the group while being offline.
+    * 
+    * Should a character immediately go offline again, before the sync state was finished, this sync is to be considered
+    * discarded. A sync finished message may not be sent in this case.
+    */
+   CharacterGroupDataSyncState:
+   {
+      name: 0,
+      header:
+      {
+         schema:
+         {
+            type: String
+         },
+         isValid: null
+      },
+      body:
+      {
+         schema:
+         {
+            characterId: Number,
+            syncId: commonSchemata.uuidSchema,
+            finished: Boolean
+         },
+         isValid: null
+      }
    }
 };
 
@@ -130,12 +172,18 @@ for ( var name in clientRequests)
    };
 }
 
+/**
+ * If the optional 'disinterest' header field is set, only those with interest but not disinterest shall receive. This
+ * case is meant for data that changes its distribution groups, so 'clearance' data can be sent to removed receivers
+ * while not bothering still legitimate receivers that are in several groups.
+ */
 var standardBroadcastEventHeader =
 {
    schema:
    {
       type: String,
-      interest: Array.of(interestSchema)
+      interest: Array.of(interestSchema),
+      '?disinterest': Array.of(interestSchema)
    },
    isValid: null
 };

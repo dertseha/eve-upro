@@ -120,6 +120,26 @@
       },
 
       /**
+       * Notifies the location status group settings for a specific group the character is in. When the character leaves
+       * a group, its settings are automatically reset (removed and set to default).
+       */
+      CharacterLocationStatusGroupSettings:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               groupId: context.commonSchemata.groupIdType,
+               sendLocation: Boolean,
+               displayLocation: Boolean
+            },
+            isValid: null
+         }
+      },
+
+      /**
        * Sent when the currently active galaxy has been changed.
        */
       CharacterActiveGalaxy:
