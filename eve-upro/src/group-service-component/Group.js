@@ -267,6 +267,29 @@ function Group(id, initData)
       return rCode;
    };
 
+   this.removeAdvertisement = function(scope, id)
+   {
+      var listKey = 'ad' + scope;
+      var list = this[listKey];
+      var rCode = false;
+
+      if (list)
+      {
+         var index = list.indexOf(id);
+
+         if (index >= 0)
+         {
+            var part1 = list.slice(0, index);
+            var part2 = list.slice(index + 1);
+
+            this[listKey] = part1.concat(part2);
+            rCode = true;
+         }
+      }
+
+      return rCode;
+   };
+
    this.saveToStorage = function(storage)
    {
       var id = UuidFactory.toMongoId(this.id);

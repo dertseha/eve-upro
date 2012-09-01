@@ -45,6 +45,7 @@ function GroupServiceComponent(services, groupFactory)
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestLeaveGroup.name);
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestJoinGroup.name);
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestAdvertiseGroup.name);
+      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveGroupAdvertisements.name);
 
       this.mongodb.defineCollection(Group.CollectionName, [ 'members', 'adCharacter', 'adCorporation' ], function()
       {
@@ -229,15 +230,7 @@ function GroupServiceComponent(services, groupFactory)
       {
          logger.info('Character ' + character.toString() + ' leaves group ' + group.toString());
          this.broadcastGroupMembersRemoved(group, [ characterId ]);
-         if (group.isEmpty())
-         {
-            group.deleteFromStorage(this.mongodb);
-            delete this.groupDataProcessingStatesById[group.getId()];
-         }
-         else
-         {
-            group.saveToStorage(this.mongodb);
-         }
+         this.handleGroupDataChange(group);
       }
    };
 
@@ -253,6 +246,11 @@ function GroupServiceComponent(services, groupFactory)
          logger.info('Character ' + character.toString() + ' joins group ' + group.toString());
          group.saveToStorage(this.mongodb);
          this.broadcastGroupMembersAdded(group, [ characterId ]);
+         this.broadcastGroupAdvertisementList(group, [
+         {
+            scope: 'Character',
+            id: characterId
+         } ]);
       }
    };
 
@@ -281,6 +279,57 @@ function GroupServiceComponent(services, groupFactory)
             this.broadcastGroupAdvertisements(group, true);
          }
       }
+   };
+
+   /**
+    * Process client request
+    */
+   this.processClientRequestRemoveGroupAdvertisements = function(group, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && group.allowsControllingActionsFrom(character))
+      {
+         var removedInterest = [];
+
+         body.interest.forEach(function(interest)
+         {
+            if (group.removeAdvertisement(interest.scope, interest.id))
+            {
+               removedInterest.push(interest);
+            }
+         });
+         if (removedInterest.length > 0)
+         {
+            this.broadcastGroupAdvertisements(group, false, removedInterest);
+            if (this.handleGroupDataChange(group))
+            {
+               this.broadcastGroupAdvertisementList(group);
+            }
+         }
+      }
+   };
+
+   /**
+    * Handles group data change that possibly can delete the group
+    */
+   this.handleGroupDataChange = function(group)
+   {
+      var rCode = false;
+
+      if (group.isEmpty())
+      {
+         logger.info('Group ' + group.toString() + ' became empty, destroying');
+         group.deleteFromStorage(this.mongodb);
+         delete this.groupDataProcessingStatesById[group.getId()];
+      }
+      else
+      {
+         group.saveToStorage(this.mongodb);
+         rCode = true;
+      }
+
+      return rCode;
    };
 
    /**
