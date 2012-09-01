@@ -180,6 +180,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedGroupLeaveRequestCommand.js', //
    'control/commands/NotifiedGroupDestroyRequestCommand.js', //
    'control/commands/NotifiedFindBodyByNameRequestCommand.js', //
+   'control/commands/NotifiedGroupAdvertiseRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //

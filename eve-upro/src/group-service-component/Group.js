@@ -1,5 +1,7 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
 var schema = require('js-schema');
 
 var UuidFactory = require('../util/UuidFactory.js');
@@ -311,9 +313,9 @@ Group.erase = function(storage, id)
 
    storage.delData(Group.CollectionName, criteria, function(err)
    {
-
+      logger.info('Group with ID ' + id + ' deletion result, err: ' + JSON.stringify(err));
    });
-}
+};
 
 Group.DocumentSchema =
 {

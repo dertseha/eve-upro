@@ -9,6 +9,7 @@ upro.model.GroupInfo = Class.create(
       this.groupData = groupData;
       this.clientCharacterId = clientCharacterId;
       this.members = [];
+      this.clientAdvertised = false;
    },
 
    toString: function()
@@ -101,9 +102,22 @@ upro.model.GroupInfo = Class.create(
       return this.isCharacterMember(this.clientCharacterId);
    },
 
+   setClientAdvertised: function(value)
+   {
+      var rCode = false;
+
+      if (this.clientAdvertised != value)
+      {
+         this.clientAdvertised = value;
+         rCode = true;
+      }
+
+      return rCode;
+   },
+
    isClientAdvertised: function()
    {
-      return false;
+      return this.clientAdvertised;
    }
 
 });

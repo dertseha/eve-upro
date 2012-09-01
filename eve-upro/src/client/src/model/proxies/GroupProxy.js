@@ -101,6 +101,26 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       });
    },
 
+   advertiseSelectedGroup: function(interest)
+   {
+      if (this.selectedGroupId)
+      {
+         this.advertiseGroup(this.selectedGroupId, interest);
+      }
+   },
+
+   advertiseGroup: function(groupId, interest)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      upro.sys.log("Requesting to advertise group [" + groupId + "]");
+      sessionProxy.sendRequest(upro.data.clientRequests.AdvertiseGroup.name,
+      {
+         groupId: groupId,
+         interest: interest
+      });
+   },
+
    onGroupMembership: function(broadcastBody)
    {
       var group = this.groups[broadcastBody.groupId];
@@ -129,29 +149,13 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
             changed = true;
          }
       }
-      if (changed)
+      if (changed && this.handleGroupDataChange(group))
       {
-         if (group.isClientMember() || group.isClientAdvertised())
+         if (created)
          {
-            if (created)
-            {
-               this.facade().sendNotification(upro.app.Notifications.GroupListChanged);
-            }
-            this.notifyGroupMemberListChanged(group);
-            if (this.selectedGroupId == group.getId())
-            { // re-notify the selected group
-               this.notifyGroupSelected();
-            }
-         }
-         else
-         {
-            if (this.selectedGroupId == group.getId())
-            {
-               this.setSelectedGroup(null);
-            }
-            delete this.groups[group.getId()];
             this.facade().sendNotification(upro.app.Notifications.GroupListChanged);
          }
+         this.notifyGroupMemberListChanged(group);
       }
    },
 
@@ -162,7 +166,66 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
 
    onGroupAdvertisement: function(broadcastBody)
    {
-      console.log('got advertisement: ' + Object.toJSON(broadcastBody));
+      var group = this.groups[broadcastBody.groupId];
+      var changed = false;
+
+      if (broadcastBody.groupData)
+      {
+         if (!group)
+         {
+            group = new upro.model.GroupInfo(broadcastBody.groupId, broadcastBody.groupData,
+                  this.characterInfo.characterId);
+            this.groups[broadcastBody.groupId] = group;
+            changed = true;
+         }
+         if (group.setClientAdvertised(true))
+         {
+            changed = true;
+         }
+      }
+      else
+      {
+         group = this.groups[broadcastBody.groupId];
+         if (group && group.setClientAdvertised(false))
+         {
+            changed = true;
+         }
+      }
+      if (changed && this.handleGroupDataChange(group))
+      {
+         this.facade().sendNotification(upro.app.Notifications.GroupListChanged);
+      }
+   },
+
+   /**
+    * Handles a change of group data which might have it deleted.
+    * 
+    * @param group the group that was changed
+    * @returns {Boolean} true if the group still exists
+    */
+   handleGroupDataChange: function(group)
+   {
+      var rCode = false;
+
+      if (group.isClientMember() || group.isClientAdvertised())
+      {
+         rCode = true;
+         if (this.selectedGroupId == group.getId())
+         { // re-notify the selected group
+            this.notifyGroupSelected();
+         }
+      }
+      else
+      {
+         if (this.selectedGroupId == group.getId())
+         {
+            this.setSelectedGroup(null);
+         }
+         delete this.groups[group.getId()];
+         this.facade().sendNotification(upro.app.Notifications.GroupListChanged);
+      }
+
+      return rCode;
    }
 });
 

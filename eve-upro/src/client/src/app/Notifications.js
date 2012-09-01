@@ -108,6 +108,8 @@ upro.app.Notifications =
    GroupLeaveRequest: 0,
    /** Group destroy request */
    GroupDestroyRequest: 0,
+   /** Group advertise request */
+   GroupAdvertiseRequest: 0,
 
    /** List of known characters has changed */
    KnownCharactersChanged: 0,

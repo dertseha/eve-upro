@@ -134,10 +134,10 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       this.searchButton.disabled(true);
       this.searchButton.bind('click', this.onSearchButton.bind(this));
       this.addInvitationButton = uki('#groupEdit_addInvitation');
-      // this.addInvitationButton.disabled(true);
+      this.addInvitationButton.disabled(true);
       this.addInvitationButton.bind('click', this.onAddInvitationButton.bind(this));
       this.removeInvitationButton = uki('#groupEdit_removeInvitation');
-      // this.removeInvitationButton.disabled(true);
+      this.removeInvitationButton.disabled(true);
       this.removeInvitationButton.bind('click', this.onRemoveInvitationButton.bind(this));
    },
 
@@ -200,7 +200,22 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
    onAddInvitationButton: function()
    {
+      var resultList = uki('#groupEdit_searchResultList');
+      var listEntries = resultList.selectedRows();
+      var interests = [];
 
+      listEntries.forEach(function(listEntry)
+      {
+         var interest =
+         {
+            scope: listEntry.type,
+            id: listEntry.bodyName.getId()
+         };
+
+         interests.push(interest);
+      });
+
+      this.facade().sendNotification(upro.app.Notifications.GroupAdvertiseRequest, interests);
    },
 
    onRemoveInvitationButton: function()
@@ -219,6 +234,11 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
          this.extractFindBodyResult(data, "Character", result.characters);
          this.extractFindBodyResult(data, "Corporation", result.corporations);
 
+         data.sort(function(listEntryA, listEntryB)
+         {
+            return listEntryA.bodyName.getName().localeCompare(listEntryB.bodyName.getName());
+         });
+
          var resultList = uki('#groupEdit_searchResultList');
          resultList.data(data);
       }
@@ -236,6 +256,22 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
          data.push(listEntry);
       });
+   },
+
+   onNotifyGroupSelected: function(group)
+   {
+      if (group)
+      {
+         var isOwner = group.isClientOwner();
+
+         this.addInvitationButton.disabled(!isOwner);
+         this.removeInvitationButton.disabled(!isOwner);
+      }
+      else
+      {
+         this.addInvitationButton.disabled(true);
+         this.removeInvitationButton.disabled(true);
+      }
    }
 
 });

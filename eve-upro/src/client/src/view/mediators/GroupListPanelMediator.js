@@ -128,7 +128,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
    getImageForMembership: function(group)
    {
-      var image = +'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ'
+      var image = 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ'
             + 'AAGvRYgsAAAAAElFTkSuQmCC';
 
       if (group.isClientMember())
@@ -164,6 +164,46 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
       this.selection = data.state ? data.group.getId() : null;
       this.selectionTimer.start(50);
+   },
+
+   refillGroupList: function()
+   {
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      var selectedGroupId = groupProxy.getSelectedGroupId();
+      var data = [];
+      var selectedIndex = -1;
+
+      groupProxy.forEachGroup(function(group)
+      {
+         var listEntry =
+         {
+            state: 0,
+            hasFocus: false,
+            group: group
+         };
+
+         data.push(listEntry);
+      });
+      data.sort(function(listEntryA, listEntryB)
+      {
+         return listEntryA.group.getName().localeCompare(listEntryB.group.getName());
+      });
+      if (selectedGroupId)
+      {
+         for ( var i = 0; (selectedIndex < 0) && (i < data.length); i++)
+         {
+            var listEntry = data[i];
+
+            if (listEntry.group.getId() == selectedGroupId)
+            {
+               selectedIndex = i;
+            }
+         }
+      }
+
+      var groupList = uki('#groupList_list');
+      groupList.data(data);
+      groupList.selectedIndex(selectedIndex);
    },
 
    onTextChange: function()
@@ -218,42 +258,12 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
    onNotifyGroupListChanged: function()
    {
-      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
-      var selectedGroupId = groupProxy.getSelectedGroupId();
-      var data = [];
-      var selectedIndex = -1;
+      this.refillGroupList();
+   },
 
-      groupProxy.forEachGroup(function(group)
-      {
-         var listEntry =
-         {
-            state: 0,
-            hasFocus: false,
-            group: group
-         };
-
-         data.push(listEntry);
-      });
-      data.sort(function(listEntryA, listEntryB)
-      {
-         return listEntryA.group.getName().localeCompare(listEntryB.group.getName());
-      });
-      if (selectedGroupId)
-      {
-         for ( var i = 0; (selectedIndex < 0) && (i < data.length); i++)
-         {
-            var listEntry = data[i];
-
-            if (listEntry.group.getId() == selectedGroupId)
-            {
-               selectedIndex = i;
-            }
-         }
-      }
-
-      var groupList = uki('#groupList_list');
-      groupList.data(data);
-      groupList.selectedIndex(selectedIndex);
+   onNotifyGroupMemberListChanged: function()
+   {
+      this.refillGroupList(); // since the list also displays whether the client is a member
    },
 
    onNotifyGroupSelected: function(group)
