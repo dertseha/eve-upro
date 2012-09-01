@@ -6,7 +6,7 @@ upro.ctrl.cmd.NotifiedGroupRemoveAdvertisementRequestCommand = Class.create(Simp
       var group = groupProxy.getSelectedGroup();
       var interest = notification.getBody();
 
-      if ((interest.length > 0) && group && group.isClientOwner())
+      if ((interest.length > 0) && group && group.isClientAllowedControl())
       {
          groupProxy.removeAdvertisementsOfSelectedGroup(interest);
       }

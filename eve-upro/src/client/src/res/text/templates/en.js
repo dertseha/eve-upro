@@ -108,10 +108,13 @@ upro.res.text.templates["en"] =
    /** Hint for the text field */
    "panels.group.list.textHint": "New Group name",
 
+   /** List of group members */
+   "panels.group.member.list.menuLabel": "Group Member List",
+
    /** Groups menu label (edit) */
    "groupEdit.menuLabel": "Groups",
    /** edit panel */
-   "panels.group.edit.menuLabel": "Edit Group",
+   "panels.group.edit.menuLabel": "Edit Group Invitations",
    /** Join a group command */
    "panels.group.edit.join": "Join",
    /** Leave a group command */

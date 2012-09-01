@@ -141,6 +141,23 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       return image;
    },
 
+   getImageForOwnership: function(group)
+   {
+      var image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ"
+            + "AAGvRYgsAAAAAElFTkSuQmCC";
+
+      console.log('ctrl: ' + group.isClientAllowedControl());
+      // console.log('data: ' + );
+      if (group.isClientAllowedControl())
+      {
+         image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYklEQVR42mNgwAJ+/Pjh/+vXr/t/"
+               + "/vz5D8IgNkiMgRgAUgjTiI6JMgTZZnQMkiNoAC7NMEx7Ayj2AsWBSHE0Ug0AbY3//v27PQiD2CQb"
+               + "QHLoD1MDgIE3H4TJMgCkERsbHQAAwGZIIPOJWqUAAAAASUVORK5CYII=";
+      }
+
+      return image;
+   },
+
    listRenderer: function(data, rect, index)
    {
       var result = '';
@@ -148,6 +165,9 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       result = '<table style="width:100%;height:100%"><tr>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">'
             + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForMembership(data.group) + '">'
+            + '</img></div>' + '</td>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">'
+            + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForOwnership(data.group) + '">'
             + '</img></div>' + '</td>';
       result += '<td>' + data.group.getName() + '</td>';
       result += '</tr></table>';
@@ -274,7 +294,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
          this.joinButton.disabled(isMember);
          this.leaveButton.disabled(!isMember);
-         this.destroyButton.disabled(!group.isClientOwner());
+         this.destroyButton.disabled(!group.isClientAllowedControl());
       }
       else
       {

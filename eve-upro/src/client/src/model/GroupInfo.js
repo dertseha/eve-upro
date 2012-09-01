@@ -33,6 +33,11 @@ upro.model.GroupInfo = Class.create(
       return this.members.length > 0;
    },
 
+   forEachMember: function(callback)
+   {
+      this.members.forEach(callback);
+   },
+
    addMembers: function(members)
    {
       var that = this;
@@ -106,9 +111,14 @@ upro.model.GroupInfo = Class.create(
       return this.groupData.owner.indexOf(characterId) >= 0;
    },
 
-   isClientOwner: function()
+   isCharacterAllowedControl: function(characterId)
    {
-      return !this.hasExplicitOwner() || this.isCharacterOwner(this.clientCharacterId);
+      return !this.hasExplicitOwner() || this.isCharacterOwner(characterId);
+   },
+
+   isClientAllowedControl: function()
+   {
+      return this.isCharacterAllowedControl(this.clientCharacterId);
    },
 
    isCharacterMember: function(characterId)

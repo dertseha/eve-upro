@@ -133,6 +133,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
       this.searchTextField = uki('#groupEdit_searchEntity');
       this.searchTextField.bind('keydown keyup', this.onSearchTextChange.bind(this));
+      this.searchTextField.bind('keyup', this.onSearchTextKeyUp.bind(this));
       this.searchButton = uki('#groupEdit_searchEntities');
       this.searchButton.disabled(true);
       this.searchButton.bind('click', this.onSearchButton.bind(this));
@@ -186,7 +187,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       container.style['background'] = state ? '#704010' : '';
    },
 
-   onSearchTextChange: function(event)
+   onSearchTextKeyUp: function(event)
    {
       var key = event.which || event.keyCode;
 
@@ -194,13 +195,14 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       {
          this.onSearchButton();
       }
-      else
-      {
-         var value = this.searchTextField.value();
-         var isValidForSearch = upro.model.proxies.BodyRegisterProxy.isValidNameSearchText(value);
+   },
 
-         this.searchButton.disabled(!isValidForSearch);
-      }
+   onSearchTextChange: function(event)
+   {
+      var value = this.searchTextField.value();
+      var isValidForSearch = upro.model.proxies.BodyRegisterProxy.isValidNameSearchText(value);
+
+      this.searchButton.disabled(!isValidForSearch);
    },
 
    onSearchButton: function()
@@ -290,18 +292,17 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
    {
       if (group)
       {
-         var isOwner = group.isClientOwner();
+         var isController = group.isClientAllowedControl();
 
-         this.addInvitationButton.disabled(!isOwner);
-         this.removeInvitationButton.disabled(!isOwner);
-         this.fillInvitationList();
+         this.addInvitationButton.disabled(!isController);
+         this.removeInvitationButton.disabled(!isController);
       }
       else
       {
          this.addInvitationButton.disabled(true);
          this.removeInvitationButton.disabled(true);
-         this.invitationList.data([]);
       }
+      this.fillInvitationList();
    },
 
    fillInvitationList: function()
@@ -328,6 +329,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
          this.sortListData(invitationData);
       }
       this.invitationList.data(invitationData);
+      this.invitationList.parent().layout();
    },
 
    onNotifyKnownCharactersChanged: function()

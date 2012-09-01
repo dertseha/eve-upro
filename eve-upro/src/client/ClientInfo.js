@@ -208,6 +208,7 @@ exports.sourceFiles = [];
    'view/mediators/AutopilotRoutePanelMediator.js', //
    'view/mediators/DebugPanelMediator.js', //
    'view/mediators/GroupListPanelMediator.js', //
+   'view/mediators/GroupMemberListPanelMediator.js', //
    'view/mediators/GroupEditPanelMediator.js', //
 
    'app/app.js', //

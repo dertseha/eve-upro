@@ -118,6 +118,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade()
             .registerMediator(new upro.view.mediators.GroupListPanelMediator(panelId, panelId + ".groupList", 5));
+      this.facade().registerMediator(
+            new upro.view.mediators.GroupMemberListPanelMediator(panelId, panelId + ".groupList", 4));
    },
 
    setupGroupEditMenu: function(uiMediator)
