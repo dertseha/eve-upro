@@ -146,8 +146,6 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       var image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ"
             + "AAGvRYgsAAAAAElFTkSuQmCC";
 
-      console.log('ctrl: ' + group.isClientAllowedControl());
-      // console.log('data: ' + );
       if (group.isClientAllowedControl())
       {
          image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYklEQVR42mNgwAJ+/Pjh/+vXr/t/"

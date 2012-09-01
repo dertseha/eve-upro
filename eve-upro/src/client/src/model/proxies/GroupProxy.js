@@ -147,7 +147,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       var group = this.groups[broadcastBody.groupId];
       var changed = false;
       var created = false;
-      console.log('member: ' + Object.toJSON(broadcastBody));
+
       if (broadcastBody.added)
       {
          if (!group)
@@ -193,7 +193,6 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
    {
       var group = this.groups[broadcastBody.groupId];
       var changed = false;
-      console.log('ad: ' + Object.toJSON(broadcastBody));
 
       if (broadcastBody.groupData)
       {

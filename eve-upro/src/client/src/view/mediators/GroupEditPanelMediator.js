@@ -158,6 +158,19 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       {
          link = "http://image.eveonline.com/Corporation/" + listEntry.bodyName.getId() + "_32.png";
       }
+      else if (listEntry.type == "Group")
+      {
+         link = "data:image/png;base64,"
+               + "iVBORw0KGgoAAAANSUhEUgAAACAAAAAfCAYAAACGVs+MAAABwUlEQVR42u2WsUoDQRCGFxIwpomQ"
+               + "ziZglSJilUIhKAGtQhB8gRRK3kGbkM5CCNhLSGMlKY3gA0j6QDpjZyGCKBjQZP0HJrJOdtfN2Vjc"
+               + "wM8dd9/M/jt3e3tKidBa56Ar6BkaQadQSjBZ6AJ6ZNF5VjApzh1xLaqZU74AkOGEHzGdTi8NJgHd"
+               + "6fmga4kZRzkWhmpnfAbq2h05Zsoepmx00RV1n4GmJ7HITM3D1Jgpepimz0DFloF2vuCQZCYPTSwY"
+               + "Xcszk+QcW1R+ew/aIuETOhBMw1K4IZh96EMwbRUSAKvQOXQCbTiYbczyjETnDmYdOuZaVd+AK1AJ"
+               + "2hFaMpg0tGVhpDahZSMvaWFK36sBJ4eWVmleuwlm9jDTNx0eY2jXWJJPFoYe7RHdvHcUGRoFrvWC"
+               + "gZwbowtDB/agPDWGAQX0X/NjA7GB2IBybCyywCCCgUGAgQnd7Ad8iDoRPkSdAAN9ulmAbvnz6erA"
+               + "KtRF0deAgYnpUo7HwJjHLChjlj0BvdMGJDatVsDkWyInzbVMk725HdFiQPOAqagG+Me0ZelSsIFZ"
+               + "u9YWNUA5lscayYA2frUWMZD3vCexgdhAbOD/GPgCAYTJ0/rAyIUAAAAASUVORK5CYII=";
+      }
 
       return link;
    },
@@ -185,6 +198,33 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
    {
       container.style['font-weight'] = state ? 'bold' : 'normal';
       container.style['background'] = state ? '#704010' : '';
+   },
+
+   /**
+    * Creates a list entry based on a body name. Its interest will resolve to the body itself
+    * 
+    * @param type type (scope) of the body
+    * @param bodyName BodyName object
+    * @returns list entry object
+    */
+   getBodyNameBasedListEntry: function(type, bodyName)
+   {
+      var interest =
+      {
+         scope: type,
+         id: bodyName.getId()
+      };
+      var listEntry =
+      {
+         type: type,
+         bodyName: bodyName,
+         getInterestAsArray: function()
+         {
+            return [ interest ];
+         }
+      };
+
+      return listEntry;
    },
 
    onSearchTextKeyUp: function(event)
@@ -236,13 +276,9 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
       listEntries.forEach(function(listEntry)
       {
-         var interestEntry =
-         {
-            scope: listEntry.type,
-            id: listEntry.bodyName.getId()
-         };
+         var entryInterest = listEntry.getInterestAsArray();
 
-         interest.push(interestEntry);
+         interest = interest.concat(entryInterest);
       });
 
       return interest;
@@ -256,6 +292,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       {
          var data = [];
 
+         this.addMatchingGroupsToResultList(value, data);
          this.extractFindBodyResult(data, "Character", result.characters);
          this.extractFindBodyResult(data, "Corporation", result.corporations);
 
@@ -266,15 +303,51 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       }
    },
 
+   addMatchingGroupsToResultList: function(searchText, data)
+   {
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      var regexp = new RegExp(searchText, 'i');
+      var that = this;
+
+      groupProxy.forEachGroup(function(group)
+      {
+         if (regexp.test(group.getName()) && (group.getAdvertisements().length > 0))
+         {
+            var listEntry =
+            {
+               type: "Group",
+               bodyName: group,
+               getInterestAsArray: function()
+               {
+                  return that.retrieveInterestForGroup(group);
+               }
+            };
+
+            data.push(listEntry);
+         }
+      });
+   },
+
+   retrieveInterestForGroup: function(group)
+   {
+      var interest = [];
+      var advertisements = group.getAdvertisements();
+
+      advertisements.forEach(function(ad)
+      {
+         interest.push(ad);
+      });
+
+      return interest;
+   },
+
    extractFindBodyResult: function(data, type, bodyNames)
    {
+      var that = this;
+
       bodyNames.forEach(function(bodyName)
       {
-         var listEntry =
-         {
-            type: type,
-            bodyName: bodyName
-         };
+         var listEntry = that.getBodyNameBasedListEntry(type, bodyName);
 
          data.push(listEntry);
       });
@@ -310,6 +383,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
       var group = groupProxy.getSelectedGroup();
       var invitationData = [];
+      var that = this;
 
       if (group)
       {
@@ -318,11 +392,8 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
          advertisements.forEach(function(ad)
          {
-            var listEntry =
-            {
-               type: ad.scope,
-               bodyName: bodyRegisterProxy.getBodyName(ad.scope, ad.id)
-            };
+            var bodyName = bodyRegisterProxy.getBodyName(ad.scope, ad.id);
+            var listEntry = that.getBodyNameBasedListEntry(ad.scope, bodyName);
 
             invitationData.push(listEntry);
          });
