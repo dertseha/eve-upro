@@ -147,25 +147,7 @@ exports.testGroupOwner_CharInList = function(test)
 {
    var char = new Character(1, 'test', 2, 'test');
 
-   this.fixture.whenGroupHasOwner([
-   {
-      scope: 'Character',
-      id: char.getCharacterId()
-   } ]);
-
-   this.fixture.thenIsCharacterOwnerShouldReturn(test, char, true);
-   test.done();
-};
-
-exports.testGroupOwner_CorpInList = function(test)
-{
-   var char = new Character(1, 'test', 2, 'test');
-
-   this.fixture.whenGroupHasOwner([
-   {
-      scope: 'Corporation',
-      id: char.getCorporationId()
-   } ]);
+   this.fixture.whenGroupHasOwner([ char.getCharacterId() ]);
 
    this.fixture.thenIsCharacterOwnerShouldReturn(test, char, true);
    test.done();

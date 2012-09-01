@@ -57,11 +57,14 @@ function Fixture()
    {
       var document =
       {
-         id: UuidFactory.toMongoId(id),
+         _id: UuidFactory.toMongoId(id),
          data:
          {
             name: name,
-            members: members
+            owner: [],
+            members: members,
+            adCharacter: [],
+            adCorporation: []
          }
       };
 
@@ -162,11 +165,7 @@ exports.testGroupMembershipEmitted_WhenCreateGroupRequested = function(test)
          groupData:
          {
             name: groupName,
-            owner: [
-            {
-               scope: 'Character',
-               id: charId
-            } ]
+            owner: [ charId ]
          },
          members: [ charId ]
       }
@@ -208,8 +207,8 @@ exports.testGroupMembershipEmitted_WhenLeaveGroupRequestedOnLoadedData = functio
    var groupName = 'TestGroup';
    var groupId = UuidFactory.v4();
 
-   this.fixture.givenExistingCharacterSession(charId, sessionId);
    this.fixture.givenExistingGroupWithMembersInDatabase(groupId, groupName, [ charId ]);
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
 
    this.fixture.whenBroadcastLeaveGroupIsReceived(sessionId, groupId);
    this.fixture.whenStorageReturnsData(Group.CollectionName);
