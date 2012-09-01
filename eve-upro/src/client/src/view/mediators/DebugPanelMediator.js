@@ -3,12 +3,13 @@
  */
 upro.view.mediators.DebugPanelMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
-   initialize: function($super, panelId, menuPath)
+   initialize: function($super, panelId, menuPath, menuIndex)
    {
       $super(upro.view.mediators.DebugPanelMediator.NAME, null);
 
       this.panelId = panelId;
       this.menuPath = menuPath;
+      this.menuIndex = menuIndex;
    },
 
    onRegister: function()
@@ -29,8 +30,8 @@ upro.view.mediators.DebugPanelMediator = Class.create(upro.view.mediators.Abstra
 
       var base = uki('#debugPanel_base');
 
-      uiMediator.setBaseView(this.panelId, this.menuPath, 4, upro.res.menu.IconData.Debug, upro.res.text.Lang
-            .format("panels.debug.menuLabel"), "debug", base);
+      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.Debug,
+            upro.res.text.Lang.format("panels.debug.menuLabel"), "debug", base);
    },
 
    onNotifyDebugMessage: function(text)

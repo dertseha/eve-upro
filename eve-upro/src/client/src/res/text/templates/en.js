@@ -116,6 +116,17 @@ upro.res.text.templates["en"] =
    "panels.group.edit.join": "Join",
    /** Leave a group command */
    "panels.group.edit.leave": "Leave",
+   /** Create a group command */
+   "panels.group.edit.create": "Create",
    /** Destroy a group command */
-   "panels.group.edit.destroy": "Destroy"
+   "panels.group.edit.destroy": "Destroy",
+
+   /** Search hint */
+   "panels.group.edit.searchEntity.hint": "Enter Name to Search",
+   /** Search command */
+   "panels.group.edit.searchEntity.command": "Search...",
+   /** Add invitation command */
+   "panels.group.edit.addInvitation.command": "Add",
+   /** Remove invitation command */
+   "panels.group.edit.removeInvitation.command": "Remove"
 };

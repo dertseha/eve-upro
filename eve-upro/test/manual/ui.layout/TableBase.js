@@ -95,7 +95,9 @@ function createNestedTable()
    var sidePanelStyle =
    {
       width: "18.75%",
-      height: "100%"
+      height: "100%",
+      padding: "3px"
+
    };
    var controlPanelAttr =
    {
@@ -105,7 +107,8 @@ function createNestedTable()
    var controlPanelStyle =
    {
       height: "30%",
-      width: "25%"
+      width: "25%",
+      padding: "3px"
    };
    var centerAttr =
    {

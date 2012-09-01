@@ -26,6 +26,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade().registerMediator(new upro.view.mediators.SolarSystemContextMenuMediator());
 
+      uiMediator.setVisible(true); // set visible before creating UI panels, so they have proper dimensions
       this.setupRouteListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
       this.setupGroupListMenu(uiMediator);
@@ -35,17 +36,16 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       {
          var scene = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
 
+         uiMediator.setVisible(false); // with a scene system supported, use this display as default.
          scene.createGalaxies();
-      }
-      else
-      {
-         uiMediator.setVisible(true);
       }
 
       this.facade().sendNotification(upro.app.Notifications.DebugMessage, "SessionLoggedIn complete");
 
       uiMediator.showBaseView("swCtrl", "debug"); // for now, always show debugging output
       uiMediator.showBaseView("wList", "autopilotRoute");
+      uiMediator.showBaseView("eList", "groupList");
+      uiMediator.showBaseView("neCtrl", "groupEdit");
    },
 
    setupHoverPosHighlight: function(highlightMediator)
@@ -94,7 +94,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.setSubMenu(panelId, "route", 0, upro.res.menu.IconData.Routing, upro.res.text.Lang
             .format("routeList.menuLabel"));
 
-      this.facade().registerMediator(new upro.view.mediators.AutopilotRoutePanelMediator(panelId, panelId + ".route"));
+      this.facade().registerMediator(
+            new upro.view.mediators.AutopilotRoutePanelMediator(panelId, panelId + ".route", 1));
    },
 
    setupSettingsMenu: function(uiMediator)
@@ -104,26 +105,28 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.setSubMenu(panelId, "settings", 4, upro.res.menu.IconData.Settings, upro.res.text.Lang
             .format("settings.menuLabel"));
 
-      this.facade().registerMediator(new upro.view.mediators.DebugPanelMediator(panelId, panelId + ".settings"));
+      this.facade().registerMediator(new upro.view.mediators.DebugPanelMediator(panelId, panelId + ".settings", 4));
    },
 
    setupGroupListMenu: function(uiMediator)
    {
-      var panelId = "wList";
+      var panelId = "eList";
 
-      uiMediator.setSubMenu(panelId, "groupList", 1, upro.res.menu.IconData.Group, upro.res.text.Lang
+      uiMediator.setSubMenu(panelId, "groupList", 5, upro.res.menu.IconData.Group, upro.res.text.Lang
             .format("groupList.menuLabel"));
 
-      this.facade().registerMediator(new upro.view.mediators.GroupListPanelMediator(panelId, panelId + ".groupList"));
+      this.facade()
+            .registerMediator(new upro.view.mediators.GroupListPanelMediator(panelId, panelId + ".groupList", 5));
    },
 
    setupGroupEditMenu: function(uiMediator)
    {
-      var panelId = "nwCtrl";
+      var panelId = "neCtrl";
 
       uiMediator.setSubMenu(panelId, "groupEdit", 1, upro.res.menu.IconData.Group, upro.res.text.Lang
             .format("groupEdit.menuLabel"));
 
-      this.facade().registerMediator(new upro.view.mediators.GroupEditPanelMediator(panelId, panelId + ".groupEdit"));
+      this.facade()
+            .registerMediator(new upro.view.mediators.GroupEditPanelMediator(panelId, panelId + ".groupEdit", 1));
    }
 });

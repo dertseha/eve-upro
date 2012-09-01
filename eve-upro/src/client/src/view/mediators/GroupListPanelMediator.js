@@ -3,15 +3,19 @@
  */
 upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
-   initialize: function($super, panelId, menuPath)
+   initialize: function($super, panelId, menuPath, menuIndex)
    {
       $super(upro.view.mediators.GroupListPanelMediator.NAME, null);
 
       this.panelId = panelId;
       this.menuPath = menuPath;
+      this.menuIndex = menuIndex;
 
       this.textField = null;
       this.createButton = null;
+      this.joinButton = null;
+      this.leaveButton = null;
+      this.destroyButton = null;
 
       this.selectionTimer = upro.sys.Timer.getSingleTimer(this.onSelectionTimer.bind(this));
       this.selection = null;
@@ -32,7 +36,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
          childViews: [
          {
             view: 'TextField',
-            rect: '0 0 ' + (dimension.width - 30) + ' ' + 25,
+            rect: '0 0 ' + (dimension.width) + ' ' + 25,
             anchors: 'left top right',
             background: 'theme(box)',
             id: 'groupList_text',
@@ -40,14 +44,35 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
          },
          {
             view: 'Button',
-            rect: (dimension.width - 25) + ' 0 25 25',
-            anchors: 'top right',
-            text: '+',
+            rect: '0 30 100 25',
+            anchors: 'top left',
+            text: upro.res.text.Lang.format("panels.group.edit.create"),
             id: 'groupList_create'
          },
          {
+            view: 'Button',
+            rect: (dimension.width - 100) + ' 30 100 25',
+            anchors: 'top right',
+            text: upro.res.text.Lang.format("panels.group.edit.destroy"),
+            id: 'groupList_destroy'
+         },
+         {
+            view: 'Button',
+            rect: '0 60 100 25',
+            anchors: 'top left',
+            text: upro.res.text.Lang.format("panels.group.edit.join"),
+            id: 'groupList_join'
+         },
+         {
+            view: 'Button',
+            rect: (dimension.width - 100) + ' 60 100 25',
+            anchors: 'top right',
+            text: upro.res.text.Lang.format("panels.group.edit.leave"),
+            id: 'groupList_leave'
+         },
+         {
             view: 'ScrollPane',
-            rect: '0 30 ' + (dimension.width) + ' ' + (dimension.height - 30),
+            rect: '0 90 ' + (dimension.width) + ' ' + (dimension.height - 90),
             anchors: 'left top right bottom',
             textSelectable: false,
             style:
@@ -59,7 +84,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
             childViews: [
             {
                view: 'List',
-               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
+               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 90),
                anchors: 'top left right bottom',
                id: 'groupList_list',
                style:
@@ -79,16 +104,26 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
       var base = uki('#groupListPanel_base');
 
-      uiMediator.setBaseView(this.panelId, this.menuPath, 0, upro.res.menu.IconData.GroupList, upro.res.text.Lang
-            .format("panels.group.list.menuLabel"), "groupList", base);
+      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.GroupList,
+            upro.res.text.Lang.format("panels.group.list.menuLabel"), "groupList", base);
 
       this.createButton = uki('#groupList_create');
 
       this.createButton.disabled(true);
       this.createButton.bind('click', this.onCreateButton.bind(this));
 
+      this.joinButton = uki('#groupList_join');
+      this.joinButton.bind('click', this.onJoinButton.bind(this));
+      this.leaveButton = uki('#groupList_leave');
+      this.leaveButton.bind('click', this.onLeaveButton.bind(this));
+      this.destroyButton = uki('#groupList_destroy');
+      this.destroyButton.bind('click', this.onDestroyButton.bind(this));
+
       this.textField = uki('#groupList_text');
       this.textField.bind('keydown keyup', this.onTextChange.bind(this));
+
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      this.onNotifyGroupSelected(groupProxy.getSelectedGroup());
    },
 
    getImageForMembership: function(group)
@@ -144,6 +179,37 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       }
    },
 
+   notifySelectedGroup: function(notification)
+   {
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+
+      this.facade().sendNotification(notification, groupProxy.getSelectedGroup().getId());
+   },
+
+   onJoinButton: function()
+   {
+      if (!this.joinButton.disabled())
+      {
+         this.notifySelectedGroup(upro.app.Notifications.GroupJoinRequest);
+      }
+   },
+
+   onLeaveButton: function()
+   {
+      if (!this.leaveButton.disabled())
+      {
+         this.notifySelectedGroup(upro.app.Notifications.GroupLeaveRequest);
+      }
+   },
+
+   onDestroyButton: function()
+   {
+      if (!this.destroyButton.disabled())
+      {
+         this.notifySelectedGroup(upro.app.Notifications.GroupDestroyRequest);
+      }
+   },
+
    onSelectionTimer: function()
    {
       this.facade().sendNotification(upro.app.Notifications.GroupSelectionRequest, this.selection);
@@ -188,7 +254,26 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       var groupList = uki('#groupList_list');
       groupList.data(data);
       groupList.selectedIndex(selectedIndex);
+   },
+
+   onNotifyGroupSelected: function(group)
+   {
+      if (group)
+      {
+         var isMember = group.isClientMember();
+
+         this.joinButton.disabled(isMember);
+         this.leaveButton.disabled(!isMember);
+         this.destroyButton.disabled(!group.isClientOwner());
+      }
+      else
+      {
+         this.joinButton.disabled(true);
+         this.leaveButton.disabled(true);
+         this.destroyButton.disabled(true);
+      }
    }
+
 });
 
 upro.view.mediators.GroupListPanelMediator.NAME = "GroupListPanel";

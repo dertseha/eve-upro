@@ -3,12 +3,13 @@
  */
 upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
-   initialize: function($super, panelId, menuPath)
+   initialize: function($super, panelId, menuPath, menuIndex)
    {
       $super(upro.view.mediators.AutopilotRoutePanelMediator.NAME, null);
 
       this.panelId = panelId;
       this.menuPath = menuPath;
+      this.menuIndex = menuIndex;
    },
 
    onRegister: function()
@@ -52,8 +53,8 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
 
       var base = uki('#autopilotRoutePanel_base');
 
-      uiMediator.setBaseView(this.panelId, this.menuPath, 1, upro.res.menu.IconData.Autopilot, upro.res.text.Lang
-            .format("panels.autopilot.route.menuLabel"), "autopilotRoute", base);
+      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.Autopilot,
+            upro.res.text.Lang.format("panels.autopilot.route.menuLabel"), "autopilotRoute", base);
    },
 
    setRoute: function(route)

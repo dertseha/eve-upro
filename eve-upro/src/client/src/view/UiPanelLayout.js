@@ -145,7 +145,8 @@ upro.view.UiPanelLayout = Class.create(
       var sidePanelStyle =
       {
          width: "18.75%",
-         height: "100%"
+         height: "100%",
+         padding: "3px"
       };
       var controlPanelAttr =
       {
@@ -155,7 +156,8 @@ upro.view.UiPanelLayout = Class.create(
       var controlPanelStyle =
       {
          height: "30%",
-         width: "25%"
+         width: "25%",
+         padding: "3px"
       };
       var centerAttr =
       {
