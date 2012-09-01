@@ -122,6 +122,26 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       });
    },
 
+   removeAdvertisementsOfSelectedGroup: function(interest)
+   {
+      if (this.selectedGroupId)
+      {
+         this.removeAdvertisementOfGroup(this.selectedGroupId, interest);
+      }
+   },
+
+   removeAdvertisementOfGroup: function(groupId, interest)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      upro.sys.log("Requesting to remove group advertisement [" + groupId + "]");
+      sessionProxy.sendRequest(upro.data.clientRequests.RemoveGroupAdvertisements.name,
+      {
+         groupId: groupId,
+         interest: interest
+      });
+   },
+
    onGroupMembership: function(broadcastBody)
    {
       var group = this.groups[broadcastBody.groupId];
@@ -148,6 +168,10 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
          if (group && group.removeMembers(broadcastBody.removed.members))
          {
             changed = true;
+            if (!group.isClientMember())
+            {
+               group.setAdvertisements([]);
+            }
          }
       }
       if (changed && this.handleGroupDataChange(group))

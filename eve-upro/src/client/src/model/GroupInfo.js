@@ -65,9 +65,27 @@ upro.model.GroupInfo = Class.create(
             var part2 = that.members.slice(index + 1);
 
             that.members = part1.concat(part2);
+            that.removeOwner(memberId);
             rCode = true;
          }
       });
+
+      return rCode;
+   },
+
+   removeOwner: function(ownerId)
+   {
+      var index = this.groupData.owner.indexOf(ownerId);
+      var rCode = false;
+
+      if (index >= 0)
+      {
+         var part1 = this.groupData.owner.slice(0, index);
+         var part2 = this.groupData.owner.slice(index + 1);
+
+         this.groupData.owner = part1.concat(part2);
+         rCode = true;
+      }
 
       return rCode;
    },

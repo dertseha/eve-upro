@@ -215,25 +215,35 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
    {
       var resultList = uki('#groupEdit_searchResultList');
       var listEntries = resultList.selectedRows();
-      var interests = [];
-
-      listEntries.forEach(function(listEntry)
-      {
-         var interest =
-         {
-            scope: listEntry.type,
-            id: listEntry.bodyName.getId()
-         };
-
-         interests.push(interest);
-      });
+      var interests = this.getSelectedInterest(listEntries);
 
       this.facade().sendNotification(upro.app.Notifications.GroupAdvertiseRequest, interests);
    },
 
    onRemoveInvitationButton: function()
    {
+      var listEntries = this.invitationList.selectedRows();
+      var interests = this.getSelectedInterest(listEntries);
 
+      this.facade().sendNotification(upro.app.Notifications.GroupRemoveAdvertisementRequest, interests);
+   },
+
+   getSelectedInterest: function(listEntries)
+   {
+      var interest = [];
+
+      listEntries.forEach(function(listEntry)
+      {
+         var interestEntry =
+         {
+            scope: listEntry.type,
+            id: listEntry.bodyName.getId()
+         };
+
+         interest.push(interestEntry);
+      });
+
+      return interest;
    },
 
    onNotifyFindBodyResult: function(result)
