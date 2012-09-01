@@ -22,7 +22,8 @@
    {
       /**
        * Sent periodically by a connected client, this request serves as a keep-alive message and also lets the system
-       * know of the current IGB headers (such as location, ...)
+       * know of the current IGB headers (such as location, ...). This request is not forwarded to the bus; Instead,
+       * EveStatusUpdateRequest is broadcasted.
        */
       Status:
       {
@@ -31,6 +32,41 @@
          body:
          {
             schema: {},
+            isValid: null
+         }
+      },
+
+      /**
+       * Finds bodies by (parts of) their name
+       */
+      FindBodiesByName:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               searchText: String
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Requests the name of a certain body
+       */
+      GetNameOfBody:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               characters: Array.of(Number),
+               corporations: Array.of(Number)
+            },
             isValid: null
          }
       },

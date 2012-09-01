@@ -15,6 +15,7 @@ var MongoDbComponentBuilder = require('./components/MongoDbComponentBuilder.js')
 var EveApiMsgComponentBuilder = require('./eveapi-msg-component/EveApiMsgComponentBuilder.js');
 var EveApiComponentBuilder = require('./eveapi-component/EveApiComponentBuilder.js');
 var HttpServerComponentBuilder = require('./http-server-component/HttpServerComponentBuilder.js');
+var BodyRegisterComponentBuilder = require('./bodyregister-service-component/BodyRegisterServiceComponentBuilder.js');
 var CharacterAgentComponentBuilder = require('./character-agent-component/CharacterAgentComponentBuilder.js');
 var ClientSessionComponentBuilder = require('./client-session-component/ClientSessionComponentBuilder.js');
 var GroupServiceComponentBuilder = require('./group-service-component/GroupServiceComponentBuilder.js');
@@ -158,6 +159,11 @@ var serviceControl = new ServiceControl();
 }
 { // eveapi
    var builder = new EveApiComponentBuilder();
+
+   serviceControl.setBuilder(builder);
+}
+{ // bodyregister
+   var builder = new BodyRegisterComponentBuilder();
 
    serviceControl.setBuilder(builder);
 }

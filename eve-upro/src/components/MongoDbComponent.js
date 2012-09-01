@@ -176,15 +176,23 @@ function MongoDbComponent(options)
    /**
     * Retrieves data from a collection
     */
-   this.getData = function(collectionName, filter, callback, fields)
+   this.getData = function(collectionName, filter, callback, fields, options)
    {
       var collection = this.collections[collectionName];
 
       if (collection)
       {
          var self = this;
-         var options = {};
-         var cursor = collection.find(filter, fields, options);
+         var finalOptions = {};
+
+         if (options)
+         {
+            for ( var optionName in options)
+            {
+               finalOptions[optionName] = options[optionName];
+            }
+         }
+         var cursor = collection.find(filter, fields, finalOptions);
 
          cursor.each(function(err, document)
          {

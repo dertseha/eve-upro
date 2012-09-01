@@ -80,7 +80,6 @@ exports.testCharacterLocationStatusEmitted_WhenEveStatusReceived = function(test
 
    this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
    {
-      sessionId: sessionId,
       eveInfo:
       {
          solarSystemId: solarSystemId
@@ -98,7 +97,6 @@ exports.testCharacterLocationStatusEmittedOnlyOnce_WhenEveStatusReceivedTwiceIde
    var solarSystemId = 3344;
    var broadcastBody =
    {
-      sessionId: sessionId,
       eveInfo:
       {
          solarSystemId: solarSystemId
@@ -132,7 +130,6 @@ exports.testCharacterLocationStatusHasCharacterScope_WhenEveStatusReceived = fun
 
    this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
    {
-      sessionId: sessionId,
       eveInfo:
       {
          solarSystemId: solarSystemId

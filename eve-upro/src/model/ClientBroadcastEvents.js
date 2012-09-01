@@ -36,6 +36,11 @@
       owner: context.commonSchemata.groupOwnerSchema
    };
    var groupMemberSchema = Number;
+   var bodySchema =
+   {
+      id: Number,
+      name: String
+   };
 
    var clientBroadcastEvents =
    {
@@ -51,6 +56,46 @@
             schema:
             {
                active: Boolean
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * The result of a previous find body request
+       */
+      FindBodyResult:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               query:
+               {
+                  searchText: String
+               },
+               characters: Array.of(bodySchema),
+               corporations: Array.of(bodySchema)
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * The reply to a previous GetNameOfBody request
+       */
+      GetNameOfBodyReply:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               characters: Array.of(bodySchema),
+               corporations: Array.of(bodySchema)
             },
             isValid: null
          }
