@@ -43,23 +43,32 @@ function ActiveLocationStatusGroupState(service, character, group)
    {
       var nextState = new NullLocationStatusGroupState(this.service, this.character, this.group);
 
+      nextState.activate();
       if (this.group.isSendLocationEnabled())
       {
          this.service.broadcastLocationStatusUndefined(this.character, this.getGroupInterest());
       }
-      nextState.activate();
    };
 
    /** {@inheritDoc} */
    this.processBroadcast = function(header, body)
    {
+      var handler = this['onBroadcast' + header.type];
 
+      if (handler)
+      {
+         handler.call(this, body);
+      }
+      else
+      {
+         logger.error('Unhandled broadcast [' + header.type + '] in ActiveLocationStatusGroupState');
+      }
    };
 
    /** {@inheritDoc} */
    this.addInterest = function(interestList)
    {
-      if (this.character.hasInterestForGroup(this.group.getGroupId()) && this.group.isSendLocationEnabled())
+      if (this.group.isSendLocationEnabled())
       {
          interestList = interestList.concat(this.getGroupInterest());
       }
@@ -105,6 +114,35 @@ function ActiveLocationStatusGroupState(service, character, group)
       var body = this.group.getSettingsBody();
 
       this.service.amqp.broadcast(header, body, queueName);
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastClientRequestModifyCharacterLocationStatusGroup = function(body)
+   {
+      var changed = false;
+
+      if (body.hasOwnProperty('sendLocation') && this.group.updateSendLocation(body.sendLocation))
+      {
+         if (this.group.isSendLocationEnabled())
+         {
+            this.service.broadcastLocationStatus(this.character, this.getGroupInterest());
+         }
+         else
+         {
+            this.service.broadcastLocationStatusUndefined(this.character, this.getGroupInterest());
+         }
+         changed = true;
+      }
+      if (body.hasOwnProperty('displayLocation') && this.group.updateDisplayLocation(body.displayLocation))
+      {
+         changed = true;
+      }
+      if (changed)
+      {
+         this.broadcastCharacterLocationStatusGroupSettings();
+      }
    };
 }
 util.inherits(ActiveLocationStatusGroupState, LocationStatusGroupState);

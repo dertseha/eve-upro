@@ -37,7 +37,7 @@ function LocationStatusGroup(documentId, initData)
 
    this.updateSendLocation = function(value)
    {
-      return this.updateDataProperty('sendLocation', value);
+      return this.updateDataProperty('sendLocation', !!value);
    };
 
    this.isDisplayLocationEnabled = function()
@@ -47,7 +47,7 @@ function LocationStatusGroup(documentId, initData)
 
    this.updateDisplayLocation = function(value)
    {
-      return this.updateDataProperty('displayLocation', value);
+      return this.updateDataProperty('displayLocation', !!value);
    };
 
    this.updateDataProperty = function(name, value)

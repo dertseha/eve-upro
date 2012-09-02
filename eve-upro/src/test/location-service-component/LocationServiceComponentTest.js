@@ -68,6 +68,19 @@ function Fixture()
       this.givenStorageReturnsDataDelayed(LocationStatusGroup.CollectionName, [ document ]);
    };
 
+   this.whenCharacterChangesGroupSettings = function(sessionId, groupId, sendLocation, displayLocation)
+   {
+      var body =
+      {
+         groupId: groupId,
+         sendLocation: sendLocation,
+         displayLocation: displayLocation
+      };
+
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestModifyCharacterLocationStatusGroup.name,
+            sessionId, body);
+   };
+
    this.expectingCharacterLocationStatus = function(test, charId, solarSystemId, interest, disinterest)
    {
       var prev = this.amqp.broadcast;
@@ -500,5 +513,85 @@ exports.testLocationStatusUndefinedEmittedForSecondCharacter_WhenLeavingDistribu
    this.fixture.whenCharacterLeavesGroup(charIdB, groupId);
 
    test.expect(3);
+   test.done();
+};
+
+exports.testLocationGroupSettingsEmitted_WhenChangingSettings = function(test)
+{
+   var charId = 356353;
+   var groupId = UuidFactory.v4();
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterIsMemberOfGroups(charId, [ groupId ]);
+   this.fixture.givenCharacterHasActiveLocationStatusGroup(charId, groupId, false, false);
+
+   this.fixture.whenCharacterChangesGroupSettings(sessionId, groupId, undefined, true);
+
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test,
+         busMessages.Broadcasts.CharacterLocationStatusGroupSettings.name,
+         {
+            groupId: groupId,
+            sendLocation: false,
+            displayLocation: true
+         }, [
+         {
+            scope: 'Character',
+            id: charId
+         } ]);
+
+   test.expect(2);
+   test.done();
+};
+
+exports.testLocationStatusEmittedForGroup_WhenSettingsChangedToSendLocation = function(test)
+{
+   var charId = 5645;
+   var groupId = UuidFactory.v4();
+   var sessionId = UuidFactory.v4();
+   var solarSystemId = 64564;
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterIsMemberOfGroups(charId, [ groupId ]);
+   this.fixture.givenCharacterHasActiveLocationStatusGroup(charId, groupId, false, false);
+   this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionId ]);
+
+   this.fixture.expectingCharacterLocationStatus(test, charId, solarSystemId, [
+   {
+      scope: 'Group',
+      id: groupId
+   } ]);
+
+   this.fixture.whenCharacterChangesGroupSettings(sessionId, groupId, true, undefined);
+
+   test.expect(3);
+   test.done();
+};
+
+exports.testLocationStatusUndefinedEmittedForGroup_WhenSettingsChangedToNotSendLocation = function(test)
+{
+   var charId = 5645;
+   var groupId = UuidFactory.v4();
+   var sessionId = UuidFactory.v4();
+   var solarSystemId = 56853;
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterIsMemberOfGroups(charId, [ groupId ]);
+   this.fixture.givenCharacterHasActiveLocationStatusGroup(charId, groupId, true, false);
+   this.fixture.givenCharacterIsAt(charId, solarSystemId, [ sessionId ]);
+
+   this.fixture.expectingCharacterLocationStatus(test, charId, undefined, [
+   {
+      scope: 'Group',
+      id: groupId
+   } ], [
+   {
+      scope: 'Character',
+      id: charId
+   } ]);
+
+   this.fixture.whenCharacterChangesGroupSettings(sessionId, groupId, false, undefined);
+
+   test.expect(4);
    test.done();
 };

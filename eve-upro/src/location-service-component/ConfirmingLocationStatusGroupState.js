@@ -77,6 +77,10 @@ function ConfirmingLocationStatusGroupState(service, character, group)
          nextState = new NullLocationStatusGroupState(this.service, this.character, this.group);
       }
       nextState.activate();
+      this.broadcastQueue.forEach(function(broadcast)
+      {
+         nextState.processBroadcast(broadcast.characterId, broadcast.header, broadcast.body);
+      });
 
       return nextState;
    };
