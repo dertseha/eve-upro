@@ -48,10 +48,11 @@ function GroupServiceComponent(services, groupFactory)
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestAdvertiseGroup.name);
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveGroupAdvertisements.name);
 
-      this.mongodb.defineCollection(Group.CollectionName, [ 'members', 'adCharacter', 'adCorporation' ], function()
-      {
-         self.onStarted();
-      });
+      this.mongodb.defineCollection(Group.CollectionName, [ 'data.members', 'data.adCharacter', 'data.adCorporation' ],
+            function()
+            {
+               self.onStarted();
+            });
    };
 
    this.registerBroadcastHandler = function(broadcastName)

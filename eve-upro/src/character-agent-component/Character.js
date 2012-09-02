@@ -8,6 +8,7 @@ function Character(charId, charName, corpId, corpName)
    this.clients = {};
    this.groupMemberships = [];
    this.groupSyncId = null;
+   this.groupSyncFinished = false;
 
    this.serviceData = {};
 
@@ -124,6 +125,14 @@ function Character(charId, charName, corpId, corpName)
    };
 
    /**
+    * @returns true whether the group sync is already finished
+    */
+   this.isGroupSyncFinished = function()
+   {
+      return this.groupSyncFinished;
+   },
+
+   /**
     * Handles the group sync state by given parameters.
     * 
     * @param syncId the group sync ID to consider
@@ -140,6 +149,7 @@ function Character(charId, charName, corpId, corpName)
       else if (this.groupSyncId == syncId)
       {
          this.groupSyncId = null;
+         this.groupSyncFinished = true;
          rCode = true;
       }
 

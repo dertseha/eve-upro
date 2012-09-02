@@ -3,24 +3,41 @@ var util = require('util');
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
+var LocationStatusGroup = require('./LocationStatusGroup.js');
+
+var LocationStatusGroup = require('./LocationStatusGroup.js');
+var LoadingLocationStatusGroupState = require('./LoadingLocationStatusGroupState.js');
+
 function LocationServiceComponent(services)
 {
    LocationServiceComponent.super_.call(this);
 
    this.amqp = services['amqp'];
+   this.mongodb = services['mongodb'];
    this.characterAgent = services['character-agent'];
 
    /** {@inheritDoc} */
    this.start = function()
    {
+      var self = this;
+
       this.registerCharacterHandler('CharacterOnline', '');
       this.registerCharacterHandler('CharacterOffline', '');
       this.registerCharacterHandler('SessionAdded', 'Character');
       this.registerCharacterHandler('SessionRemoved', 'Character');
+      this.registerCharacterHandler('CharacterGroupMemberAdded', '');
+      this.registerCharacterHandler('CharacterGroupMemberRemoved', '');
+      this.registerCharacterHandler('CharacterGroupSyncFinished', '');
 
       this.registerBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest.name);
 
-      this.onStarted();
+      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestModifyCharacterLocationStatusGroup.name);
+
+      this.mongodb.defineCollection(LocationStatusGroup.CollectionName, [ 'data.characterId', 'data.groupId' ],
+            function()
+            {
+               self.onStarted();
+            });
    };
 
    this.registerCharacterHandler = function(eventName, infix)
@@ -46,6 +63,67 @@ function LocationServiceComponent(services)
       });
    };
 
+   this.registerGroupBroadcastHandler = function(broadcastName)
+   {
+      var self = this;
+
+      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      {
+         self.onGroupBroadcast(header, body);
+      });
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onGroupBroadcast = function(header, body)
+   {
+      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+
+      if (character)
+      {
+         var state = this.ensureGroupState(character, body.groupId);
+
+         state.processBroadcast(header, body);
+      }
+   };
+
+   this.ensureGroupState = function(character, groupId)
+   {
+      var serviceData = character.serviceData['location-service'];
+      var state = serviceData.groupStatesById[groupId];
+
+      if (!state)
+      {
+         state = new LoadingLocationStatusGroupState(this, character, groupId, LocationStatusGroup.getDocumentId(
+               character.getCharacterId(), groupId));
+         state.activate();
+      }
+
+      return state;
+   };
+
+   this.setGroupState = function(character, groupId, state)
+   {
+      if (character.isOnline())
+      {
+         var serviceData = character.serviceData['location-service'];
+
+         if (state)
+         {
+            serviceData.groupStatesById[groupId] = state;
+         }
+         else
+         {
+            delete serviceData.groupStatesById[groupId];
+         }
+      }
+      else
+      {
+         logger.info('Character ' + character.toString() + ' has gone offline again, ignoring group state');
+      }
+   };
+
    /**
     * Broadcast handler
     */
@@ -62,7 +140,7 @@ function LocationServiceComponent(services)
          {
             serviceData.lastKnownLocation = newLocation;
             serviceData.locationsBySessionId[header.sessionId] = newLocation;
-            this.broadcastLocationStatus(character, this.getLocationInterest(character));
+            this.broadcastLocationStatus(character);
          }
       }
    };
@@ -72,11 +150,30 @@ function LocationServiceComponent(services)
     */
    this.onCharacterOnline = function(character)
    {
+      var self = this;
+      var characterId = character.getCharacterId();
+      var filter =
+      {
+         "data.characterId": characterId
+      };
+
       character.serviceData['location-service'] =
       {
          lastKnownLocation: null,
-         locationsBySessionId: {}
+         locationsBySessionId: {},
+         groupStatesById: {}
       };
+      this.mongodb.getData(LocationStatusGroup.CollectionName, filter, function(err, id, data)
+      {
+         if (data)
+         {
+            self.ensureGroupState(character, data.groupId);
+         }
+      },
+      {
+         _id: true,
+         'data.groupId': true
+      });
    };
 
    /**
@@ -84,24 +181,25 @@ function LocationServiceComponent(services)
     */
    this.onCharacterSessionAdded = function(character, sessionId)
    {
+      var serviceData = character.serviceData['location-service'];
       var responseQueue = character.getResponseQueue(sessionId);
       var interest = [
       {
          scope: 'Session',
          id: sessionId
       } ];
-      var self = this;
 
-      this.characterAgent.forEachCharacter(function(existingCharacter)
+      if (serviceData.lastKnownLocation)
       {
-         var existingServiceData = existingCharacter.serviceData['location-service'];
-         var existingInterest = self.getLocationInterest(existingCharacter);
+         this.broadcastLocationStatus(character, interest, responseQueue);
+      }
+      for ( var groupId in serviceData.groupStatesById)
+      {
+         var state = serviceData.groupStatesById[groupId];
 
-         if (existingServiceData.lastKnownLocation && character.hasInterestIn(existingInterest))
-         {
-            self.broadcastLocationStatus(existingCharacter, interest, responseQueue);
-         }
-      });
+         state.onCharacterSessionAdded(interest, responseQueue);
+      }
+      this.notifyCharacterOfOtherLocations(character, interest, responseQueue);
    };
 
    /**
@@ -148,7 +246,86 @@ function LocationServiceComponent(services)
       var serviceData = character.serviceData['location-service'];
 
       serviceData.lastKnownLocation = null;
-      this.broadcastLocationStatus(character, this.getLocationInterest(character));
+      this.broadcastLocationStatus(character);
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterGroupMemberAdded = function(character, groupId)
+   {
+      var interest = [
+      {
+         scope: 'Character',
+         id: character.getCharacterId()
+      } ];
+
+      this.ensureGroupState(character, groupId);
+      this.notifyCharacterOfOtherLocations(character, interest);
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterGroupMemberRemoved = function(character, groupId)
+   {
+      var self = this;
+      var interest = [
+      {
+         scope: 'Character',
+         id: character.getCharacterId()
+      } ];
+
+      // lets this char send undefined to group
+      this.ensureGroupState(character, groupId).onCharacterGroupMemberRemoved();
+
+      this.characterAgent.forEachCharacter(function(existingCharacter)
+      { // let this character receive undefined from all other characters of this group
+         if (character.getCharacterId() != existingCharacter.getCharacterId())
+         {
+            var existingServiceData = existingCharacter.serviceData['location-service'];
+            var existingGroup = existingServiceData.groupStatesById[groupId];
+
+            if (existingServiceData.lastKnownLocation && existingGroup && (existingGroup.addInterest([]).length > 0))
+            {
+               self.broadcastLocationStatusUndefined(existingCharacter, interest);
+            }
+         }
+      });
+   };
+
+   /**
+    * Character state handler
+    */
+   this.onCharacterGroupSyncFinished = function(character)
+   {
+      var serviceData = character.serviceData['location-service'];
+
+      for ( var groupId in serviceData.groupStatesById)
+      {
+         var state = serviceData.groupStatesById[groupId];
+
+         state.onCharacterGroupSyncFinished();
+      }
+   };
+
+   this.notifyCharacterOfOtherLocations = function(character, interest, responseQueue)
+   {
+      var self = this;
+
+      this.characterAgent.forEachCharacter(function(existingCharacter)
+      {
+         if (character.getCharacterId() != existingCharacter.getCharacterId())
+         {
+            var existingServiceData = existingCharacter.serviceData['location-service'];
+            var existingInterest = self.getLocationInterest(existingCharacter);
+
+            if (existingServiceData.lastKnownLocation && character.hasInterestIn(existingInterest))
+            {
+               self.broadcastLocationStatus(existingCharacter, interest, responseQueue);
+            }
+         }
+      });
    };
 
    /**
@@ -157,11 +334,17 @@ function LocationServiceComponent(services)
     */
    this.getLocationInterest = function(character)
    {
+      var serviceData = character.serviceData['location-service'];
       var interest = [
       {
          scope: 'Character',
          id: character.getCharacterId()
       } ];
+
+      for ( var groupId in serviceData.groupStatesById)
+      {
+         interest = serviceData.groupStatesById[groupId].addInterest(interest);
+      }
 
       return interest;
    };
@@ -179,7 +362,7 @@ function LocationServiceComponent(services)
       var header =
       {
          type: busMessages.Broadcasts.CharacterLocationStatus.name,
-         interest: interest,
+         interest: interest || this.getLocationInterest(character),
          characterId: character.getCharacterId()
       };
       var body =
@@ -191,6 +374,30 @@ function LocationServiceComponent(services)
       this.amqp.broadcast(header, body, queueName);
    };
 
+   /**
+    * Broadcast an undefined location status of given character, used when destinations should no longer receive the
+    * information.
+    * 
+    * @param character the Character object
+    * @param interest the explicit interest for the broadcast message
+    */
+   this.broadcastLocationStatusUndefined = function(character, interest)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.CharacterLocationStatus.name,
+         interest: interest,
+         disinterest: this.getLocationInterest(character),
+         characterId: character.getCharacterId()
+      };
+      var body =
+      {
+         characterInfo: character.getCharacterInfo(),
+         solarSystemId: undefined
+      };
+
+      this.amqp.broadcast(header, body);
+   };
 }
 util.inherits(LocationServiceComponent, Component);
 

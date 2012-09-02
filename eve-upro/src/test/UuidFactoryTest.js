@@ -49,3 +49,27 @@ exports.testFromMongoId = function(test)
    test.equal(result, value);
    test.done();
 };
+
+exports.testV3Empty = function(test)
+{
+   var result = uuid.v3(uuid.empty(), '');
+
+   test.equal(result, '4ae71336e44b39bfb9d2752e234818a5');
+   test.done();
+};
+
+exports.testV3 = function(test)
+{
+   var result = uuid.v3(uuid.empty(), 'Test');
+
+   test.equal(result, '7a8bf5d22e3334ec8af5d3636b55e1fe');
+   test.done();
+};
+
+exports.testV5 = function(test)
+{
+   var result = uuid.v5(uuid.empty(), 'Test');
+
+   test.equal(result, '5b23436d8e7c51cf81625cd5fd379ecf');
+   test.done();
+};

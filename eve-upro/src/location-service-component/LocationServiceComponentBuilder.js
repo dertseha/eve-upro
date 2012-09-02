@@ -16,7 +16,7 @@ function LocationServiceComponentBuilder()
    /** {@inheritDoc} */
    this.getServiceDependencies = function()
    {
-      return [ 'amqp', 'character-agent' ];
+      return [ 'amqp', 'mongodb', 'character-agent' ];
    };
 
    /** {@inheritDoc} */

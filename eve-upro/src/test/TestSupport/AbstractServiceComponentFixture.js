@@ -3,6 +3,7 @@ var EventEmitter = require('events').EventEmitter;
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
+var UuidFactory = require('../../util/UuidFactory.js');
 var busMessages = require('../../model/BusMessages.js');
 
 var Character = require('../../character-agent-component/Character.js');
@@ -189,8 +190,82 @@ function AbstractServiceComponentFixture()
          }
       };
 
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + header.type, header, body);
+      this.broadcast(header, body);
+   };
+
+   this.givenCharacterIsMemberOfGroups = function(charId, groupIds)
+   {
+      var syncId = UuidFactory.v4();
+      var character = this.characterAgent.characters[charId];
+
+      character.handleGroupDataSyncState(syncId, false);
+      character.groupMemberships = groupIds;
+      character.handleGroupDataSyncState(syncId, true);
+   };
+
+   this.givenCharacterStartedGroupSync = function(charId, syncId)
+   {
+      this.broadcastGroupSyncState(charId, syncId, false);
+   };
+
+   this.whenCharacterFinishedGroupSync = function(charId, syncId, groupIds)
+   {
+      var character = this.characterAgent.characters[charId];
+
+      character.groupMemberships = groupIds;
+      this.broadcastGroupSyncState(charId, syncId, true);
+   };
+
+   this.broadcastGroupSyncState = function(charId, syncId, finished)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.CharacterGroupDataSyncState.name,
+      };
+      var body =
+      {
+         characterId: charId,
+         syncId: syncId,
+         finished: finished
+      };
+
+      this.amqp.broadcast(header, body);
+   };
+
+   this.whenCharacterJoinsGroup = function(charId, groupId)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupMembership.name
+      };
+      var body =
+      {
+         groupId: groupId,
+         added:
+         {
+            members: [ charId ]
+         }
+      };
+
+      this.broadcast(header, body);
+   };
+
+   this.whenCharacterLeavesGroup = function(charId, groupId)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupMembership.name
+      };
+      var body =
+      {
+         groupId: groupId,
+         removed:
+         {
+            members: [ charId ]
+         }
+      };
+
+      this.broadcast(header, body);
    };
 
    this.expectingBroadcastInterest = function(test, expectedType, expectedInterest)
@@ -222,7 +297,7 @@ function AbstractServiceComponentFixture()
       return found;
    };
 
-   this.thenTheLastBroadcastShouldHaveBeen = function(test, type, body, interest)
+   this.thenTheLastBroadcastShouldHaveBeen = function(test, type, body, interest, disinterest)
    {
       var lastMessage = this.findLastBroadcastOfType(type);
 
@@ -231,6 +306,10 @@ function AbstractServiceComponentFixture()
          if (interest)
          {
             test.deepEqual(lastMessage.header.interest, interest);
+         }
+         if (disinterest)
+         {
+            test.deepEqual(lastMessage.header.disinterest, disinterest);
          }
          test.deepEqual(lastMessage.body, body);
       }
