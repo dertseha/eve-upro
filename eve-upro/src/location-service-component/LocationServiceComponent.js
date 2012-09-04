@@ -261,7 +261,7 @@ function LocationServiceComponent(services)
    {
       var serviceData = character.serviceData['location-service'];
 
-      serviceData.lastKnownLocation = null;
+      serviceData.lastKnownLocation = undefined;
       this.broadcastLocationStatus(character);
    };
 

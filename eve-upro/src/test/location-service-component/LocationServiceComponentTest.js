@@ -108,7 +108,7 @@ function Fixture()
          if (header.type == busMessages.Broadcasts.CharacterLocationStatus.name)
          {
             test.equal(body.characterInfo.characterId, charId);
-            test.equal(body.solarSystemId, solarSystemId);
+            test.strictEqual(body.solarSystemId, solarSystemId);
             if (interest)
             {
                test.deepEqual(header.interest, interest);
