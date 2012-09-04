@@ -66,9 +66,9 @@ function Character(charId, charName, corpId, corpName)
    };
 
    /**
-    * @returns true if at least one client session is active
+    * @returns the amount of currently registered sessions
     */
-   this.isOnline = function()
+   this.getSessionCount = function()
    {
       var count = 0;
 
@@ -77,7 +77,15 @@ function Character(charId, charName, corpId, corpName)
          count++;
       });
 
-      return count > 0;
+      return count;
+   };
+
+   /**
+    * @returns true if at least one client session is active
+    */
+   this.isOnline = function()
+   {
+      return this.getSessionCount() > 0;
    };
 
    /**

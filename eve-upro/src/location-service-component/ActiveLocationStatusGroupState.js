@@ -17,12 +17,12 @@ function ActiveLocationStatusGroupState(service, character, group)
    /** {@inheritDoc} */
    this.activate = function()
    {
-      this.service.setGroupState(this.character, this.groupId, this);
+      this.service.setGroupState(this.character, this.group.getGroupId(), this);
 
       this.broadcastCharacterLocationStatusGroupSettings();
       if (this.group.isSendLocationEnabled())
       {
-         this.service.broadcastLocationStatus(this.character, this.getGroupInterest());
+         this.service.broadcastLocationStatus(this.character, this.group.getInterest());
       }
    };
 
@@ -46,7 +46,7 @@ function ActiveLocationStatusGroupState(service, character, group)
       nextState.activate();
       if (this.group.isSendLocationEnabled())
       {
-         this.service.broadcastLocationStatusUndefined(this.character, this.getGroupInterest());
+         this.service.broadcastLocationStatusUndefined(this.character, this.group.getInterest());
       }
    };
 
@@ -70,21 +70,10 @@ function ActiveLocationStatusGroupState(service, character, group)
    {
       if (this.group.isSendLocationEnabled())
       {
-         interestList = interestList.concat(this.getGroupInterest());
+         interestList = interestList.concat(this.group.getInterest());
       }
 
       return interestList;
-   };
-
-   this.getGroupInterest = function()
-   {
-      var interest = [
-      {
-         scope: 'Group',
-         id: this.group.getGroupId()
-      } ];
-
-      return interest;
    };
 
    this.getCharacterInterest = function()
@@ -127,11 +116,11 @@ function ActiveLocationStatusGroupState(service, character, group)
       {
          if (this.group.isSendLocationEnabled())
          {
-            this.service.broadcastLocationStatus(this.character, this.getGroupInterest());
+            this.service.broadcastLocationStatus(this.character, this.group.getInterest());
          }
          else
          {
-            this.service.broadcastLocationStatusUndefined(this.character, this.getGroupInterest());
+            this.service.broadcastLocationStatusUndefined(this.character, this.group.getInterest());
          }
          changed = true;
       }

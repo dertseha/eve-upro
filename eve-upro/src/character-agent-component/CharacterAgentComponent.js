@@ -87,12 +87,15 @@ function CharacterAgentComponent(services)
       {
          character = new Character(charId, body.user.characterName, body.user.corporationId, body.user.corporationName);
          this.characters[charId] = character;
-         this.emit('CharacterOnline', character);
       }
       if (!character.hasClientSession(body.sessionId))
       {
          character.addClientSession(body.sessionId, body.responseQueue);
          this.charactersBySession[body.sessionId] = character;
+         if (character.getSessionCount() == 1)
+         {
+            this.emit('CharacterOnline', character);
+         }
          this.emit('SessionAdded', character, body.sessionId);
       }
    };

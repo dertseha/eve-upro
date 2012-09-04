@@ -8,7 +8,7 @@ var UuidFactory = require('../util/UuidFactory.js');
 
 var commonSchemata = require('../model/CommonSchemata.js');
 
-function LocationStatusGroup(documentId, initData)
+function LocationStatusGroup(documentId, initData, interest)
 {
    this.documentId = documentId;
    this.data =
@@ -19,6 +19,11 @@ function LocationStatusGroup(documentId, initData)
       sendLocation: initData.hasOwnProperty('sendLocation') ? initData.sendLocation : false,
       displayLocation: initData.hasOwnProperty('displayLocation') ? initData.displayLocation : false,
    };
+   this.interest = interest || [
+   {
+      scope: 'Group',
+      id: this.data.groupId
+   } ];
 
    this.getGroupId = function()
    {
@@ -75,6 +80,11 @@ function LocationStatusGroup(documentId, initData)
       return body;
    };
 
+   this.getInterest = function()
+   {
+      return this.interest;
+   };
+
    this.saveToStorage = function(storage)
    {
       var id = UuidFactory.toMongoId(this.documentId);
@@ -111,7 +121,7 @@ LocationStatusGroup.getDocumentId = function(characterId, groupId)
    return UuidFactory.v5(namespace, name);
 };
 
-LocationStatusGroup.create = function(characterId, groupId)
+LocationStatusGroup.create = function(characterId, groupId, interest)
 {
    var id = UuidFactory.v4();
    var initData =
@@ -119,7 +129,7 @@ LocationStatusGroup.create = function(characterId, groupId)
       characterId: characterId,
       groupId: groupId
    };
-   var group = new LocationStatusGroup(id, initData);
+   var group = new LocationStatusGroup(id, initData, interest);
 
    return group;
 };

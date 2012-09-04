@@ -66,7 +66,7 @@ function ConfirmingLocationStatusGroupState(service, character, group)
    {
       var nextState = null;
 
-      if (this.character.hasInterestForGroup(this.group.getGroupId()))
+      if (this.character.hasInterestIn(this.group.getInterest()))
       {
          nextState = this.getNextState();
       }

@@ -1,7 +1,11 @@
 var util = require('util');
 
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
+var predefinedGroupIds = require('../model/PredefinedGroups.js').predefinedGroupIds;
 
 var LocationStatusGroup = require('./LocationStatusGroup.js');
 
@@ -88,6 +92,16 @@ function LocationServiceComponent(services)
       }
    };
 
+   this.ensureGroupStateForPredefined = function(character)
+   {
+      for ( var groupType in predefinedGroupIds)
+      {
+         var groupId = predefinedGroupIds[groupType];
+
+         this.ensureGroupState(character, groupId);
+      }
+   };
+
    this.ensureGroupState = function(character, groupId)
    {
       var serviceData = character.serviceData['location-service'];
@@ -163,6 +177,8 @@ function LocationServiceComponent(services)
          locationsBySessionId: {},
          groupStatesById: {}
       };
+
+      this.ensureGroupStateForPredefined(character);
       this.mongodb.getData(LocationStatusGroup.CollectionName, filter, function(err, id, data)
       {
          if (data)

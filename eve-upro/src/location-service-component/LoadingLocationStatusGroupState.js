@@ -4,6 +4,7 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 
 var UuidFactory = require('../util/UuidFactory.js');
+var predefinedGroupTypes = require('../model/PredefinedGroups.js').predefinedGroupTypes;
 
 var LocationStatusGroup = require('./LocationStatusGroup.js');
 var LocationStatusGroupState = require('./LocationStatusGroupState.js');
@@ -91,20 +92,53 @@ function LoadingLocationStatusGroupState(service, character, groupId, documentId
       });
    };
 
+   /**
+    * Returns a group object corresponding to the loaded data and ID information.
+    * 
+    * @returns LocationStatusGroup instance
+    */
    this.getGroupFromData = function(data)
    {
       var group = null;
+      var interest = this.getInterestForNewGroup(this.groupId);
 
       if (data)
       {
-         group = new LocationStatusGroup(this.documentId, data);
+         group = new LocationStatusGroup(this.documentId, data, interest);
       }
       else
       {
-         group = LocationStatusGroup.create(this.character.getCharacterId(), this.groupId);
+         group = LocationStatusGroup.create(this.character.getCharacterId(), this.groupId, interest);
       }
 
       return group;
+   };
+
+   /**
+    * Returns the interest for given group ID. Checks whether the ID is a predefined one, relating to common bodies.
+    * 
+    * @returns an array of interest for the group.
+    */
+   this.getInterestForNewGroup = function(groupId)
+   {
+      var interest = null;
+      var predefinedType = predefinedGroupTypes[groupId];
+
+      if (predefinedType)
+      {
+         var idGetter = this.character['get' + predefinedType + 'Id'];
+
+         if (idGetter)
+         {
+            interest = [
+            {
+               scope: predefinedType,
+               id: idGetter.call(character)
+            } ];
+         }
+      }
+
+      return interest;
    };
 
    this.getNextState = function(group)

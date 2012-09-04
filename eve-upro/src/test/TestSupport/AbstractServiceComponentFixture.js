@@ -101,12 +101,12 @@ function AbstractServiceComponentFixture()
       var self = this;
 
       this.characterAgent.characters[charId] = character;
-      this.initCharacterServiceData(character);
       sessionIds.forEach(function(sessionId)
       {
          self.characterAgent.charactersBySession[sessionId] = character;
          character.addClientSession(sessionId);
       });
+      this.initCharacterServiceData(character);
    };
 
    this.initCharacterServiceData = function(character)
@@ -201,6 +201,7 @@ function AbstractServiceComponentFixture()
       character.handleGroupDataSyncState(syncId, false);
       character.groupMemberships = groupIds;
       character.handleGroupDataSyncState(syncId, true);
+      this.characterAgent.emit('CharacterGroupSyncFinished', character);
    };
 
    this.givenCharacterStartedGroupSync = function(charId, syncId)

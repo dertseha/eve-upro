@@ -3,6 +3,7 @@ var util = require('util');
 
 var UuidFactory = require("../../util/UuidFactory.js");
 var busMessages = require('../../model/BusMessages.js');
+var predefinedGroupIds = require('../../model/PredefinedGroups.js').predefinedGroupIds;
 var CharacterAgentComponent = require('../../character-agent-component/CharacterAgentComponent.js');
 var LocationServiceComponent = require('../../location-service-component/LocationServiceComponent.js');
 
@@ -27,6 +28,13 @@ function Fixture()
       this.locationService.onCharacterOnline(character);
    };
 
+   this.givenLocationServiceKnowsNoPredefinedGroups = function()
+   {
+      this.locationService.ensureGroupStateForPredefined = function()
+      {
+      };
+   };
+
    this.givenCharacterIsAt = function(charId, solarSystemId, notifyingSessions)
    {
       var character = this.characterAgent.getCharacterById(charId);
@@ -49,6 +57,16 @@ function Fixture()
       group.updateSendLocation(sendLocation);
       group.updateDisplayLocation(displayLocation);
       serviceData.groupStatesById[groupId] = state;
+   };
+
+   this.givenCharacterHasLocationStatusGroupSettings = function(charId, groupId, sendLocation, displayLocation)
+   {
+      var character = this.characterAgent.getCharacterById(charId);
+      var serviceData = character.serviceData['location-service'];
+      var state = serviceData.groupStatesById[groupId];
+
+      state.group.updateSendLocation(sendLocation);
+      state.group.updateDisplayLocation(displayLocation);
    };
 
    this.givenExistingLocationStatusGroupInDatabase = function(charId, groupId, sendLocation, displayLocation)
@@ -99,6 +117,24 @@ function Fixture()
             {
                test.deepEqual(header.disinterest, disinterest);
             }
+         }
+         else
+         {
+            prev(header, body);
+         }
+      };
+   };
+
+   this.expectingSpecificCharacterLocationStatus = function(test, charId, solarSystemId, checker)
+   {
+      var prev = this.amqp.broadcast;
+
+      this.amqp.broadcast = function(header, body)
+      {
+         if ((header.type == busMessages.Broadcasts.CharacterLocationStatus.name) && checker(header, body))
+         {
+            test.equal(body.characterInfo.characterId, charId);
+            test.equal(body.solarSystemId, solarSystemId);
          }
          else
          {
@@ -327,6 +363,7 @@ exports.testLocationStatusEmittedForGroup_WhenGettingOnlineWithExistingGroup = f
    var sessionId = UuidFactory.v4();
    var solarSystemId = 5656;
 
+   this.fixture.givenLocationServiceKnowsNoPredefinedGroups();
    this.fixture.givenExistingLocationStatusGroupInDatabase(charId, groupId, true, true);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
    this.fixture.givenCharacterIsMemberOfGroups(charId, [ groupId ]);
@@ -351,6 +388,7 @@ exports.testLocationStatusNotEmittedForGroup_WhenGettingOnlineWithExistingGroupN
    var groupId = UuidFactory.v4();
    var sessionId = UuidFactory.v4();
 
+   this.fixture.givenLocationServiceKnowsNoPredefinedGroups();
    this.fixture.givenExistingLocationStatusGroupInDatabase(charId, groupId, true, true);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
    this.fixture.givenCharacterIsMemberOfGroups(charId, []);
@@ -376,6 +414,7 @@ exports.testLocationStatusEmittedForGroup_WhenGettingOnlineWithExistingGroupDela
    var syncId = UuidFactory.v4();
    var solarSystemId = 2345;
 
+   this.fixture.givenLocationServiceKnowsNoPredefinedGroups();
    this.fixture.givenExistingLocationStatusGroupInDatabase(charId, groupId, true, true);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
    this.fixture.givenCharacterStartedGroupSync(charId, syncId);
@@ -593,5 +632,39 @@ exports.testLocationStatusUndefinedEmittedForGroup_WhenSettingsChangedToNotSendL
    this.fixture.whenCharacterChangesGroupSettings(sessionId, groupId, false, undefined);
 
    test.expect(4);
+   test.done();
+};
+
+exports.testCharacterLocationStatusEmittedForCorporation_WhenEveStatusReceived = function(test)
+{
+   var charId = 1234;
+   var corpId = 53453;
+   var corpGroupId = predefinedGroupIds['Corporation'];
+   var sessionId = UuidFactory.v4();
+   var solarSystemId = 5678;
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId, corpId);
+   this.fixture.givenCharacterIsMemberOfGroups(charId, []);
+   this.fixture.givenCharacterHasLocationStatusGroupSettings(charId, corpGroupId, true, false);
+
+   this.fixture.expectingCharacterLocationStatus(test, charId, solarSystemId, [
+   {
+      scope: 'Character',
+      id: charId
+   },
+   {
+      scope: 'Corporation',
+      id: corpId
+   } ]);
+
+   this.fixture.whenBroadcastReceived(busMessages.Broadcasts.EveStatusUpdateRequest.name, sessionId,
+   {
+      eveInfo:
+      {
+         solarSystemId: solarSystemId
+      }
+   });
+
+   test.expect(3);
    test.done();
 };
