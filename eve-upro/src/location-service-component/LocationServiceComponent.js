@@ -109,8 +109,9 @@ function LocationServiceComponent(services)
 
       if (!state)
       {
-         state = new LoadingLocationStatusGroupState(this, character, groupId, LocationStatusGroup.getDocumentId(
-               character.getCharacterId(), groupId));
+         var documentId = LocationStatusGroup.getDocumentId(character.getCharacterId(), groupId);
+
+         state = new LoadingLocationStatusGroupState(this, character, groupId, documentId);
          state.activate();
       }
 
@@ -173,7 +174,7 @@ function LocationServiceComponent(services)
 
       character.serviceData['location-service'] =
       {
-         lastKnownLocation: null,
+         lastKnownLocation: undefined,
          locationsBySessionId: {},
          groupStatesById: {}
       };

@@ -123,13 +123,13 @@ LocationStatusGroup.getDocumentId = function(characterId, groupId)
 
 LocationStatusGroup.create = function(characterId, groupId, interest)
 {
-   var id = UuidFactory.v4();
+   var documentId = LocationStatusGroup.getDocumentId(characterId, groupId);
    var initData =
    {
       characterId: characterId,
       groupId: groupId
    };
-   var group = new LocationStatusGroup(id, initData, interest);
+   var group = new LocationStatusGroup(documentId, initData, interest);
 
    return group;
 };

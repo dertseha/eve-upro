@@ -130,6 +130,7 @@ function ActiveLocationStatusGroupState(service, character, group)
       }
       if (changed)
       {
+         this.group.saveToStorage(this.service.mongodb);
          this.broadcastCharacterLocationStatusGroupSettings();
       }
    };
