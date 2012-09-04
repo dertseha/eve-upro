@@ -7,6 +7,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
    {
       $super(upro.model.proxies.GroupProxy.NAME);
 
+      this.predefinedGroups = {};
       this.groups = {};
       this.selectedGroupId = null;
    },
@@ -19,6 +20,24 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupMembership.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupAdvertisement.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupAdvertisementList.name);
+
+      this.createPredefinedGroupInfoObjects();
+   },
+
+   createPredefinedGroupInfoObjects: function()
+   {
+      for ( var groupId in upro.model.predefinedGroupTypes)
+      {
+         var type = upro.model.predefinedGroupTypes[groupId];
+         var groupData =
+         {
+            name: upro.res.text.Lang.format("predefined.groups." + type),
+            owner: [ 0 ]
+         };
+         var group = new upro.model.GroupInfo(groupId, groupData, this.characterInfo.characterId);
+
+         this.predefinedGroups[groupId] = group;
+      }
    },
 
    forEachGroup: function(callback)
@@ -27,6 +46,11 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       {
          callback(this.groups[groupId]);
       }
+   },
+
+   getGroup: function(groupId)
+   {
+      return this.groups[groupId] || this.predefinedGroups[groupId];
    },
 
    setSelectedGroup: function(groupId)

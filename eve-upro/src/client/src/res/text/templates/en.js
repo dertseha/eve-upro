@@ -8,6 +8,9 @@ upro.res.text.templates["en"] =
    /** General text for anything that is turned 'off' */
    "general.off": "Off",
 
+   /** The "own corporation" predefined group */
+   "predefined.groups.Corporation": "Own Corporation",
+
    /** Label for routing menu */
    "routing.menuLabel": "Routing",
    /** Command for clearing the route */
@@ -131,5 +134,15 @@ upro.res.text.templates["en"] =
    /** Add invitation command */
    "panels.group.edit.addInvitation.command": "Add",
    /** Remove invitation command */
-   "panels.group.edit.removeInvitation.command": "Remove"
+   "panels.group.edit.removeInvitation.command": "Remove",
+
+   /** Menu Label for the map controls */
+   "map.menuLabel": "Map Controls",
+
+   /** Current Location control */
+   "panels.currrentLocation.menuLabel": "Current Location",
+   /** Send the own location to given group */
+   "panels.currentLocation.send.command": "Send Own",
+   /** Display others location of given group */
+   "panels.currentLocation.display.command": "Display Others"
 };

@@ -25,7 +25,7 @@ upro.model.GroupInfo = Class.create(
 
    getName: function()
    {
-      return this.groupData.name;
+      return this.groupData.name.escapeHTML();
    },
 
    hasMembers: function()

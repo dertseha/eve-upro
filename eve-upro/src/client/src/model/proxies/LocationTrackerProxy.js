@@ -1,20 +1,61 @@
-upro.model.proxies.LocationTrackerProxy = Class.create(Proxy,
+upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.AbstractProxy,
 {
    initialize: function($super)
    {
       $super(upro.model.proxies.LocationTrackerProxy.NAME, new upro.model.LocationTracker());
 
+      this.statusGroups = {};
    },
 
    onRegister: function()
    {
-      var self = this;
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterLocationStatusGroupSettings.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterLocationStatus.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.GroupMembership.name);
+   },
+
+   forEachGroup: function(callback)
+   {
+      for ( var groupId in this.statusGroups)
+      {
+         callback(this.statusGroups[groupId]);
+      }
+   },
+
+   modifyLocationStatusGroup: function(groupId, data)
+   {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.addBroadcastHandler("CharacterLocationStatus", function(broadcastBody)
+      sessionProxy.sendRequest(upro.data.clientRequests.ModifyCharacterLocationStatusGroup.name,
       {
-         self.onCharacterLocationStatus(broadcastBody);
+         groupId: groupId,
+         sendLocation: data.sendLocation,
+         displayLocation: data.displayLocation
       });
+   },
+
+   onCharacterLocationStatusGroupSettings: function(broadcastBody)
+   {
+      var group = this.ensureLocationStatusGroup(broadcastBody.groupId);
+      upro.sys.log("settings changed: " + Object.toJSON(broadcastBody));
+      group.setSendLocation(broadcastBody.sendLocation);
+      group.setDisplayLocation(broadcastBody.displayLocation);
+
+      this.facade().sendNotification(upro.app.Notifications.LocationStatusGroupListChanged);
+   },
+
+   onGroupMembership: function(broadcastBody)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+      var characterInfo = sessionProxy.getCharacterInfo();
+      var statusGroup = this.statusGroups[broadcastBody.groupId];
+
+      if (statusGroup && broadcastBody.removed
+            && (broadcastBody.removed.members.indexOf(characterInfo.characterId) >= 0))
+      {
+         delete this.statusGroups[broadcastBody.groupId];
+         this.facade().sendNotification(upro.app.Notifications.LocationStatusGroupListChanged);
+      }
    },
 
    onCharacterLocationStatus: function(broadcastBody)
@@ -33,6 +74,19 @@ upro.model.proxies.LocationTrackerProxy = Class.create(Proxy,
       var data = this.getData();
 
       return data.getLocationByCharacter(charId);
+   },
+
+   ensureLocationStatusGroup: function(groupId)
+   {
+      var group = this.statusGroups[groupId];
+
+      if (!group)
+      {
+         group = new upro.model.LocationStatusGroupInfo(groupId);
+         this.statusGroups[groupId] = group;
+      }
+
+      return group;
    }
 
 });

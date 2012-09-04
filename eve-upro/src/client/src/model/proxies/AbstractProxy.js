@@ -3,9 +3,9 @@
  */
 upro.model.proxies.AbstractProxy = Class.create(Proxy,
 {
-   initialize: function($super, name)
+   initialize: function($super, name, data)
    {
-      $super(name);
+      $super(name, data);
    },
 
    registerBroadcast: function(type)

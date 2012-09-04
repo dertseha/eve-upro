@@ -114,9 +114,11 @@ exports.sourceFiles = [];
    'data/CommunicationUplink.js', //
 
    'model/model.js', //
+   shareBase + 'PredefinedGroups.js', //
    shareBase + 'navigation/RoutingRules.js', //
    shareBase + 'navigation/RoutingCapabilities.js', //
    'model/LocationTracker.js', //
+   'model/LocationStatusGroupInfo.js', //
    'model/UserRoutingRule.js', //
    'model/GroupInfo.js', //
    'model/AbstractBodyName.js', //
@@ -148,6 +150,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedAutopilotRouteChangedCommand.js', //
    'control/commands/NotifiedAutopilotNextRouteIndexChangedCommand.js', //
    'control/commands/NotifiedCharacterLocationStatusCommand.js', //
+   'control/commands/NotifiedModifyLocationStatusGroupSettingsCommand.js', //
    'control/commands/NotifiedSessionLoggedInCommand.js', //
    'control/commands/NotifiedSetActiveGalaxyCommand.js', //
    'control/commands/NotifiedSetHighlightedObjectCommand.js', //
@@ -210,6 +213,7 @@ exports.sourceFiles = [];
    'view/mediators/GroupListPanelMediator.js', //
    'view/mediators/GroupMemberListPanelMediator.js', //
    'view/mediators/GroupEditPanelMediator.js', //
+   'view/mediators/CurrentLocationPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //
@@ -229,7 +233,9 @@ exports.sourceFiles = [];
    'res/menu/IconData.js', //
 
    'res/text/templates/templates.js', //
-   'res/text/templates/en.js' //
+   'res/text/templates/en.js', //
+
+   'res/ImageData.js' //
    ];
 
    function getFilePath(fileName)

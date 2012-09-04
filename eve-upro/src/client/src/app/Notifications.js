@@ -120,7 +120,12 @@ upro.app.Notifications =
    /** request to find bodies by name */
    FindBodyByNameRequest: 0,
    /** result of a body search */
-   FindBodyResult: 0
+   FindBodyResult: 0,
+
+   /** list of location status groups changed */
+   LocationStatusGroupListChanged: 0,
+   /** Modify the settings of a location status group */
+   ModifyLocationStatusGroupSettings: 0
 };
 
 /**

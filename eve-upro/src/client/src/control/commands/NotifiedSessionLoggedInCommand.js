@@ -30,6 +30,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.setVisible(true); // set visible before creating UI panels, so they have proper dimensions
       this.setupRouteListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
+      this.setupMapMenu(uiMediator);
       this.setupGroupListMenu(uiMediator);
       this.setupGroupEditMenu(uiMediator);
 
@@ -47,6 +48,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.showBaseView("wList", "autopilotRoute");
       uiMediator.showBaseView("eList", "groupList");
       uiMediator.showBaseView("neCtrl", "groupEdit");
+      uiMediator.showBaseView("nwCtrl", "currentLocation");
    },
 
    setupHoverPosHighlight: function(highlightMediator)
@@ -107,6 +109,16 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             .format("settings.menuLabel"));
 
       this.facade().registerMediator(new upro.view.mediators.DebugPanelMediator(panelId, panelId + ".settings", 4));
+   },
+
+   setupMapMenu: function(uiMediator)
+   {
+      var panelId = "nwCtrl";
+
+      uiMediator.setSubMenu(panelId, "map", 1, upro.res.menu.IconData.Map, upro.res.text.Lang.format("map.menuLabel"));
+
+      this.facade()
+            .registerMediator(new upro.view.mediators.CurrentLocationPanelMediator(panelId, panelId + ".map", 1));
    },
 
    setupGroupListMenu: function(uiMediator)
