@@ -97,7 +97,7 @@ function CharacterGroupDataSync(broadcaster, characterId)
       var body =
       {
          characterId: this.characterId,
-         syncId: this.syncId,
+         syncId: this.id,
          finished: finished
       };
 
