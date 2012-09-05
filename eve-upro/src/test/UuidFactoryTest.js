@@ -8,7 +8,13 @@ exports.testEmptyShouldReturnEmptyUuid = function(test)
 
 exports.testV4ShouldReturnStringOfLength32 = function(test)
 {
-   test.equal(uuid.v4().length, 32);
+   var value = null;
+
+   for ( var i = 0; i < 1000; i++)
+   {
+      value = uuid.v4();
+      test.equal(value.length, 32, 'err: "' + value + '"');
+   }
    test.done();
 };
 

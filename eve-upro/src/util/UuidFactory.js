@@ -1,7 +1,12 @@
 var crypto = require('crypto');
 
-var uuidJs = require('uuid-js');
+var uuid = require('node-uuid');
 var mongodb = require('mongodb');
+
+var v4Options =
+{
+   rng: uuid.nodeRNG
+};
 
 /**
  * Creates a UUID from a hash, which is used for either v3 or v5 variants
@@ -42,7 +47,7 @@ exports.v3 = function(namespace, name)
 
 exports.v4 = function()
 {
-   return uuidJs.create(4).toString().replace(/-/g, '');
+   return uuid.v4(v4Options).replace(/-/g, '');
 };
 
 exports.v5 = function(namespace, name)
