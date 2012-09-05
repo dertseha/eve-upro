@@ -87,7 +87,7 @@ upro.view.mediators.SolarSystemHighlightMediator = Class.create(upro.view.mediat
     * @param key id of the highlight
     * @param solarSystem the new solarSystem to track
     */
-   setHighlightSolarSystem: function(key, solarSystem)
+   setHighlightSolarSystem: function(key, solarSystem, text)
    {
       var highlight = this.entries[key];
 
@@ -97,7 +97,7 @@ upro.view.mediators.SolarSystemHighlightMediator = Class.create(upro.view.mediat
       {
          highlight.setTextOptions(
          {
-            value: solarSystem.name
+            value: text || solarSystem.name
          });
          highlight.show();
       }

@@ -17,6 +17,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
       this.characterInfo = sessionProxy.getCharacterInfo();
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterLocationStatus.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupMembership.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupAdvertisement.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupAdvertisementList.name);
@@ -164,6 +165,21 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
          groupId: groupId,
          interest: interest
       });
+   },
+
+   /**
+    * Broadcast Handler
+    * 
+    * TODO: that the group proxy needs to handle location status to get info is not good.
+    */
+   onCharacterLocationStatus: function(broadcastBody)
+   {
+      if (this.characterInfo.corporationId === broadcastBody.characterInfo.corporationId)
+      {
+         var charId = broadcastBody.characterInfo.characterId;
+
+         this.predefinedGroups[upro.model.predefinedGroupIds['Corporation']].addMembers([ charId ]);
+      }
    },
 
    onGroupMembership: function(broadcastBody)

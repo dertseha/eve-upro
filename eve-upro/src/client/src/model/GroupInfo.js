@@ -33,6 +33,11 @@ upro.model.GroupInfo = Class.create(
       return this.members.length > 0;
    },
 
+   isCharacterMember: function(characterId)
+   {
+      return this.members.indexOf(characterId) >= 0;
+   },
+
    forEachMember: function(callback)
    {
       this.members.forEach(callback);

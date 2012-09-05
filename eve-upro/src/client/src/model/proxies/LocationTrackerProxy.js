@@ -5,7 +5,7 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
 {
    initialize: function($super)
    {
-      $super(upro.model.proxies.LocationTrackerProxy.NAME, new upro.model.LocationTracker());
+      $super(upro.model.proxies.LocationTrackerProxy.NAME, new upro.model.LocationTracker(this));
 
       this.statusGroups = {};
    },
@@ -16,6 +16,22 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterLocationStatusGroupSettings.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterLocationStatus.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupMembership.name);
+   },
+
+   fireCharacterListInSolarSystemChangedIfOnlyChar: function(charId)
+   {
+      var data = this.getData();
+      var solarSystem = data.getLocationByCharacter(charId);
+
+      if (solarSystem)
+      {
+         var charIds = data.getCharactersByLocation(solarSystem.getId());
+
+         if (charIds.length == 1)
+         {
+            this.notifyCharacterListInSolarSystemChanged(solarSystem.getId(), charIds);
+         }
+      }
    },
 
    /**
@@ -44,6 +60,27 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       }
    },
 
+   isCharacterVisible: function(characterId)
+   {
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      var rCode = false;
+
+      this.forEachGroup(function(statusGroup)
+      {
+         if (statusGroup.isDisplayLocationEnabled())
+         {
+            var group = groupProxy.getGroup(statusGroup.getId());
+
+            if (group.isCharacterMember(characterId))
+            {
+               rCode = true;
+            }
+         }
+      });
+
+      return rCode;
+   },
+
    /**
     * Requests to modify the settings of a status group
     * 
@@ -67,10 +104,21 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
     */
    onCharacterLocationStatusGroupSettings: function(broadcastBody)
    {
+      var data = this.getData();
       var group = this.ensureLocationStatusGroup(broadcastBody.groupId);
+      var that = this;
 
       group.setSendLocation(broadcastBody.sendLocation);
-      group.setDisplayLocation(broadcastBody.displayLocation);
+      if (group.updateDisplayLocation(broadcastBody.displayLocation))
+      {
+         data.forEachLocation(function(solarSystemId)
+         {
+            var charIds = data.getCharactersByLocation(solarSystemId);
+
+            that.notifyCharacterListInSolarSystemChanged(solarSystemId, charIds);
+         });
+         // TODO: notify displayed list changed
+      }
 
       this.facade().sendNotification(upro.app.Notifications.LocationStatusGroupListChanged);
    },
@@ -123,6 +171,23 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       }
 
       return group;
+   },
+
+   onCharactersByLocationChanged: function(solarSystemId, characterIdList)
+   {
+      this.notifyCharacterListInSolarSystemChanged(solarSystemId, characterIdList);
+   },
+
+   notifyCharacterListInSolarSystemChanged: function(solarSystemId, characterIdList)
+   {
+      var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
+      var notifyBody =
+      {
+         solarSystem: universeProxy.findSolarSystemById(solarSystemId),
+         characterIdList: characterIdList
+      };
+
+      this.facade().sendNotification(upro.app.Notifications.CharacterListInSolarSystemChanged, notifyBody);
    }
 
 });

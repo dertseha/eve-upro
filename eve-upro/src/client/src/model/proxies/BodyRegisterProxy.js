@@ -103,22 +103,14 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
    onFindBodyResult: function(broadcastBody)
    {
       var that = this;
-
-      if (this.updateBodies("Character", broadcastBody.characters))
-      {
-         this.facade().sendNotification(upro.app.Notifications.KnownCharactersChanged);
-      }
-      if (this.updateBodies("Corporation", broadcastBody.corporations))
-      {
-         this.facade().sendNotification(upro.app.Notifications.KnownCorporationsChanged);
-      }
-
       var result =
       {
          query: broadcastBody.query,
          characters: [],
          corporations: []
       };
+
+      this.updateBodiesFromBroadcast(broadcastBody);
       broadcastBody.characters.forEach(function(data)
       {
          result.characters.push(that.getBodyName("Character", data.id));
@@ -133,13 +125,26 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
 
    onGetNameOfBodyReply: function(broadcastBody)
    {
-      if (this.updateBodies("Character", broadcastBody.characters))
+      this.updateBodiesFromBroadcast(broadcastBody);
+   },
+
+   /**
+    * Updates the known bodies from given broadcast body
+    * 
+    * @param broadcastBody the body containing the info
+    */
+   updateBodiesFromBroadcast: function(broadcastBody)
+   {
+      var newCharacters = this.updateBodies("Character", broadcastBody.characters);
+      var newCorporations = this.updateBodies("Corporation", broadcastBody.corporations);
+
+      if (newCharacters.length > 0)
       {
-         this.facade().sendNotification(upro.app.Notifications.KnownCharactersChanged);
+         this.facade().sendNotification(upro.app.Notifications.KnownCharactersChanged, newCharacters);
       }
-      if (this.updateBodies("Corporation", broadcastBody.corporations))
+      if (newCorporations.length > 0)
       {
-         this.facade().sendNotification(upro.app.Notifications.KnownCorporationsChanged);
+         this.facade().sendNotification(upro.app.Notifications.KnownCorporationsChanged, newCorporations);
       }
    },
 
@@ -148,11 +153,11 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
     * 
     * @param bodyType type of the bodies
     * @param dataList list returned from the server
-    * @returns {Boolean} true if new bodies were resolved
+    * @returns array of new bodies
     */
    updateBodies: function(bodyType, dataList)
    {
-      var bodiesChanged = false;
+      var newBodies = [];
       var bodies = this.bodyNamesByType[bodyType];
 
       dataList.forEach(function(data)
@@ -163,11 +168,11 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
          {
             body = new upro.model.ResolvedBodyName(data.id, data.name);
             bodies[data.id] = body;
-            bodiesChanged = true;
+            newBodies.push(body);
          }
       });
 
-      return bodiesChanged;
+      return newBodies;
    }
 
 });

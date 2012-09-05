@@ -150,6 +150,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedAutopilotRouteChangedCommand.js', //
    'control/commands/NotifiedAutopilotNextRouteIndexChangedCommand.js', //
    'control/commands/NotifiedCharacterLocationStatusCommand.js', //
+   'control/commands/NotifiedCharacterListInSolarSystemChangedCommand.js', //
    'control/commands/NotifiedModifyLocationStatusGroupSettingsCommand.js', //
    'control/commands/NotifiedSessionLoggedInCommand.js', //
    'control/commands/NotifiedSetActiveGalaxyCommand.js', //
@@ -185,6 +186,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedFindBodyByNameRequestCommand.js', //
    'control/commands/NotifiedGroupAdvertiseRequestCommand.js', //
    'control/commands/NotifiedGroupRemoveAdvertisementRequestCommand.js', //
+   'control/commands/NotifiedKnownCharactersChangedCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //

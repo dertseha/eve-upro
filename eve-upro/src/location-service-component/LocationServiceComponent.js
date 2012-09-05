@@ -226,21 +226,20 @@ function LocationServiceComponent(services)
    {
       var serviceData = character.serviceData['location-service'];
 
-      if (serviceData.lastKnownLocation)
+      if (serviceData.lastKnownLocation && serviceData.locationsBySessionId[sessionId])
       {
-         if (serviceData.locationsBySessionId[sessionId])
-         {
-            var amount = 0;
+         var amount = 0;
 
-            delete serviceData.locationsBySessionId[sessionId];
-            for (existingId in serviceData.locationsBySessionId)
-            {
-               amount++;
-            }
-            if (amount == 0)
-            {
-               this.onCharacterLocationUnknown(character);
-            }
+         delete serviceData.locationsBySessionId[sessionId];
+         for (existingId in serviceData.locationsBySessionId)
+         {
+            amount++;
+         }
+         logger.info('Lost IGB connection with ' + amount + ' remaining to provide location info for character '
+               + character.toString());
+         if (amount == 0)
+         {
+            this.onCharacterLocationUnknown(character);
          }
       }
    };

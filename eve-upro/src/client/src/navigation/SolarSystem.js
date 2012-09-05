@@ -21,9 +21,20 @@ upro.nav.SolarSystem = Class.create(
       this.jumpPortals = new upro.nav.IdentifiedObjectHolder(this);
    },
 
+   /**
+    * @return string presentation of the object
+    */
    toString: function()
    {
       return 'SolarSystem [' + this.name + ']';
+   },
+
+   /**
+    * @returns the ID of the system
+    */
+   getId: function()
+   {
+      return this.id;
    }
 });
 

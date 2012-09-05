@@ -76,6 +76,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       }
 
       guiList.data(data);
+      guiList.parent().layout();
    },
 
    getColorBySecurityLevel: function(solarSystem)
