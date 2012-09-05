@@ -10,26 +10,54 @@ upro.model.LocationStatusGroupInfo = Class.create(
       this.displayLocation = null;
    },
 
+   /**
+    * @returns the ID of the group
+    */
    getId: function()
    {
       return this.id;
    },
 
+   /**
+    * Sets the SendLocation setting
+    * 
+    * @param value to set
+    */
    setSendLocation: function(value)
    {
       this.sendLocation = value;
    },
 
+   /**
+    * @returns Whether the current location is transmitted to the membrs of this group
+    */
    isSendLocationEnabled: function()
    {
       return this.sendLocation;
    },
 
-   setDisplayLocation: function(value)
+   /**
+    * Updates the DisplayLocation setting
+    * 
+    * @param value to set
+    * @returns {Boolean} true if the setting changed
+    */
+   updateDisplayLocation: function(value)
    {
-      this.displayLocation = value;
+      var rCode = false;
+
+      if (this.displayLocation !== value)
+      {
+         this.displayLocation = value;
+         rCode = true;
+      }
+
+      return rCode;
    },
 
+   /**
+    * @returns Whether the current location of other group members should be displayed
+    */
    isDisplayLocationEnabled: function()
    {
       return this.displayLocation;

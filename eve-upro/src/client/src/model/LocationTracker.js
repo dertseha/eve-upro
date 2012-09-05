@@ -8,6 +8,12 @@ upro.model.LocationTracker = Class.create(
       this.locationsByCharacter = {};
    },
 
+   /**
+    * Set the location for a specific character
+    * 
+    * @param characterId identifying the character
+    * @param locationInfo the info to store
+    */
    setLocationForCharacter: function(characterId, locationInfo)
    {
       if (locationInfo)
@@ -20,6 +26,12 @@ upro.model.LocationTracker = Class.create(
       }
    },
 
+   /**
+    * Returns the location info of given character
+    * 
+    * @param characterId
+    * @returns the object stored by setLocationForCharacter() or undefined
+    */
    getLocationByCharacter: function(characterId)
    {
       return this.locationsByCharacter[characterId];

@@ -1,3 +1,6 @@
+/**
+ * The location tracker holds all the location information for pilots
+ */
 upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.AbstractProxy,
 {
    initialize: function($super)
@@ -7,6 +10,7 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       this.statusGroups = {};
    },
 
+   /** {@inheritDoc} */
    onRegister: function()
    {
       this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterLocationStatusGroupSettings.name);
@@ -14,6 +18,24 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupMembership.name);
    },
 
+   /**
+    * Returns the current location of given character
+    * 
+    * @param charId identifying the character
+    * @returns either a SolarSytem instance or undefined
+    */
+   getLocation: function(charId)
+   {
+      var data = this.getData();
+
+      return data.getLocationByCharacter(charId);
+   },
+
+   /**
+    * Calls the callback for each status group
+    * 
+    * @param callback to be called, signature: function(statusGroup) {}
+    */
    forEachGroup: function(callback)
    {
       for ( var groupId in this.statusGroups)
@@ -22,6 +44,12 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       }
    },
 
+   /**
+    * Requests to modify the settings of a status group
+    * 
+    * @param groupId identifying the group to modify
+    * @param data object containing optional sendLocation and displayLocation members
+    */
    modifyLocationStatusGroup: function(groupId, data)
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
@@ -34,16 +62,22 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       });
    },
 
+   /**
+    * Broadcast Handler
+    */
    onCharacterLocationStatusGroupSettings: function(broadcastBody)
    {
       var group = this.ensureLocationStatusGroup(broadcastBody.groupId);
-      upro.sys.log("settings changed: " + Object.toJSON(broadcastBody));
+
       group.setSendLocation(broadcastBody.sendLocation);
       group.setDisplayLocation(broadcastBody.displayLocation);
 
       this.facade().sendNotification(upro.app.Notifications.LocationStatusGroupListChanged);
    },
 
+   /**
+    * Broadcast Handler
+    */
    onGroupMembership: function(broadcastBody)
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
@@ -58,6 +92,9 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       }
    },
 
+   /**
+    * Broadcast Handler
+    */
    onCharacterLocationStatus: function(broadcastBody)
    {
       var data = this.getData();
@@ -69,13 +106,12 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       this.facade().sendNotification(upro.app.Notifications.CharacterLocationStatus, charId);
    },
 
-   getLocation: function(charId)
-   {
-      var data = this.getData();
-
-      return data.getLocationByCharacter(charId);
-   },
-
+   /**
+    * Ensures that a LocationStatusGroupInfo exists for given groupId
+    * 
+    * @param groupId the ID of the group
+    * @returns a LocationStatusGroupInfo instance
+    */
    ensureLocationStatusGroup: function(groupId)
    {
       var group = this.statusGroups[groupId];
