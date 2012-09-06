@@ -137,6 +137,12 @@ upro.res.text.templates["en"] =
    "panels.group.edit.removeInvitation.command": "Remove",
 
    /** Menu Label for the map controls */
+   "mapList.menuLabel": "Map Lists",
+
+   /** Current locations of all to display */
+   "panels.currentLocation.list.menuLabel": "Current Locations",
+
+   /** Menu Label for the map controls */
    "map.menuLabel": "Map Controls",
 
    /** Current Location control */

@@ -14,7 +14,15 @@ upro.model.LocationTracker = Class.create(
    {
       for ( var locationId in this.charactersByLocation)
       {
-         callback(locationId);
+         callback(locationId | 0);
+      }
+   },
+
+   forEachCharacter: function(callback)
+   {
+      for ( var charId in this.locationsByCharacter)
+      {
+         callback(charId | 0);
       }
    },
 

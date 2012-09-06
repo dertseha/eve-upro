@@ -29,6 +29,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       uiMediator.setVisible(true); // set visible before creating UI panels, so they have proper dimensions
       this.setupRouteListMenu(uiMediator);
+      this.setupMapListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
       this.setupMapMenu(uiMediator);
       this.setupGroupListMenu(uiMediator);
@@ -99,6 +100,17 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade().registerMediator(
             new upro.view.mediators.AutopilotRoutePanelMediator(panelId, panelId + ".route", 1));
+   },
+
+   setupMapListMenu: function(uiMediator)
+   {
+      var panelId = "wList";
+
+      uiMediator.setSubMenu(panelId, "map", 1, upro.res.menu.IconData.Map, upro.res.text.Lang
+            .format("mapList.menuLabel"));
+
+      this.facade().registerMediator(
+            new upro.view.mediators.CurrentLocationListPanelMediator(panelId, panelId + ".map", 0));
    },
 
    setupSettingsMenu: function(uiMediator)

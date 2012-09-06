@@ -16,6 +16,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       this.addInvitationButton = null;
       this.removeInvitationButton = null;
 
+      this.searchResultList = null;
       this.invitationList = null;
    },
 
@@ -65,11 +66,10 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
                rect: '0 0 ' + (halfWidth - 6) + ' ' + (dimension.height - 60),
                anchors: 'top left right bottom',
                id: 'groupEdit_searchResultList',
-               // background: 'rows(64, #FF0000)',
+               rowHeight: 36,
                style:
                {
-                  fontSize: '12px',
-                  lineHeight: '18px'
+                  fontSize: '12px'
                },
                render:
                {
@@ -96,10 +96,10 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
                rect: '0 0 ' + (halfWidth - 6) + ' ' + (dimension.height - 60),
                anchors: 'top left right bottom',
                id: 'groupEdit_invitationList',
+               rowHeight: 36,
                style:
                {
-                  fontSize: '12px',
-                  lineHeight: '18px'
+                  fontSize: '12px'
                },
                render:
                {
@@ -143,7 +143,10 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
       this.removeInvitationButton = uki('#groupEdit_removeInvitation');
       this.removeInvitationButton.disabled(true);
       this.removeInvitationButton.bind('click', this.onRemoveInvitationButton.bind(this));
-      this.invitationList = uki('#groupEdit_invitationList');
+      this.invitationList = uki('#groupEdit_invitationList')[0];
+      this.invitationList.parent().layout();
+      this.searchResultList = uki('#groupEdit_searchResultList')[0];
+      this.searchResultList.parent().layout();
    },
 
    getImageForBody: function(listEntry)
@@ -255,8 +258,7 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
    onAddInvitationButton: function()
    {
-      var resultList = uki('#groupEdit_searchResultList');
-      var listEntries = resultList.selectedRows();
+      var listEntries = this.searchResultList.selectedRows();
       var interests = this.getSelectedInterest(listEntries);
 
       this.facade().sendNotification(upro.app.Notifications.GroupAdvertiseRequest, interests);
@@ -298,8 +300,8 @@ upro.view.mediators.GroupEditPanelMediator = Class.create(upro.view.mediators.Ab
 
          this.sortListData(data);
 
-         var resultList = uki('#groupEdit_searchResultList');
-         resultList.data(data);
+         this.searchResultList.data(data);
+         this.searchResultList.parent().layout();
       }
    },
 

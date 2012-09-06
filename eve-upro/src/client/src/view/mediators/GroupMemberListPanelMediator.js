@@ -42,10 +42,10 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
                rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
                anchors: 'top left right bottom',
                id: 'groupMemberList_list',
+               rowHeight: 36,
                style:
                {
-                  fontSize: '12px',
-                  lineHeight: '18px'
+                  fontSize: '12px'
                },
                render:
                {
@@ -134,6 +134,7 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
 
       var memberList = uki('#groupMemberList_list');
       memberList.data(data);
+      memberList.parent().layout();
    },
 
    onNotifyGroupSelected: function(group)

@@ -58,6 +58,11 @@ upro.view.UiTheme = Class
                list: function(rowHeight)
                {
                   return new uki.background.Rows(rowHeight, self.getBackgroundCss(9) + ' ' + self.getBackgroundCss(8));
+               },
+               'table-header': function()
+               {
+                  return new uki.background.CssBox(defaultCss + 'border-bottom:2px solid #704010;background:'
+                        + self.getBackgroundCss(9));
                }
             };
 

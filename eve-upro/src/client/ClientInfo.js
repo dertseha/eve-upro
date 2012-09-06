@@ -216,6 +216,7 @@ exports.sourceFiles = [];
    'view/mediators/GroupMemberListPanelMediator.js', //
    'view/mediators/GroupEditPanelMediator.js', //
    'view/mediators/CurrentLocationPanelMediator.js', //
+   'view/mediators/CurrentLocationListPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

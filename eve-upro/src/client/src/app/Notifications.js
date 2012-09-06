@@ -127,7 +127,9 @@ upro.app.Notifications =
    /** Modify the settings of a location status group */
    ModifyLocationStatusGroupSettings: 0,
    /** List of characters in a solar system has changed */
-   CharacterListInSolarSystemChanged: 0
+   CharacterListInSolarSystemChanged: 0,
+   /** List of displayed characters has changed */
+   LocationStatusDisplayListChanged: 0
 };
 
 /**

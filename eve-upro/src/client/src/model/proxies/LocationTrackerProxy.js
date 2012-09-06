@@ -60,6 +60,20 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
       }
    },
 
+   forEachVisibleCharacter: function(callback)
+   {
+      var that = this;
+      var data = this.getData();
+
+      data.forEachCharacter(function(charId)
+      {
+         if (that.isCharacterVisible(charId))
+         {
+            callback(charId);
+         }
+      });
+   },
+
    isCharacterVisible: function(characterId)
    {
       var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
@@ -117,9 +131,8 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
 
             that.notifyCharacterListInSolarSystemChanged(solarSystemId, charIds);
          });
-         // TODO: notify displayed list changed
+         this.facade().sendNotification(upro.app.Notifications.LocationStatusDisplayListChanged);
       }
-
       this.facade().sendNotification(upro.app.Notifications.LocationStatusGroupListChanged);
    },
 
@@ -138,6 +151,7 @@ upro.model.proxies.LocationTrackerProxy = Class.create(upro.model.proxies.Abstra
          delete this.statusGroups[broadcastBody.groupId];
          this.facade().sendNotification(upro.app.Notifications.LocationStatusGroupListChanged);
       }
+      this.facade().sendNotification(upro.app.Notifications.LocationStatusDisplayListChanged);
    },
 
    /**
