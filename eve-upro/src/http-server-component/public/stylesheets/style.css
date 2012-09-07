@@ -6,6 +6,11 @@ background-color:#000000;
 font-family:"Verdana", "Arial", "sans-serif";
 }
 
+a:link     { color:#E0E0FF; }
+a:visited  { color:#E0E0E0; }
+a:hover    { color:#50E050; }
+a:active   { color:#D0D0D0; }
+
 div.message
 {
 color:#FFFFFF;
@@ -51,11 +56,6 @@ div.login table td.label
 width:10%;
 max-width:10%;
 }
-div.login table td.label a:link     { color:#FFFFFF; }
-div.login table td.label a:visited  { color:#FFFFFF; }
-div.login table td.label a:hover    { color:#E0E0E0; }
-div.login table td.label a:active   { color:#D0D0D0; }
-
 div.login table td.input
 {
 width:100%;
