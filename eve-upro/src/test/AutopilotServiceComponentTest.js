@@ -180,6 +180,45 @@ exports.testCharacterAutopilotRouteIndexEmitted_WhenLocationIsBroadcast = functi
    test.done();
 };
 
+exports.testCharacterAutopilotRouteIndexEmittedOnlyOnce_WhenLocationIsBroadcastTwice = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterHasAutopilotRoute(charId, [
+         this.fixture.autopilotService.createRouteEntry('Checkpoint', 2, null),
+         this.fixture.autopilotService.createRouteEntry('Waypoint', 3, null) ]);
+
+   this.fixture.expectingCharacterAutopilotRouteIndex(test, charId, 1);
+
+   this.fixture.whenBroadcastCharacterLocationReceived(charId, 2);
+   this.fixture.whenBroadcastCharacterLocationReceived(charId, 2);
+
+   test.expect(1);
+   test.done();
+};
+
+exports.testCharacterAutopilotRouteIndexEmittedOnlyOnce_WhenLocationIsBroadcastWithUndefined = function(test)
+{
+   var charId = 1234;
+   var sessionId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenCharacterHasAutopilotRoute(charId, [
+         this.fixture.autopilotService.createRouteEntry('Checkpoint', 2, null),
+         this.fixture.autopilotService.createRouteEntry('Waypoint', 3, null) ]);
+
+   this.fixture.expectingCharacterAutopilotRouteIndex(test, charId, 1);
+
+   this.fixture.whenBroadcastCharacterLocationReceived(charId, 2);
+   this.fixture.whenBroadcastCharacterLocationReceived(charId, undefined);
+   this.fixture.whenBroadcastCharacterLocationReceived(charId, 2);
+
+   test.expect(1);
+   test.done();
+};
+
 exports.testCharacterAutopilotRouteIndexResetEmitted_WhenDestinationReached = function(test)
 {
    var charId = 1234;
