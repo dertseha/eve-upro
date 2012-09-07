@@ -10,6 +10,8 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
       this.panelId = panelId;
       this.menuPath = menuPath;
       this.menuIndex = menuIndex;
+
+      this.listUpdateTimer = upro.sys.Timer.getSingleTimer(this.onListUpdateTimer.bind(this));
    },
 
    onRegister: function()
@@ -37,7 +39,7 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
             rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
             anchors: 'top left right bottom',
             id: 'currentLocationList',
-            rowHeight: 36,
+            rowHeight: 38,
             style:
             {
                fontSize: '12px'
@@ -47,7 +49,8 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
                view: 'table.CustomColumn',
                label: 'Solar System',
                width: 120,
-               // sort: 'ASC',
+               key: "solarSystem",
+               sort: 'ASC',
                formatter: this.solarSystemFormatter.bind(this)
             },
             {
@@ -56,6 +59,7 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
                resizable: true,
                minWidth: 100,
                width: 250,
+               key: "bodyName",
                formatter: this.pilotFormatter.bind(this)
             } ]
          } ]
@@ -69,7 +73,85 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
 
       this.table = uki('#currentLocationList')[0];
       this.table.list().render(new upro.view.mediators.CurrentLocationListPanelMediator.TableRender(this.table));
+
+      this.table.header().bind('columnClick', this.onColumnClick.bind(this));
       this.fillList();
+   },
+
+   onColumnClick: function(event)
+   {
+      var header = this.table.header();
+
+      if (event.column.sort() == 'ASC')
+      {
+         event.column.sort('DESC');
+      }
+      else
+      {
+         event.column.sort('ASC');
+      }
+      header.redrawColumn(event.columnIndex);
+      uki.each(header.columns(), function(i, col)
+      {
+         if ((col != event.column) && col.sort())
+         {
+            col.sort('');
+            header.redrawColumn(i);
+         }
+      });
+      this.prepareSort();
+   },
+
+   /**
+    * Creates a cell entry for the table capable of providing both a basic value for UKIs internal sorting algorithm,
+    * but also provide a backdoor to get to the original value.
+    * 
+    * If a key is specified in the column definition, UKI uses uki.attr() to access the cells data from the list entry.
+    * If the entry itself is a function, it is called to retrieve the value. Internally, UKI uses this value for sorting
+    * routines, so the sortValue is returned. But this sortValue is subclassed into another object that has a .data
+    * member - pointing to the complete data object.
+    * 
+    * @param data the data to wrap
+    * @param sortValue the sort value for UKI
+    * @returns {Function} returning a wrapper
+    */
+   getCellEntry: function(data, sortValue)
+   {
+      var wrapper = Object.create(new String(sortValue));
+
+      wrapper.data = data;
+      wrapper.valueOf = function()
+      {
+         return sortValue;
+      };
+      wrapper.toString = function()
+      {
+         return sortValue;
+      };
+      var entry = function()
+      {
+         return wrapper;
+      };
+
+      return entry;
+   },
+
+   /**
+    * Creates or updates a list entry.
+    * 
+    * @param template optional parameter referencing an existing list entry
+    * @param solarSystem the solar system to set
+    * @param bodyName the body name to set
+    * @returns a list entry - either updated or created
+    */
+   getListEntry: function(template, solarSystem, bodyName)
+   {
+      var result = template || {};
+
+      result.solarSystem = this.getCellEntry(solarSystem, solarSystem.name.toLowerCase());
+      result.bodyName = this.getCellEntry(bodyName, bodyName.getName().toLowerCase());
+
+      return result;
    },
 
    fillList: function()
@@ -77,6 +159,7 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
       var locationTrackerProxy = this.facade().retrieveProxy(upro.model.proxies.LocationTrackerProxy.NAME);
       var bodyRegisterProxy = this.facade().retrieveProxy(upro.model.proxies.BodyRegisterProxy.NAME);
       var data = [];
+      var that = this;
 
       locationTrackerProxy.forEachVisibleCharacter(function(charId)
       {
@@ -84,14 +167,40 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
 
          if (solarSystem)
          {
-            var listEntry = [ solarSystem, bodyRegisterProxy.getBodyName("Character", charId) ];
+            var bodyName = bodyRegisterProxy.getBodyName("Character", charId);
+            var listEntry = that.getListEntry(null, solarSystem, bodyName);
 
             data.push(listEntry);
          }
       });
 
+      this.setData(data);
+      this.prepareSort();
+   },
+
+   setData: function(data)
+   {
       this.table.data(data);
       this.table.parent().layout();
+   },
+
+   prepareSort: function()
+   {
+      this.listUpdateTimer.start(50);
+   },
+
+   onListUpdateTimer: function()
+   {
+      var data = this.table.data();
+
+      uki.each(this.table.header().columns(), function(i, col)
+      {
+         if (col.sort())
+         {
+            col.sortData(data);
+         }
+      });
+      this.setData(data);
    },
 
    updateListForCharacter: function(characterId, bodyName)
@@ -107,22 +216,24 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
       for ( var i = 0; (foundIndex < 0) && (i < data.length); i++)
       {
          listEntry = data[i];
-         if (listEntry[1].getId() == newBodyName.getId())
+
+         var oldBodyName = listEntry.bodyName().data;
+         if (oldBodyName.getId() == newBodyName.getId())
          {
             foundIndex = i;
          }
       }
       if (solarSystem && locationTrackerProxy.isCharacterVisible(characterId))
       {
-         if (!listEntry)
+         if (foundIndex < 0)
          {
-            listEntry = [ solarSystem, newBodyName ];
+            listEntry = this.getListEntry(null, solarSystem, newBodyName);
             this.table.addRow(0, listEntry);
+            this.prepareSort();
          }
          else
          {
-            listEntry[0] = solarSystem;
-            listEntry[1] = newBodyName;
+            this.getListEntry(listEntry, solarSystem, newBodyName);
             this.table.redrawRow(foundIndex);
          }
       }
@@ -154,11 +265,12 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
    pilotFormatter: function(entry)
    {
       var result = '';
+      var bodyName = entry.data;
 
       result = '<table style="width:100%;height:100%"><tr>';
       result += '<td style="width:32px;">' + '<div style="height:32px;">' + '<img style="height:32px;" src="'
-            + this.getImageForCharacter(entry) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + entry.getName() + '</td>';
+            + this.getImageForCharacter(bodyName) + '">' + '</img></div>' + '</td>';
+      result += '<td>' + bodyName.getName() + '</td>';
       result += '</tr></table>';
 
       return result;
@@ -167,11 +279,12 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
    solarSystemFormatter: function(entry)
    {
       var result = '';
+      var solarSystem = entry.data;
 
       result = '<table style="width:100%;height:100%"><tr>';
       result += '<td style="width:16px;">' + '<div style="height:16px;background:'
-            + this.getColorBySecurityLevel(entry) + ';"></div>' + '</td>';
-      result += '<td>' + entry.name + '</td>';
+            + this.getColorBySecurityLevel(solarSystem) + ';"></div>' + '</td>';
+      result += '<td>' + solarSystem.name + '</td>';
       result += '</tr></table>';
 
       return result;
