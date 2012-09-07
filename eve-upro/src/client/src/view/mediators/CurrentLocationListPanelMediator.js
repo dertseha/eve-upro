@@ -267,7 +267,7 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
       var result = '';
       var bodyName = entry.data;
 
-      result = '<table style="width:100%;height:100%"><tr>';
+      result = '<table style="width:100%;height:100%"><tr style="height:32px;">';
       result += '<td style="width:32px;">' + '<div style="height:32px;">' + '<img style="height:32px;" src="'
             + this.getImageForCharacter(bodyName) + '">' + '</img></div>' + '</td>';
       result += '<td>' + bodyName.getName() + '</td>';
@@ -281,7 +281,7 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
       var result = '';
       var solarSystem = entry.data;
 
-      result = '<table style="width:100%;height:100%"><tr>';
+      result = '<table style="width:100%;height:100%"><tr style="height:32px;">';
       result += '<td style="width:16px;">' + '<div style="height:16px;background:'
             + this.getColorBySecurityLevel(solarSystem) + ';"></div>' + '</td>';
       result += '<td>' + solarSystem.name + '</td>';
