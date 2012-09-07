@@ -33,14 +33,14 @@ block content
             tr
                td(class="label")
                   label(for="keyId")
-                     a(href="http://support.eveonline.com/api/Key/Create", title="Create one here") keyID:
+                     a(href="https://support.eveonline.com/api/Key/CreatePredefined/0", title="Create one here") keyID:
                td(class="input")
                   input(type='text', name='keyId', required=true, class="keyId")
             tr
                td(class="label")
                   label(for="vCode") vCode:
                td(class="input")
-                  input(type='password', name='vCode', required=true, class="vCode")
+                  input(type='password', name='vCode', required=true, class="vCode", placeholder="The key must be of type Character and be for one character only. The access mask must be 0.")
             tr
                td(class="label")
                td(class="input")
