@@ -102,6 +102,7 @@ function HttpServerComponent(services, options)
    this.loggedOffLimiter = createRateLimiterInfo(options.requestsPerSecondLoggedOff || 100);
    this.corpLimiter = {};
    this.corpLimiterRate = options.requestsPerSecondCorporation || 1000;
+   this.stayLoggedInAge = 1000 * 60 * 60 * 24 * 32;
 
    this.setSessionHandler = function(handler)
    {
@@ -250,6 +251,10 @@ function HttpServerComponent(services, options)
          successRedirect: '/',
          failureRedirect: '/login?message=loginFailed'
       }));
+      expressServer.get('/logout', function(req, res)
+      {
+         self.onGetLogout(req, res);
+      });
 
       expressServer.get('/eventSource', function(req, res)
       {
@@ -314,6 +319,12 @@ function HttpServerComponent(services, options)
    {
       if (req.user)
       {
+         if (req.session.cookie.maxAge > 0)
+         {
+            logger.debug('Resetting maxAge of session cookie');
+            req.session.cookie.maxAge = this.stayLoggedInAge;
+         }
+
          res.render('mainClient.jade',
          {
             user: req.user,
@@ -374,6 +385,20 @@ function HttpServerComponent(services, options)
             message: message
          });
       }
+   };
+
+   this.onGetLogout = function(req, res)
+   {
+      var param = '';
+
+      if (req.user)
+      {
+         req.logout();
+         param = '?message=loggedOut';
+      }
+      req.session.cookie.maxAge = null;
+      req.session.cookie.expires = false;
+      res.redirect('/login' + param);
    };
 
    this.onRequestEventSource = function(req, res)
@@ -493,6 +518,11 @@ function HttpServerComponent(services, options)
       }
       else
       {
+         if (req.body.stayLoggedIn == 'true')
+         {
+            logger.debug("KeyId " + req.body.keyId + " requests to stay logged in...");
+            req.session.cookie.maxAge = this.stayLoggedInAge;
+         }
          this.sessionHandler.onLogInRequest(keyId, vCode, done);
       }
    };

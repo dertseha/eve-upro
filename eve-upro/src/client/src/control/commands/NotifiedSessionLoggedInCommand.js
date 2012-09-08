@@ -121,6 +121,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             .format("settings.menuLabel"));
 
       this.facade().registerMediator(new upro.view.mediators.DebugPanelMediator(panelId, panelId + ".settings", 4));
+      this.facade().registerMediator(new upro.view.mediators.SessionPanelMediator(panelId, panelId + ".settings", 5));
    },
 
    setupMapMenu: function(uiMediator)

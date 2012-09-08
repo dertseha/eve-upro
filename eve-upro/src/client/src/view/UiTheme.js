@@ -32,7 +32,7 @@ upro.view.UiTheme = Class
                'simpleFrame': function()
                {
                   return new uki.background.CssBox(defaultCss
-                        + 'border-width:2px;border-style:solid;padding:2px;border-color:' + self.getBackgroundCss(7));
+                        + 'border-width:2px;border-style:solid;padding:2px;border-color:#704010;');
                },
                'box': function()
                {

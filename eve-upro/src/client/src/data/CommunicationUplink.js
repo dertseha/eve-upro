@@ -88,6 +88,7 @@ upro.data.CommunicationUplink = Class.create(
          contentType: 'application/json',
          onSuccess: function(response)
          {
+            self.handleResponseCode(response);
             self.handleGenericResponse(response, postBodyText);
 
             self.requestQueue = self.requestQueue.slice(1);
@@ -99,10 +100,23 @@ upro.data.CommunicationUplink = Class.create(
          },
          onFailure: function(response)
          {
+            self.handleResponseCode(response);
             request.ajax = null;
          }
       });
 
+   },
+
+   handleResponseCode: function(response)
+   {
+      if (response.status)
+      {
+         if (response.status == 401)
+         {
+            upro.sys.log("401 on request sink, assuming logged out");
+            window.location.href = "/logout";
+         }
+      }
    },
 
    handleGenericResponse: function(response, postBody)

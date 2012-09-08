@@ -212,6 +212,7 @@ exports.sourceFiles = [];
    'view/mediators/HideUiSideButtonMediator.js', //
    'view/mediators/AutopilotRoutePanelMediator.js', //
    'view/mediators/DebugPanelMediator.js', //
+   'view/mediators/SessionPanelMediator.js', //
    'view/mediators/GroupListPanelMediator.js', //
    'view/mediators/GroupMemberListPanelMediator.js', //
    'view/mediators/GroupEditPanelMediator.js', //

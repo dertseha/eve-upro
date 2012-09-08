@@ -22,7 +22,10 @@ block content
          else if (message == 'noSsl')
             p
                | You are not connecting via a secure connection. Your key and all further information will be transmitted
-               | as plain text over the network. If you do not desire this, make sure 'https' is used in the URL. 
+               | as plain text over the network. If you do not desire this, make sure 'https' is used in the URL.
+         else if (message == 'loggedOut')
+            p
+               | You have been logged out. 
          else
             p #{message}
 
@@ -40,11 +43,14 @@ block content
                td(class="label")
                   label(for="vCode") vCode:
                td(class="input")
-                  input(type='password', name='vCode', required=true, class="vCode", placeholder="The key must be of type Character and be for one character only. The access mask must be 0.")
+                  input(type='password', name='vCode', required=true, class="vCode",
+                     placeholder="The key must be of type Character and be for one character only. The access mask must be 0.")
             tr
                td(class="label")
                td(class="input")
                   input(type='submit', value='Log In', class="submit")
+                  input(type='checkbox', name='stayLoggedIn', value='true')
+                  | Stay logged in
    div(class="disclaimer")
       p
          | This service is provided free of charge to pilots of 

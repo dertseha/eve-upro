@@ -150,5 +150,10 @@ upro.res.text.templates["en"] =
    /** Send the own location to given group */
    "panels.currentLocation.send.command": "Send Own",
    /** Display others location of given group */
-   "panels.currentLocation.display.command": "Display Others"
+   "panels.currentLocation.display.command": "Display Others",
+
+   /** Session control panel */
+   "panels.session.menuLabel": "Session Control",
+   /** Logout command */
+   "panels.session.logout.command": "Logout (This Browser)"
 };
