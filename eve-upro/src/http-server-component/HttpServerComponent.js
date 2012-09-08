@@ -212,6 +212,10 @@ function HttpServerComponent(services, options)
          {
             return self.getSessionLimiter(req);
          }));
+         expressServer.use(new uglify('/javascripts/ThreadedEventSource.js', [
+               path.normalize(__dirname + '/public/javascripts/EventSource.js'),
+               path.normalize(__dirname + '/private/javascripts/EventSourceThreadWrapper.js') ],
+               "/** Threaded EventSource. Based on /public/javascripts/EventSource.js but wrapped in a worker */\n"));
          expressServer.use(new uglify('/javascripts/upro.js', clientInfo.sourceFiles, clientInfo.header));
          expressServer.use(new uglify('/javascripts/upro-full.js', clientInfo.sourceFiles, clientInfo.header,
          {

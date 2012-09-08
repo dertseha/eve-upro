@@ -140,12 +140,32 @@ upro.data.CommunicationUplink = Class.create(
     */
    setupEventSource: function()
    {
-      var eventSourceUrl = "eventSource";
+      var eventSourceUrl = "/eventSource";
+      var eventNames = [ upro.data.clientEvents.Timer.name, upro.data.clientEvents.Session.name,
+            upro.data.clientEvents.Broadcast.name ];
+      var that = this;
 
-      this.eventSource = new EventSource(eventSourceUrl);
-      this.registerEventHandler(upro.data.clientEvents.Timer.name);
-      this.registerEventHandler(upro.data.clientEvents.Session.name);
-      this.registerEventHandler(upro.data.clientEvents.Broadcast.name);
+      if (upro.sys.isRunningInInGameBrowser() || (typeof Worker === "undefined"))
+      { // although Worker to be reported available in IGB, starting one crashes the browser.
+         this.eventSource = new EventSource(eventSourceUrl);
+         eventNames.forEach(function(eventName)
+         {
+            that.registerEventHandler(eventName);
+         });
+      }
+      else
+      {
+         var startCmd =
+         {
+            type: "start",
+            eventSourceUrl: eventSourceUrl,
+            eventNames: eventNames
+         };
+
+         this.eventSource = new Worker("/javascripts/ThreadedEventSource.js");
+         this.registerThreadedEventHandler();
+         this.eventSource.postMessage(startCmd);
+      }
    },
 
    /**
@@ -160,6 +180,21 @@ upro.data.CommunicationUplink = Class.create(
       this.eventSource.addEventListener(name, function(event)
       {
          self.onEvent(name, JSON.parse(event.data));
+      }, false);
+   },
+
+   /**
+    * Registers an event handler at the threaded event source
+    */
+   registerThreadedEventHandler: function()
+   {
+      var self = this;
+
+      this.eventSource.addEventListener("message", function(event)
+      {
+         var message = event.data;
+
+         self.onEvent(message.name, JSON.parse(message.data));
       }, false);
    },
 
