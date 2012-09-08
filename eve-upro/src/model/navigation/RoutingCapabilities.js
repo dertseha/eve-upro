@@ -5,7 +5,8 @@
       jumpDrive:
       {
          rangeMinimum: 0.25,
-         rangeMaximum: 20.0,
+         /** The maximum must be kept in sync with upro.nav.Constants.MaxJumpDistanceLightYears */
+         rangeMaximum: 17.0,
          rangeStep: 0.25,
 
          defaultValue: 5.0,

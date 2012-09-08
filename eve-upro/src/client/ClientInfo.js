@@ -46,6 +46,7 @@ exports.sourceFiles = [];
    'eve/ThrottledInGameBrowser.js', //
 
    'navigation/navigation.js', //
+   'navigation/Constants.js', //
    'navigation/IdentifiedObjectHolder.js', //
    'navigation/Universe.js', //
    'navigation/Galaxy.js', //

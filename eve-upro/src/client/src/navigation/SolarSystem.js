@@ -19,6 +19,9 @@ upro.nav.SolarSystem = Class.create(
       this.constellation = null;
 
       this.jumpPortals = new upro.nav.IdentifiedObjectHolder(this);
+
+      this.nearJumps = {};
+      this.getNearJumps = this.calculateNearJumps;
    },
 
    /**
@@ -35,6 +38,46 @@ upro.nav.SolarSystem = Class.create(
    getId: function()
    {
       return this.id;
+   },
+
+   /**
+    * Calculates the near jumps and modifies the object to return the result immediately the next time.
+    */
+   calculateNearJumps: function()
+   {
+      var allSystems = this.galaxy.solarSystems;
+      var tempVec = vec3.create();
+
+      for ( var systemId in allSystems.objects)
+      {
+         var other = allSystems.get(systemId);
+
+         if ((other.security < 0.5) && (systemId !== this.id) && !this.nearJumps[systemId])
+         {
+            var dist = vec3.length(vec3.subtract(this.position, other.position, tempVec));
+            var ly = dist / upro.nav.Constants.MeterUnitsInLightYears;
+
+            if (ly <= upro.nav.Constants.MaxJumpDistanceLightYears)
+            {
+               this.nearJumps[systemId] = ly;
+               if (this.security < 0.5)
+               {
+                  other.nearJumps[this.id] = ly;
+               }
+            }
+         }
+      }
+      this.getNearJumps = this.returnNearJumps;
+
+      return this.nearJumps;
+   },
+
+   /**
+    * @returns map of system id to distance in light years
+    */
+   returnNearJumps: function()
+   {
+      return this.nearJumps;
    }
 });
 

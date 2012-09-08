@@ -19,8 +19,8 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    /** {@inheritDoc} */
    onRegister: function()
    {
-      this.timer = new upro.sys.Timer.getIntervalTimer(this.runOptimizers.bind(this));
-      this.timer.start(10);
+      this.timer = new upro.sys.Timer.getSingleTimer(this.runOptimizers.bind(this));
+      this.timer.start(upro.model.proxies.ActiveRouteProxy.IDLE_TIMER_INTERVAL_MSEC);
    },
 
    /** {@inheritDoc} */
@@ -347,6 +347,7 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
       var keys = [];
       var someCompleted = false;
       var allCompleted = true;
+      var endTime = upro.sys.Time.tickMSec() + upro.model.proxies.ActiveRouteProxy.BULK_LIMIT_TIME_MSEC;
 
       for (key in this.optimizersByIndex)
       {
@@ -357,7 +358,7 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
          key = new Number(keys[i]);
          var finder = this.optimizersByIndex[key];
 
-         if (this.runFinderBulk(finder))
+         if (this.runFinderBulk(finder, endTime))
          {
             this.onOptimizerCompleted(key);
             someCompleted = true;
@@ -372,6 +373,8 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
          this.notify(upro.app.Notifications.ActiveRoutePathChanged);
       }
 
+      this.timer.start(allCompleted ? upro.model.proxies.ActiveRouteProxy.IDLE_TIMER_INTERVAL_MSEC : 0);
+
       return allCompleted;
    },
 
@@ -380,11 +383,11 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
     * 
     * @return true if finder completed
     */
-   runFinderBulk: function(finder)
+   runFinderBulk: function(finder, endTime)
    {
       var rCode = false;
 
-      for ( var i = 0; !rCode && (i < 100); i++)
+      while (!rCode && (upro.sys.Time.tickMSec() < endTime))
       {
          rCode = finder.continueSearch();
       }
@@ -511,5 +514,10 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    }
 
 });
+
+/** How long one go at optimizing the paths shall take */
+upro.model.proxies.ActiveRouteProxy.BULK_LIMIT_TIME_MSEC = 20;
+/** The interval for the timer at idle times */
+upro.model.proxies.ActiveRouteProxy.IDLE_TIMER_INTERVAL_MSEC = 50;
 
 upro.model.proxies.ActiveRouteProxy.NAME = "ActiveRoute";
