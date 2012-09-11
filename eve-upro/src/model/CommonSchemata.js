@@ -29,6 +29,46 @@
       id: Number
    } ];
 
+   context.namespace.sharingInterestSchema = [
+   {
+      scope: 'Character',
+      id: Number
+   },
+   {
+      scope: 'Corporation',
+      id: Number
+   },
+   {
+      scope: 'Group',
+      id: context.namespace.groupIdType
+   } ];
+
+   var standardSharingBodyDefinition =
+   {
+      schema:
+      {
+         id: context.namespace.uuidSchema,
+         interest: Array.of(context.namespace.sharingInterestSchema)
+      },
+      isValid: null
+   };
+
+   /**
+    * @returns a standard header definition
+    */
+   context.namespace.getStandardSharingBodyDefinition = function()
+   {
+      return standardSharingBodyDefinition;
+   };
+
+   context.namespace.jumpCorridorSchema =
+   {
+      name: String,
+      entrySolarSystemId: Number,
+      exitSolarSystemId: Number,
+      jumpType: String
+   };
+
 })((typeof module !== 'undefined') ?
 {
    namespace: module.exports,

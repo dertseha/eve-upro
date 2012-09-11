@@ -318,7 +318,7 @@ AbstractDataObject.BodyListSchema =
 {
    listCharacter: Array.of(Number),
    listCorporation: Array.of(Number),
-   listGroup: Array.of(commonSchemata.uuidSchema)
+   listGroup: Array.of(commonSchemata.groupIdType)
 };
 AbstractDataObject.DocumentSchema =
 {

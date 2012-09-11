@@ -316,6 +316,70 @@
             },
             isValid: null
          }
+      },
+
+      /**
+       * Sets the entry for a new jump corridor
+       */
+      SetJumpCorridorEntry:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               solarSystemId: Number,
+               jumpType: String
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Sets jump corridor information. If the 'id' field is missing, it requests to create a new one
+       */
+      SetJumpCorridor:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               '?id': context.commonSchemata.uuidSchema,
+               data: context.commonSchemata.jumpCorridorSchema
+            },
+            isValid: null
+         }
+      },
+
+      AddJumpCorridorOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RemoveJumpCorridorOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      AddJumpCorridorShare:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RemoveJumpCorridorShare:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
       }
    };
 

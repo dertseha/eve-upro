@@ -314,6 +314,56 @@
             },
             isValid: null
          }
+      },
+
+      /**
+       * Info message about the current jump corridor entry
+       */
+      JumpCorridorEntry:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               solarSystemId: Number,
+               jumpType: String
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Informs about the current state of a jump corridor. If the 'data' field is missing, the corridor is destroyed
+       */
+      JumpCorridor:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema,
+               '?data': context.commonSchemata.jumpCorridorSchema
+            },
+            isValid: null
+         }
+      },
+
+      JumpCorridorOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      JumpCorridorShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
       }
    };
 
