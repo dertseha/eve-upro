@@ -156,6 +156,14 @@ function ActiveDataState(owner, dataObject)
          }
       }
    };
+
+   this.destroy = function()
+   {
+      this.dataObject.deleteFromStorage(owner.getStorage());
+      owner.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
+
+      owner.setDataState(this.dataObject.getDocumentId(), null);
+   };
 }
 util.inherits(ActiveDataState, AbstractDataState);
 

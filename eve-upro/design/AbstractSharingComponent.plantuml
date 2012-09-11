@@ -31,6 +31,8 @@ class ActiveDataState {
  + removeShare(interest)
  + addOwner(interest)
  + removeOwner(interest)
+ 
+ + destroy()
 }
 
 AbstractDataState <|-down- LoadingDataState
