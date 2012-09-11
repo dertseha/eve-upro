@@ -8,8 +8,6 @@ var busMessages = require('../model/BusMessages.js');
 var predefinedGroupIds = require('../model/PredefinedGroups.js').predefinedGroupIds;
 
 var LocationStatusGroup = require('./LocationStatusGroup.js');
-
-var LocationStatusGroup = require('./LocationStatusGroup.js');
 var LoadingLocationStatusGroupState = require('./LoadingLocationStatusGroupState.js');
 
 function LocationServiceComponent(services)

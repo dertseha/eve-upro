@@ -216,6 +216,14 @@ function Character(charId, charName, corpId, corpName)
       return rCode;
    };
 
+   this.forEachGroupInterest = function(callback)
+   {
+      this.groupMemberships.forEach(function(groupId)
+      {
+         callback(groupId);
+      });
+   };
+
    this.hasInterestForCharacter = function(id)
    {
       return id == this.characterId;
