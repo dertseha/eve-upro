@@ -1,0 +1,73 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+hide circle
+
+interface DataState {
+ + onCharacterSessionAdded(character, interest, queueName)
+ + onCharacterGroupMemberAdded(groupId, interest)
+ + onCharacterGroupMemberRemoved(groupId, interest)
+ 
+ + onBroadcast(message) -- message := header, body, characterId
+ 
+ + activate()
+}
+
+class AbstractDataState {
+ - owner: DataStateOwner
+}
+
+DataState <|-down- AbstractDataState
+
+class LoadingDataState {
+ - documentId
+ - broadcastQueue
+ 
+ - onFirstDataReturned(documentId, initData)
+}
+
+class ActiveDataState {
+ + addShare(interest)
+ + removeShare(interest)
+ + addOwner(interest)
+ + removeOwner(interest)
+}
+
+AbstractDataState <|-down- LoadingDataState
+AbstractDataState <|-down- ActiveDataState
+
+interface DataStateOwner {
+ + createDataObject(documentId, initData): DataObject
+ + getStorage(): Storage
+
+ + processXxxBroadcast(dataObject, characterId, body)
+ 
+ + broadcastDataInfo(dataObject, interest, queueName)
+ + broadcastDataInfoReset(dataObject, interest)
+ + broadcastDataShare(dataObject, interest, queueName)
+ + broadcastDataShareReset(dataObject, interest)
+ + broadcastDataOwnership(dataObject, interest, queueName)
+ + broadcastDataOwnershipReset(dataObject, interest)
+}
+
+class AbstractDataObject {
+ - collectionName
+ - rawData: object
+ 
+ - getDocumentName()
+ - extendStorageData(data): data
+ 
+ + getDocumentId(): uuid
+ + getDataInterest(): Interest[]
+ + getOwnerInterest(): Interest[]
+
+ + isCharacterOwner(character): boolean
+ + isGroupOwner(groupId): boolean
+ + isInterestForCharacter(character): boolean
+ + isInterestForGroup(groupId): boolean
+
+ + saveToStorage(storage)
+ + removeFromStorage(storage) 
+}
+
+@enduml
