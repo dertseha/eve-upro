@@ -286,11 +286,12 @@ function AbstractDataObject(documentId, initData)
    };
 };
 
+AbstractDataObject.Scopes = [ 'Character', 'Corporation', 'Group' ];
 AbstractDataObject.createMemberList = function(initData)
 {
    var memberList = {};
 
-   [ 'Character', 'Corporation', 'Group' ].forEach(function(scope)
+   AbstractDataObject.Scopes.forEach(function(scope)
    {
       var memberName = 'list' + scope;
       var list = initData ? initData[memberName] : [];

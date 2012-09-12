@@ -22,15 +22,16 @@ function ActiveDataState(owner, dataObject)
    this.onCharacterSessionAdded = function(character, interest, responseQueue)
    {
       var owner = this.getOwner();
+      var broadcaster = owner.getBroadcaster();
 
       if (this.dataObject.isInterestForCharacter(character))
       {
-         owner.broadcastDataInfo(this.dataObject, interest, responseQueue);
-         owner.broadcastDataOwnership(this.dataObject, interest, responseQueue);
+         broadcaster.broadcastDataInfo(this.dataObject, interest, responseQueue);
+         broadcaster.broadcastDataOwnership(this.dataObject, interest, responseQueue);
       }
       if (this.dataObject.isCharacterOwner(character))
       {
-         owner.broadcastDataShare(this.dataObject, interest, responseQueue);
+         broadcaster.broadcastDataShare(this.dataObject, interest, responseQueue);
       }
    };
 
@@ -40,15 +41,16 @@ function ActiveDataState(owner, dataObject)
    this.onCharacterGroupMemberAdded = function(groupId, interest)
    {
       var owner = this.getOwner();
+      var broadcaster = owner.getBroadcaster();
 
       if (this.dataObject.isInterestForGroup(groupId))
       {
-         owner.broadcastDataInfo(this.dataObject, interest);
-         owner.broadcastDataOwnership(this.dataObject, interest);
+         broadcaster.broadcastDataInfo(this.dataObject, interest);
+         broadcaster.broadcastDataOwnership(this.dataObject, interest);
       }
       if (this.dataObject.isGroupOwner(groupId))
       {
-         owner.broadcastDataShare(this.dataObject, interest);
+         broadcaster.broadcastDataShare(this.dataObject, interest);
       }
    };
 
@@ -58,14 +60,15 @@ function ActiveDataState(owner, dataObject)
    this.onCharacterGroupMemberRemoved = function(character, groupId, interest)
    {
       var owner = this.getOwner();
+      var broadcaster = owner.getBroadcaster();
 
       if (this.dataObject.isGroupOwner(groupId) && !this.dataObject.isCharacterOwner(character))
       {
-         owner.broadcastDataShareReset(this.dataObject, interest);
+         broadcaster.broadcastDataShareReset(this.dataObject, interest);
       }
       if (this.dataObject.isInterestForGroup(groupId) && !this.dataObject.isInterestForCharacter(character))
       {
-         owner.broadcastDataInfoReset(this.dataObject, interest);
+         broadcaster.broadcastDataInfoReset(this.dataObject, interest);
       }
    };
 
@@ -86,13 +89,14 @@ function ActiveDataState(owner, dataObject)
    this.activate = function()
    {
       var owner = this.getOwner();
+      var broadcaster = owner.getBroadcaster();
       var dataInterest = this.dataObject.getDataInterest();
 
       owner.setDataState(this.dataObject.getDocumentId(), this);
 
-      owner.broadcastDataInfo(this.dataObject, dataInterest);
-      owner.broadcastDataOwnership(this.dataObject, dataInterest);
-      owner.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+      broadcaster.broadcastDataInfo(this.dataObject, dataInterest);
+      broadcaster.broadcastDataOwnership(this.dataObject, dataInterest);
+      broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
    };
 
    this.addShare = function(interest)
@@ -100,11 +104,12 @@ function ActiveDataState(owner, dataObject)
       if (this.dataObject.addShare(interest))
       {
          var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
 
          this.dataObject.saveToStorage(owner.getStorage());
 
-         owner.broadcastDataInfo(this.dataObject, [ interest ]);
-         owner.broadcastDataOwnership(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataInfo(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataOwnership(this.dataObject, [ interest ]);
       }
    };
 
@@ -113,9 +118,10 @@ function ActiveDataState(owner, dataObject)
       if (this.dataObject.removeShare(interest))
       {
          var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
 
          this.dataObject.saveToStorage(owner.getStorage());
-         owner.broadcastDataInfoReset(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataInfoReset(this.dataObject, [ interest ]);
       }
    };
 
@@ -124,14 +130,15 @@ function ActiveDataState(owner, dataObject)
       if (this.dataObject.addOwner(interest))
       {
          var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
 
          if (this.dataObject.addShare(interest))
          {
-            owner.broadcastDataInfo(this.dataObject, [ interest ]);
+            broadcaster.broadcastDataInfo(this.dataObject, [ interest ]);
          }
          this.dataObject.saveToStorage(owner.getStorage());
-         owner.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
-         owner.broadcastDataShare(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
+         broadcaster.broadcastDataShare(this.dataObject, [ interest ]);
       }
    };
 
@@ -140,17 +147,18 @@ function ActiveDataState(owner, dataObject)
       if (this.dataObject.removeOwner(interest))
       {
          var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
 
-         owner.broadcastDataOwnershipReset(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataOwnershipReset(this.dataObject, [ interest ]);
          if (dataObject.hasOwner())
          {
             this.dataObject.saveToStorage(owner.getStorage());
-            owner.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
+            broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
          }
          else
          {
             this.dataObject.deleteFromStorage(owner.getStorage());
-            owner.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
+            broadcaster.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
 
             owner.setDataState(this.dataObject.getDocumentId(), null);
          }
@@ -159,8 +167,11 @@ function ActiveDataState(owner, dataObject)
 
    this.destroy = function()
    {
+      var owner = this.getOwner();
+      var broadcaster = owner.getBroadcaster();
+
       this.dataObject.deleteFromStorage(owner.getStorage());
-      owner.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
+      broadcaster.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
 
       owner.setDataState(this.dataObject.getDocumentId(), null);
    };

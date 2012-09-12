@@ -41,9 +41,12 @@ AbstractDataState <|-down- ActiveDataState
 interface DataStateOwner {
  + createDataObject(documentId, initData): DataObject
  + getStorage(): Storage
+ + getBroadcaster(): DataBroadcaster
 
  + processXxxBroadcast(dataObject, characterId, body)
- 
+ }
+
+interface DataBroadcaster {
  + broadcastDataInfo(dataObject, interest, queueName)
  + broadcastDataInfoReset(dataObject, interest)
  + broadcastDataShare(dataObject, interest, queueName)

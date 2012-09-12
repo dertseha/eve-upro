@@ -3,12 +3,15 @@ var util = require('util');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
+var UuidFactory = require('../util/UuidFactory.js');
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
+var AbstractDataObject = require('./AbstractDataObject.js');
+var StandardDataBroadcaster = require('./StandardDataBroadcaster.js');
 var LoadingDataState = require('./LoadingDataState.js');
 
-function AbstractSharingComponent(services, dataObjectConstructor)
+function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 {
    AbstractSharingComponent.super_.call(this);
 
@@ -18,6 +21,7 @@ function AbstractSharingComponent(services, dataObjectConstructor)
 
    this.dataStatesById = {};
    this.dataObjectConstructor = dataObjectConstructor;
+   this.broadcaster = new StandardDataBroadcaster(this.amqp, dataBaseName);
 
    /** {@inheritDoc} */
    this.start = function()
@@ -30,7 +34,15 @@ function AbstractSharingComponent(services, dataObjectConstructor)
       this.registerCharacterHandler('CharacterGroupMemberAdded', '');
       this.registerCharacterHandler('CharacterGroupMemberRemoved', '');
 
-      this.mongodb.defineCollection(this.dataObjectConstructor.CollectionName, [], function()
+      var index = [];
+
+      AbstractDataObject.Scopes.forEach(function(scope)
+      {
+         index.push('data.owner.list' + scope);
+         index.push('data.shares.list' + scope);
+      });
+
+      this.mongodb.defineCollection(this.dataObjectConstructor.CollectionName, index, function()
       {
          self.onStarted();
       });
@@ -65,7 +77,7 @@ function AbstractSharingComponent(services, dataObjectConstructor)
 
       if (!state)
       {
-         state = new LoadingDataState(this, documentId);
+         state = new LoadingDataState(this, this.dataObjectConstructor, documentId);
          state.activate();
       }
 
@@ -202,6 +214,14 @@ function AbstractSharingComponent(services, dataObjectConstructor)
    this.getStorage = function()
    {
       return this.mongodb;
+   };
+
+   /**
+    * @returns the broadcaster
+    */
+   this.getBroadcaster = function()
+   {
+      return this.broadcaster;
    };
 
    /**
