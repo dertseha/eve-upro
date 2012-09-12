@@ -354,6 +354,20 @@
          }
       },
 
+      DestroyJumpCorridor:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema
+            },
+            isValid: null
+         }
+      },
+
       AddJumpCorridorOwner:
       {
          name: 0,

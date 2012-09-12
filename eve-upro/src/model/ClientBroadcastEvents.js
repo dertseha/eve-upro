@@ -337,7 +337,7 @@
       /**
        * Informs about the current state of a jump corridor. If the 'data' field is missing, the corridor is destroyed
        */
-      JumpCorridor:
+      JumpCorridorInfo:
       {
          name: 0,
          header: getStandardHeaderDefinition(),
