@@ -125,8 +125,12 @@ exports.sourceFiles = [];
    'model/AbstractBodyName.js', //
    'model/UnknownBodyName.js', //
    'model/ResolvedBodyName.js', //
+   'model/InterestChecker.js', //
+   'model/AbstractSharedObjectInfo.js', //
+   'model/JumpCorridorInfo.js', //
 
    'model/proxies/proxies.js', //
+   'model/proxies/LocalBasedInterestChecker.js', //
    'model/proxies/AbstractProxy.js', //
    'model/proxies/SessionControlProxy.js', //
    'model/proxies/LocationTrackerProxy.js', //
@@ -138,6 +142,7 @@ exports.sourceFiles = [];
    'model/proxies/AutopilotProxy.js', //
    'model/proxies/GroupProxy.js', //
    'model/proxies/BodyRegisterProxy.js', //
+   'model/proxies/JumpCorridorProxy.js', //
 
    'control/ctrl.js', //
    'control/commands/cmd.js', //

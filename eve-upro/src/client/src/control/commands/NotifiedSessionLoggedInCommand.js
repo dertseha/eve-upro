@@ -12,6 +12,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.facade().registerProxy(new upro.model.proxies.LocationTrackerProxy());
       this.facade().registerProxy(new upro.model.proxies.AutopilotProxy());
       this.facade().registerProxy(new upro.model.proxies.ActiveRouteProxy());
+      this.facade().registerProxy(new upro.model.proxies.JumpCorridorProxy());
 
       this.facade().registerMediator(new upro.view.mediators.MainContextMenuMediator());
       {
@@ -48,7 +49,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.showBaseView("swCtrl", "debug"); // for now, always show debugging output
       uiMediator.showBaseView("wList", "autopilotRoute");
       uiMediator.showBaseView("eList", "groupList");
-      uiMediator.showBaseView("neCtrl", "groupEdit");
+      uiMediator.showBaseView("seCtrl", "groupEdit");
       uiMediator.showBaseView("nwCtrl", "currentLocation");
    },
 
@@ -149,7 +150,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
    setupGroupEditMenu: function(uiMediator)
    {
-      var panelId = "neCtrl";
+      var panelId = "seCtrl";
 
       uiMediator.setSubMenu(panelId, "groupEdit", 1, upro.res.menu.IconData.Group, upro.res.text.Lang
             .format("groupEdit.menuLabel"));

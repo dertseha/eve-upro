@@ -129,7 +129,12 @@ upro.app.Notifications =
    /** List of characters in a solar system has changed */
    CharacterListInSolarSystemChanged: 0,
    /** List of displayed characters has changed */
-   LocationStatusDisplayListChanged: 0
+   LocationStatusDisplayListChanged: 0,
+
+   /** List of jump corridors changed */
+   JumpCorridorListChanged: 0,
+   /** Data of one jump corridor changed */
+   JumpCorridorDataChanged: 0
 };
 
 /**
