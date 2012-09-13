@@ -8,6 +8,7 @@ upro.model.proxies.UserSessionProxy = Class.create(Proxy,
    {
       $super(upro.model.proxies.UserSessionProxy.NAME);
 
+      this.preparedCorridor = null;
    },
 
    onRegister: function()
@@ -17,7 +18,20 @@ upro.model.proxies.UserSessionProxy = Class.create(Proxy,
 
    setCorridorPreparation: function(solarSystem, jumpType)
    {
+      if (solarSystem && jumpType)
+      {
+         this.preparedCorridor =
+         {
+            entrySolarSystemId: solarSystem.getId(),
+            jumpType: jumpType
+         };
+      }
+      else
+      {
+         this.preparedCorridor = null;
+      }
 
+      this.onCorridorPreparationChanged();
    },
 
    /**
@@ -27,7 +41,7 @@ upro.model.proxies.UserSessionProxy = Class.create(Proxy,
     */
    getCorridorPreparationJumpType: function()
    {
-      return upro.nav.JumpType.None;
+      return this.preparedCorridor ? this.preparedCorridor.jumpType : upro.nav.JumpType.None;
    },
 
    /**
@@ -37,7 +51,16 @@ upro.model.proxies.UserSessionProxy = Class.create(Proxy,
     */
    getCorridorPreparationSolarSystem: function()
    {
-      return null;
+      var solarSystem = null;
+
+      if (this.preparedCorridor && this.preparedCorridor.entrySolarSystemId)
+      {
+         var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
+
+         solarSystem = universeProxy.findSolarSystemById(this.preparedCorridor.entrySolarSystemId);
+      }
+
+      return solarSystem;
    },
 
    onCorridorPreparationChanged: function()

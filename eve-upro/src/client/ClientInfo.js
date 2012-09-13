@@ -193,6 +193,10 @@ exports.sourceFiles = [];
    'control/commands/NotifiedGroupAdvertiseRequestCommand.js', //
    'control/commands/NotifiedGroupRemoveAdvertisementRequestCommand.js', //
    'control/commands/NotifiedKnownCharactersChangedCommand.js', //
+   'control/commands/NotifiedJumpCorridorSelectionRequestCommand.js', //
+   'control/commands/NotifiedJumpCorridorSelectedCommand.js', //
+   'control/commands/NotifiedUpdateJumpCorridorRequestCommand.js', //
+   'control/commands/NotifiedDestroyJumpCorridorRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
@@ -200,6 +204,7 @@ exports.sourceFiles = [];
    'view/IdlePointerOperation.js', //
    'view/UiTheme.js', //
    'view/UiPanelLayout.js', //
+   'view/UiHelper.js', //
    'view/ZoomMoveOperation.js', //
 
    'view/mediators/mediators.js', //
@@ -224,6 +229,8 @@ exports.sourceFiles = [];
    'view/mediators/GroupEditPanelMediator.js', //
    'view/mediators/CurrentLocationPanelMediator.js', //
    'view/mediators/CurrentLocationListPanelMediator.js', //
+   'view/mediators/JumpCorridorListPanelMediator.js', //
+   'view/mediators/JumpCorridorEditPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

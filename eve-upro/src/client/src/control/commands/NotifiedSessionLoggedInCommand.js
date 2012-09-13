@@ -112,6 +112,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade().registerMediator(
             new upro.view.mediators.CurrentLocationListPanelMediator(panelId, panelId + ".map", 0));
+      this.facade().registerMediator(
+            new upro.view.mediators.JumpCorridorListPanelMediator(panelId, panelId + ".map", 1));
    },
 
    setupSettingsMenu: function(uiMediator)
@@ -133,6 +135,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade()
             .registerMediator(new upro.view.mediators.CurrentLocationPanelMediator(panelId, panelId + ".map", 1));
+      this.facade().registerMediator(
+            new upro.view.mediators.JumpCorridorEditPanelMediator(panelId, panelId + ".map", 2));
    },
 
    setupGroupListMenu: function(uiMediator)

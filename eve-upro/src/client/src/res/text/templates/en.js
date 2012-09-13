@@ -8,6 +8,9 @@ upro.res.text.templates["en"] =
    /** General text for anything that is turned 'off' */
    "general.off": "Off",
 
+   /** Label for an item name */
+   "general.labels.itemName": "Name:",
+
    /** The "own corporation" predefined group */
    "predefined.groups.Corporation": "Own Corporation",
 
@@ -155,5 +158,33 @@ upro.res.text.templates["en"] =
    /** Session control panel */
    "panels.session.menuLabel": "Session Control",
    /** Logout command */
-   "panels.session.logout.command": "Logout (This Browser)"
+   "panels.session.logout.command": "Logout (This Browser)",
+
+   /** menu label for jump corridor list */
+   "panels.jumpCorridor.list.menuLabel": "List of Jump Corridors",
+
+   /** Label for entry of jump corridor */
+   "jumpCorridor.entryLabel": "Entry:",
+   /** Label for exit of jump corridor */
+   "jumpCorridor.exitLabel": "Exit:",
+   /** Label for jump type of jump corridor */
+   "jumpCorridor.jumpTypeLabel": "Jump Type:",
+
+   /** Jump type name */
+   "jumpCorridor.typeName.JumpGate": "Jump Gate",
+   /** Jump type name */
+   "jumpCorridor.typeName.JumpDrive": "Jump Drive",
+   /** Jump type name */
+   "jumpCorridor.typeName.JumpBridge": "Jump Bridge",
+   /** Jump type name */
+   "jumpCorridor.typeName.StaticWormhole": "Static Wormhole",
+   /** Jump type name */
+   "jumpCorridor.typeName.DynamicWormhole": "Dynamic Wormhole",
+
+   /** menu label for jump corridor edit control */
+   "panels.jumpCorridor.edit.menuLabel": "Modify Jump Corridor",
+   /** button to update a jump corridor */
+   "panels.jumpCorridor.edit.updateButton": "Update",
+   /** button to destroy a jump corridor */
+   "panels.jumpCorridor.edit.destroyButton": "Destroy"
 };

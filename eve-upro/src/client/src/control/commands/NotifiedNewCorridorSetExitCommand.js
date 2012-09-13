@@ -2,12 +2,13 @@ upro.ctrl.cmd.NotifiedNewCorridorSetExitCommand = Class.create(SimpleCommand,
 {
    execute: function(notification)
    {
+      var jumpCorridorProxy = this.facade().retrieveProxy(upro.model.proxies.JumpCorridorProxy.NAME);
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.UserSessionProxy.NAME);
-      // var solarSystemEntry = sessionProxy.getCorridorPreparationSolarSystem();
-      // var solarSystemExit = notification.getBody();
-      // var jumpType = sessionProxy.getCorridorPreparationJumpType();
+      var entrySolarSystem = sessionProxy.getCorridorPreparationSolarSystem();
+      var exitSolarSystem = notification.getBody();
+      var jumpType = sessionProxy.getCorridorPreparationJumpType();
 
-      // TODO: do it!
+      jumpCorridorProxy.createJumpCorridor('', entrySolarSystem, exitSolarSystem, jumpType);
       sessionProxy.setCorridorPreparation(null, null);
    }
 });

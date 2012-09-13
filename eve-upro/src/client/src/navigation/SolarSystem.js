@@ -45,24 +45,27 @@ upro.nav.SolarSystem = Class.create(
     */
    calculateNearJumps: function()
    {
-      var allSystems = this.galaxy.solarSystems;
-      var tempVec = vec3.create();
-
-      for ( var systemId in allSystems.objects)
+      if (upro.nav.Constants.GalaxiesForJumpDrive.indexOf(this.galaxy.id) >= 0)
       {
-         var other = allSystems.get(systemId);
+         var allSystems = this.galaxy.solarSystems;
+         var tempVec = vec3.create();
 
-         if ((other.security < 0.5) && (systemId !== this.id) && !this.nearJumps[systemId])
+         for ( var systemId in allSystems.objects)
          {
-            var dist = vec3.length(vec3.subtract(this.position, other.position, tempVec));
-            var ly = dist / upro.nav.Constants.MeterUnitsInLightYears;
+            var other = allSystems.get(systemId);
 
-            if (ly <= upro.nav.Constants.MaxJumpDistanceLightYears)
+            if ((other.security < 0.5) && (systemId !== this.id) && !this.nearJumps[systemId])
             {
-               this.nearJumps[systemId] = ly;
-               if (this.security < 0.5)
+               var dist = vec3.length(vec3.subtract(this.position, other.position, tempVec));
+               var ly = dist / upro.nav.Constants.MeterUnitsInLightYears;
+
+               if (ly <= upro.nav.Constants.MaxJumpDistanceLightYears)
                {
-                  other.nearJumps[this.id] = ly;
+                  this.nearJumps[systemId] = ly;
+                  if (this.security < 0.5)
+                  {
+                     other.nearJumps[this.id] = ly;
+                  }
                }
             }
          }

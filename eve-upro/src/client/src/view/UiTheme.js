@@ -86,7 +86,7 @@ upro.view.UiTheme = Class
                },
                'label': function()
                {
-                  return 'font-size:12px;';
+                  return 'font-size:12px;font-weight:bold;';
                },
                'button': function()
                {

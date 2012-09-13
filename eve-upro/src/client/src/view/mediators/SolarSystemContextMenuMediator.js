@@ -121,6 +121,7 @@ upro.view.mediators.SolarSystemContextMenuMediator = Class.create(upro.view.medi
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.UserSessionProxy.NAME);
       var solarSystem = this.getNotifyBody();
+      var prepSolarSystem = sessionProxy.getCorridorPreparationSolarSystem();
       var prepJumpType = sessionProxy.getCorridorPreparationJumpType();
       var isSystemNullSec = solarSystem
             && (solarSystem.galaxy.id == upro.model.proxies.UniverseProxy.GALAXY_ID_NEW_EDEN)
@@ -133,8 +134,10 @@ upro.view.mediators.SolarSystemContextMenuMediator = Class.create(upro.view.medi
       }
       else if (prepJumpType == upro.nav.JumpType.JumpBridge)
       { // jump bridges are only possible in NewEdens null sec and within 5ly
-         // TODO: fetch other, get distance
-         isCorridorPossible = isSystemNullSec; // && distance <= 5ly
+         var distance = prepSolarSystem.getNearJumps()[solarSystem.getId()];
+         var isWithinFiveLightYears = distance <= 5.0;
+
+         isCorridorPossible = isSystemNullSec && isWithinFiveLightYears;
       }
 
       this.commandCorridorExit.setPossible(isCorridorPossible);

@@ -134,7 +134,15 @@ upro.app.Notifications =
    /** List of jump corridors changed */
    JumpCorridorListChanged: 0,
    /** Data of one jump corridor changed */
-   JumpCorridorDataChanged: 0
+   JumpCorridorDataChanged: 0,
+   /** Group selection request */
+   JumpCorridorSelectionRequest: 0,
+   /** Group selected */
+   JumpCorridorSelected: 0,
+   /** Request to update a jump corridor */
+   UpdateJumpCorridorRequest: 0,
+   /** Request to destroy a jump corridor */
+   DestroyJumpCorridorRequest: 0
 };
 
 /**

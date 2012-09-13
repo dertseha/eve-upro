@@ -3,25 +3,38 @@
  */
 upro.model.JumpCorridorInfo = Class.create(upro.model.AbstractSharedObjectInfo,
 {
-   initialize: function($super, id, interestChecker, data)
+   initialize: function($super, id, interestChecker, data, solarSystemResolver)
    {
       $super(id, "JumpCorridor", interestChecker);
 
       this.data =
       {
          name: data.name,
-         jumpType: data.jumpType
+         jumpType: data.jumpType,
+         entrySolarSystemId: data.entrySolarSystemId,
+         exitSolarSystemId: data.exitSolarSystemId
       };
+      this.solarSystemResolver = solarSystemResolver;
    },
 
    getName: function()
    {
-      return this.name;
+      return this.data.name;
    },
 
    getJumpType: function()
    {
-      return this.jumpType;
+      return this.data.jumpType;
+   },
+
+   getEntrySolarSystem: function()
+   {
+      return this.solarSystemResolver.findSolarSystemById(this.data.entrySolarSystemId);
+   },
+
+   getExitSolarSystem: function()
+   {
+      return this.solarSystemResolver.findSolarSystemById(this.data.exitSolarSystemId);
    },
 
    /**
