@@ -1,7 +1,6 @@
 /**
- * This class is basically a map of objects that have an ID.
- * It furthermore provides functionality to both listen to changes
- * of the map and to wait for specific additions.
+ * This class is basically a map of objects that have an ID. It furthermore provides functionality to both listen to
+ * changes of the map and to wait for specific additions.
  */
 upro.nav.IdentifiedObjectHolder = Class.create(
 {
@@ -21,8 +20,21 @@ upro.nav.IdentifiedObjectHolder = Class.create(
    },
 
    /**
-    * Adds the given object to the map. First all listeners are informed, then
-    * all waiters.
+    * Iterates through all objects and passes them one by one to given callback
+    * 
+    * @param callback the function to call; signature: function(object) { }
+    */
+   forEachObject: function(callback)
+   {
+      for ( var id in this.objects)
+      {
+         callback(this.objects[id]);
+      }
+   },
+
+   /**
+    * Adds the given object to the map. First all listeners are informed, then all waiters.
+    * 
     * @param object the object to add
     */
    add: function(object)
@@ -50,6 +62,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
 
    /**
     * Removes the object with given ID
+    * 
     * @param id of the object to remove
     */
    remove: function(id)
@@ -60,7 +73,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
       {
          delete this.objects[id];
 
-         for (var i = this.listeners.length - 1; i >= 0; i--)
+         for ( var i = this.listeners.length - 1; i >= 0; i--)
          {
             this.listeners[i].onRemoved(object);
          }
@@ -69,6 +82,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
 
    /**
     * Retrieves the object with given ID. Returns undefined if not found
+    * 
     * @param id to look for
     * @return the object with given ID.
     */
@@ -78,8 +92,8 @@ upro.nav.IdentifiedObjectHolder = Class.create(
    },
 
    /**
-    * Tries to find all objects of which the name contains the given
-    * name part, case insenstitive.
+    * Tries to find all objects of which the name contains the given name part, case insenstitive.
+    * 
     * @param namePart to be found.
     * @return an array of the found objects
     */
@@ -104,6 +118,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
 
    /**
     * Returns the object that has the given name (case insensitive)
+    * 
     * @param searchName the name of the object to look for
     * @return the object that has the given name
     */
@@ -128,6 +143,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
 
    /**
     * Registers the given listener for any changes
+    * 
     * @param listener to register
     */
    register: function(listener)
@@ -142,6 +158,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
 
    /**
     * Unregisters the given listener
+    * 
     * @param listener to unregister
     */
    unregister: function(listener)
@@ -155,10 +172,10 @@ upro.nav.IdentifiedObjectHolder = Class.create(
    },
 
    /**
-    * Requests to wait for an object with given ID. If the object is already contained,
-    * the waiter function will be called immediately. Otherwise, it will be
-    * stored and called when the object is added.
-    * The waiter will be removed automatically when it is called
+    * Requests to wait for an object with given ID. If the object is already contained, the waiter function will be
+    * called immediately. Otherwise, it will be stored and called when the object is added. The waiter will be removed
+    * automatically when it is called
+    * 
     * @param id to look for
     * @param waiter to call as soon as the object with given ID is added
     */
@@ -184,6 +201,7 @@ upro.nav.IdentifiedObjectHolder = Class.create(
 
    /**
     * Stops waiting for an object
+    * 
     * @param id to look for
     * @param waiter to unregister
     */

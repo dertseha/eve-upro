@@ -12,17 +12,17 @@ upro.nav.finder.PathFinderCapabilityJumpGates = Class.create(upro.nav.finder.Pat
    {
       var waypoints = [];
 
-      for (var systemId in sourceWaypoint.system.jumpPortals.objects)
+      for ( var portalId in sourceWaypoint.system.jumpPortals.objects)
       {
-         var jumpPortal = sourceWaypoint.system.jumpPortals.get(systemId);
+         var jumpPortal = sourceWaypoint.system.jumpPortals.get(portalId);
          var jumpType = jumpPortal.getJumpCorridor().getJumpType();
 
          if (jumpType == upro.nav.JumpType.JumpGate)
          {
             var system = jumpPortal.system;
             var cost = pathFinder.getBasicCostTo(system);
-            var waypoint = new upro.nav.finder.PathFinderWaypoint(pathFinder, system, sourceWaypoint,
-               pathFinder.sumCosts(sourceWaypoint.totalCost, cost), jumpType);
+            var waypoint = new upro.nav.finder.PathFinderWaypoint(pathFinder, system, sourceWaypoint, pathFinder
+                  .sumCosts(sourceWaypoint.totalCost, cost), jumpType);
 
             waypoints.push(waypoint);
          }

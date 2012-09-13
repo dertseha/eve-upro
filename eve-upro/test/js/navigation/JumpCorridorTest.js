@@ -18,8 +18,10 @@ JumpCorridorTest.prototype.whenAddingAJumpCorridor = function(galaxyId1, systemI
 {
    var galaxy1 = Fixture.universe.galaxies.get(galaxyId1);
    var galaxy2 = Fixture.universe.galaxies.get(galaxyId2);
+   var id = upro.nav.JumpCorridor.createDefaultId(galaxy1, systemId1, galaxy2, systemId2, upro.nav.JumpType.JumpGate);
 
-   Fixture.jumpCorridor = new upro.nav.JumpCorridor(galaxy1, systemId1, galaxy2, systemId2);
+   Fixture.jumpCorridor = new upro.nav.JumpCorridor(id, galaxy1, systemId1, galaxy2, systemId2,
+         upro.nav.JumpType.JumpGate);
 };
 
 JumpCorridorTest.prototype.whenRemovingTheJumpCorridor = function()
@@ -35,18 +37,30 @@ JumpCorridorTest.prototype.thenToStringShouldReturn = function(value)
    assertEquals(value, result);
 };
 
-JumpCorridorTest.prototype.thenSystemShouldHaveAJumpTo = function(systemId1, systemId2)
+JumpCorridorTest.prototype.hasSystemJumpTo = function(systemId1, systemId2)
 {
    var system1 = Fixture.galaxy.solarSystems.get(systemId1);
+   var found = false;
 
-   assertSame(systemId2, system1.jumpPortals.get(systemId2).id);
+   system1.jumpPortals.forEachObject(function(jumpPortal)
+   {
+      if (jumpPortal.system.id == systemId2)
+      {
+         found = true;
+      }
+   });
+
+   return found;
+};
+
+JumpCorridorTest.prototype.thenSystemShouldHaveAJumpTo = function(systemId1, systemId2)
+{
+   assertTrue(this.hasSystemJumpTo(systemId1, systemId2));
 };
 
 JumpCorridorTest.prototype.thenSystemShouldHaveNoJumpTo = function(systemId1, systemId2)
 {
-   var system1 = Fixture.galaxy.solarSystems.get(systemId1);
-
-   assertUndefined(system1.jumpPortals.get(systemId2));
+   assertFalse(this.hasSystemJumpTo(systemId1, systemId2));
 };
 
 JumpCorridorTest.prototype.thenNothingShouldWaitForSystem = function(systemId)
@@ -66,7 +80,7 @@ JumpCorridorTest.prototype.testCreateJumpCorridor = function()
 
    this.whenAddingAJumpCorridor(1, 10, 1, 20);
 
-   this.thenToStringShouldReturn('JumpCorridor [1.10-1.20]');
+   this.thenToStringShouldReturn('JumpCorridor [1.10-1.20@JumpGate]');
 };
 
 JumpCorridorTest.prototype.testOrderedIdByGalaxy = function()
@@ -76,7 +90,7 @@ JumpCorridorTest.prototype.testOrderedIdByGalaxy = function()
 
    this.whenAddingAJumpCorridor(2, 20, 1, 10);
 
-   this.thenToStringShouldReturn('JumpCorridor [1.10-2.20]');
+   this.thenToStringShouldReturn('JumpCorridor [1.10-2.20@JumpGate]');
 };
 
 JumpCorridorTest.prototype.testOrderedIdBySystem = function()
@@ -85,7 +99,7 @@ JumpCorridorTest.prototype.testOrderedIdBySystem = function()
 
    this.whenAddingAJumpCorridor(1, 20, 1, 10);
 
-   this.thenToStringShouldReturn('JumpCorridor [1.10-1.20]');
+   this.thenToStringShouldReturn('JumpCorridor [1.10-1.20@JumpGate]');
 };
 
 JumpCorridorTest.prototype.testSolarSystemJumpAfterSystems = function()

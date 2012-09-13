@@ -65,7 +65,8 @@ upro.nav.Galaxy = Class.create(
     */
    addStaticJumpCorridor: function(systemId1, systemId2, jumpType)
    {
-      var corridor = new upro.nav.JumpCorridor(this, systemId1, this, systemId2, jumpType);
+      var id = upro.nav.JumpCorridor.createDefaultId(this, systemId1, this, systemId2, jumpType);
+      var corridor = new upro.nav.JumpCorridor(id, this, systemId1, this, systemId2, jumpType);
 
       this.jumpCorridors.push(corridor);
    },

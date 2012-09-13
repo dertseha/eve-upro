@@ -87,8 +87,17 @@ GalaxyTest.prototype.thenAllReferencesAreSet = function(regionId, constellationI
 GalaxyTest.prototype.thenSystemShouldHaveAJumpTo = function(systemId1, systemId2)
 {
    var system1 = Fixture.galaxy.solarSystems.get(systemId1);
+   var found = false;
 
-   assertSame(systemId2, system1.jumpPortals.get(systemId2).id);
+   system1.jumpPortals.forEachObject(function(jumpPortal)
+   {
+      if (jumpPortal.system.id == systemId2)
+      {
+         found = true;
+      }
+   });
+
+   assertTrue(found);
 };
 
 GalaxyTest.prototype.setUp = function()

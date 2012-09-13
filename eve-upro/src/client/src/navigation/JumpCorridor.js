@@ -1,13 +1,14 @@
 /**
- * A Jump corridor is a general pair of two jump portals; It could be for
- * jump gates, (static) worm holes and jump bridges.
+ * A Jump corridor is a general pair of two jump portals; It could be for jump gates, (static) worm holes and jump
+ * bridges.
  */
 upro.nav.JumpCorridor = Class.create(
 {
-   initialize: function(galaxy1, systemId1, galaxy2, systemId2, jumpType)
+   initialize: function(id, galaxy1, systemId1, galaxy2, systemId2, jumpType)
    {
       var local = this;
 
+      this.id = id;
       this.jumpType = jumpType;
 
       this.galaxy1 = galaxy1;
@@ -20,18 +21,15 @@ upro.nav.JumpCorridor = Class.create(
       this.system2 = null;
       this.portal2 = null;
 
-      if ((galaxy1.id < galaxy2.id) || ((galaxy1.id === galaxy2.id) && (systemId1 < systemId2)))
+      this.waiter1 = function(solarSystem)
       {
-         this.id = this.createId(galaxy1, systemId1, galaxy2, systemId2);
-      }
-      else
-      {
-         this.id = this.createId(galaxy2, systemId2, galaxy1, systemId1);
-      }
-
-      this.waiter1 = function(solarSystem) { local.onSystem1Added(solarSystem); };
+         local.onSystem1Added(solarSystem);
+      };
       this.galaxy1.solarSystems.waitFor(this.systemId1, this.waiter1);
-      this.waiter2 = function(solarSystem) { local.onSystem2Added(solarSystem); };
+      this.waiter2 = function(solarSystem)
+      {
+         local.onSystem2Added(solarSystem);
+      };
       this.galaxy2.solarSystems.waitFor(this.systemId2, this.waiter2);
    },
 
@@ -42,16 +40,12 @@ upro.nav.JumpCorridor = Class.create(
 
    /**
     * Returns the jump type
+    * 
     * @return the jump type
     */
    getJumpType: function()
    {
       return this.jumpType;
-   },
-
-   createId: function(galaxy1, systemId1, galaxy2, systemId2)
-   {
-      return "" + galaxy1.id + "." + systemId1 + "-" + galaxy2.id + "." + systemId2;
    },
 
    dispose: function()
@@ -103,3 +97,24 @@ upro.nav.JumpCorridor = Class.create(
       return new upro.nav.JumpPortal(this, destSystem);
    }
 });
+
+upro.nav.JumpCorridor.createDefaultId = function(galaxy1, systemId1, galaxy2, systemId2, jumpType)
+{
+   var id = null;
+
+   if ((galaxy1.id < galaxy2.id) || ((galaxy1.id === galaxy2.id) && (systemId1 < systemId2)))
+   {
+      id = upro.nav.JumpCorridor.createDefaultIdOrdered(galaxy1, systemId1, galaxy2, systemId2, jumpType);
+   }
+   else
+   {
+      id = upro.nav.JumpCorridor.createDefaultIdOrdered(galaxy2, systemId2, galaxy1, systemId1, jumpType);
+   }
+
+   return id;
+};
+
+upro.nav.JumpCorridor.createDefaultIdOrdered = function(galaxy1, systemId1, galaxy2, systemId2, jumpType)
+{
+   return "" + galaxy1.id + "." + systemId1 + "-" + galaxy2.id + "." + systemId2 + "@" + jumpType;
+};
