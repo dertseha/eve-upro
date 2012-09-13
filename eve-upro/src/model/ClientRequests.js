@@ -337,9 +337,9 @@
       },
 
       /**
-       * Sets jump corridor information. If the 'id' field is missing, it requests to create a new one
+       * Creates a new jump corridor
        */
-      SetJumpCorridor:
+      CreateJumpCorridor:
       {
          name: 0,
          header: getStandardHeaderDefinition(),
@@ -363,6 +363,27 @@
             schema:
             {
                id: context.commonSchemata.uuidSchema
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Updates a jump corridor
+       */
+      UpdateJumpCorridor:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema,
+               data:
+               {
+                  '?name': String
+               }
             },
             isValid: null
          }
