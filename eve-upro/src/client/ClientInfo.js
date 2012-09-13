@@ -229,6 +229,7 @@ exports.sourceFiles = [];
    'view/mediators/GroupEditPanelMediator.js', //
    'view/mediators/CurrentLocationPanelMediator.js', //
    'view/mediators/CurrentLocationListPanelMediator.js', //
+   'view/mediators/JumpCorridorSceneMediator.js', //
    'view/mediators/JumpCorridorListPanelMediator.js', //
    'view/mediators/JumpCorridorEditPanelMediator.js', //
 

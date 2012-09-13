@@ -42,6 +42,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
          uiMediator.setVisible(false); // with a scene system supported, use this display as default.
          scene.createGalaxies();
+
+         this.facade().registerMediator(new upro.view.mediators.JumpCorridorSceneMediator());
       }
 
       this.facade().sendNotification(upro.app.Notifications.DebugMessage, "SessionLoggedIn complete");

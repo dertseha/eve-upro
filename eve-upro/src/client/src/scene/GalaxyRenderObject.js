@@ -17,6 +17,7 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
 
       this.routes = {};
       this.routeSegments = [];
+      this.addRoute('JumpCorridors');
       this.addRoute('ActiveRoute');
       this.addRoute('Autopilot');
 
@@ -119,13 +120,38 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       this.updateRouteSegments();
    },
 
-   addEdge: function(system1, system2, vertices, colors, color)
+   /**
+    * Returns the position to be used for given solar system and a reference. Will return a position a bit off the
+    * galaxy relative to the reference if the reference is from another galaxy.
+    * 
+    * @param solarSystem the system for which to retrieve the position for
+    * @param solarSystemReference a reference specifying the reference
+    * @returns a vector to use
+    */
+   getSolarSystemPosition: function(solarSystem, solarSystemReference)
    {
-      var galaxy = system1.galaxy;
+      var galaxy = solarSystemReference.galaxy;
       var systemScale = galaxy.scale;
       var center = galaxy.position;
-      var pos1 = vec3.scale(vec3.subtract(system1.position, center, vec3.create()), 1 / systemScale);
-      var pos2 = vec3.scale(vec3.subtract(system2.position, center, vec3.create()), 1 / systemScale);
+      var pos = null;
+
+      if (solarSystem.galaxy.id == galaxy.id)
+      {
+         pos = vec3.scale(vec3.subtract(solarSystem.position, center, vec3.create()), 1 / systemScale);
+      }
+      else
+      {
+         pos = vec3.scale(vec3.subtract(solarSystemReference.position, center, vec3.create()), 1 / systemScale);
+         vec3.add(pos, vec3.create([ 0.0, -10.0, 0.0 ]));
+      }
+
+      return pos;
+   },
+
+   addEdge: function(system1, system2, vertices, colors, color)
+   {
+      var pos1 = this.getSolarSystemPosition(system1, system1);
+      var pos2 = this.getSolarSystemPosition(system2, system1);
       var diffVec = vec3.subtract(pos2, pos1, vec3.create());
       var distance = vec3.length(diffVec);
       var fadeInLength = distance / 5.0, fadeInLimit = 1.0;
