@@ -157,10 +157,7 @@ function ActiveDataState(owner, dataObject)
          }
          else
          {
-            this.dataObject.deleteFromStorage(owner.getStorage());
-            broadcaster.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
-
-            owner.setDataState(this.dataObject.getDocumentId(), null);
+            this.destroy();
          }
       }
    };
@@ -171,7 +168,7 @@ function ActiveDataState(owner, dataObject)
       var broadcaster = owner.getBroadcaster();
 
       this.dataObject.deleteFromStorage(owner.getStorage());
-      broadcaster.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest());
+      broadcaster.broadcastDataInfoReset(this.dataObject, this.dataObject.getDataInterest(), []);
 
       owner.setDataState(this.dataObject.getDocumentId(), null);
    };

@@ -71,6 +71,41 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
       });
    };
 
+   /**
+    * Registers a broadcast handler that is meant for a data object. Must have an 'id' field in the body.
+    */
+   this.registerDataBroadcastHandler = function(broadcastName)
+   {
+      var self = this;
+
+      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      {
+         self.onDataBroadcast(header, body);
+      });
+   };
+
+   /**
+    * Broadcast handler for data
+    */
+   this.onDataBroadcast = function(header, body)
+   {
+      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+
+      if (character)
+      {
+         var characterId = character.getCharacterId();
+         var state = this.ensureDataState(body.id);
+         var message =
+         {
+            characterId: characterId,
+            header: header,
+            body: body
+         };
+
+         state.onBroadcast(message);
+      }
+   };
+
    this.ensureDataState = function(documentId)
    {
       var state = this.dataStatesById[documentId];

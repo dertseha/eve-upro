@@ -24,20 +24,20 @@ function StandardDataBroadcaster(broadcaster, dataName)
       this.broadcaster.broadcast(header, body, queueName);
    };
 
-   this.broadcastDataInfoReset = function(dataObject, interest)
+   this.broadcastDataInfoReset = function(dataObject, interest, disinterest)
    {
       var header =
       {
          type: busMessages.Broadcasts[this.dataName + 'Info'].name,
          interest: interest,
-         disinterest: dataObject.getDataInterest()
+         disinterest: disinterest || dataObject.getDataInterest()
       };
       var body =
       {
          id: dataObject.getDocumentId()
       };
 
-      this.amqp.broadcast(header, body);
+      this.broadcaster.broadcast(header, body);
    };
 
    this.broadcastDataShare = function(dataObject, interest, queueName)
