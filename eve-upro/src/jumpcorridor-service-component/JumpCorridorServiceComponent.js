@@ -25,61 +25,65 @@ function JumpCorridorServiceComponent(services)
    {
       superStart.call(this);
 
-      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestSetJumpCorridor.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestCreateJumpCorridor.name);
+
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestUpdateJumpCorridor.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestDestroyJumpCorridor.name);
    };
 
    /**
     * Broadcast handler
     */
-   this.onBroadcastClientRequestSetJumpCorridor = function(header, body)
+   this.onBroadcastClientRequestCreateJumpCorridor = function(header, body)
    {
       var character = this.characterAgent.getCharacterBySession(header.sessionId);
 
       if (character)
       {
-         var characterId = character.getCharacterId();
-
-         if (body.data.id)
+         var id = UuidFactory.v4();
+         var initData =
          {
-            var state = this.ensureDataState(body.data.id);
-            var message =
-            {
-               characterId: characterId,
-               header: header,
-               body: body
-            };
-
-            state.onBroadcast(message);
-         }
-         else
+            jumpCorridor: body.data
+         };
+         var state = new ActiveDataState(this, new JumpCorridorDataObject(id, initData));
+         var interest =
          {
-            var id = UuidFactory.v4();
-            var initData =
-            {
-               jumpCorridor: body.data
-            };
-            var state = new ActiveDataState(this, new JumpCorridorDataObject(id, initData));
-            var interest =
-            {
-               scope: 'Character',
-               id: characterId
-            };
+            scope: 'Character',
+            id: character.getCharacterId()
+         };
 
-            logger.info('Character ' + character.toString() + ' creating jump corridor');
-            state.activate();
-            state.addOwner(interest);
-         }
+         logger.info('Character ' + character.toString() + ' creating jump corridor');
+         state.activate();
+         state.addOwner(interest);
       }
    };
 
-   this.processClientRequestSetJumpCorridor = function(dataObject, characterId, body)
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestUpdateJumpCorridor = function(dataObject, characterId, body)
    {
-      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+      var character = this.characterAgent.getCharacterById(characterId);
 
-      if (character && this.dataObject.isCharacterOwner(character) && dataObject.updateData(body.data))
+      if (character && dataObject.isCharacterOwner(character) && dataObject.updateData(body.data))
       {
          dataObject.saveToStorage(this.getStorage());
          this.getBroadcaster().broadcastDataInfo(dataObject, dataObject.getDataInterest());
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestDestroyJumpCorridor = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.destroy();
       }
    };
 }
