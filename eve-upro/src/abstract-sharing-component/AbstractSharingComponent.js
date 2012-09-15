@@ -34,6 +34,8 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
       this.registerCharacterHandler('CharacterGroupMemberAdded', '');
       this.registerCharacterHandler('CharacterGroupMemberRemoved', '');
 
+      this.registerBroadcastHandler(busMessages.Broadcasts.GroupDestroyed.name);
+
       var index = [];
 
       AbstractDataObject.Scopes.forEach(function(scope)
@@ -104,6 +106,28 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 
          state.onBroadcast(message);
       }
+   };
+
+   this.onBroadcastGroupDestroyed = function(header, body)
+   {
+      var documentIds = [];
+      var self = this;
+      var interest = [
+      {
+         scope: 'Group',
+         id: body.groupId
+      } ];
+
+      for ( var documentId in this.dataStatesById)
+      {
+         documentIds.push(documentId);
+      }
+      documentIds.forEach(function(documentId)
+      {
+         var dataState = self.dataStatesById[documentId];
+
+         dataState.onGroupDestroyed(interest);
+      });
    };
 
    this.ensureDataState = function(documentId)

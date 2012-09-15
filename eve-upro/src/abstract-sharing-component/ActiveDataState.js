@@ -16,9 +16,7 @@ function ActiveDataState(owner, dataObject)
 
    this.dataObject = dataObject;
 
-   /**
-    * Character state handler
-    */
+   /** {@inheritDoc} */
    this.onCharacterSessionAdded = function(character, interest, responseQueue)
    {
       var owner = this.getOwner();
@@ -35,9 +33,7 @@ function ActiveDataState(owner, dataObject)
       }
    };
 
-   /**
-    * Character state handler
-    */
+   /** {@inheritDoc} */
    this.onCharacterGroupMemberAdded = function(groupId, interest)
    {
       var owner = this.getOwner();
@@ -54,9 +50,7 @@ function ActiveDataState(owner, dataObject)
       }
    };
 
-   /**
-    * Character state handler
-    */
+   /** {@inheritDoc} */
    this.onCharacterGroupMemberRemoved = function(character, groupId, interest)
    {
       var owner = this.getOwner();
@@ -72,9 +66,7 @@ function ActiveDataState(owner, dataObject)
       }
    };
 
-   /**
-    * Broadcast handler
-    */
+   /** {@inheritDoc} */
    this.onBroadcast = function(message)
    {
       var owner = this.getOwner();
@@ -83,9 +75,7 @@ function ActiveDataState(owner, dataObject)
       handler.call(owner, this.dataObject, message.characterId, message.body);
    };
 
-   /**
-    * Requests to activate the state: Set it active at the owner and perform initial tasks
-    */
+   /** {@inheritDoc} */
    this.activate = function()
    {
       var owner = this.getOwner();
@@ -97,6 +87,12 @@ function ActiveDataState(owner, dataObject)
       broadcaster.broadcastDataInfo(this.dataObject, dataInterest);
       broadcaster.broadcastDataOwnership(this.dataObject, dataInterest);
       broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+   };
+
+   /** {@inheritDoc} */
+   this.onGroupDestroyed = function(interest)
+   {
+      this.removeShares(interest);
    };
 
    this.addShares = function(interest)

@@ -52,6 +52,14 @@ function AbstractDataState(owner)
    {
 
    };
+
+   /**
+    * Informing about a dropped group
+    */
+   this.onGroupDestroyed = function(interest)
+   {
+
+   };
 }
 
 module.exports = AbstractDataState;

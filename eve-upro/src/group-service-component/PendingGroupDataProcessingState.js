@@ -100,6 +100,8 @@ function PendingGroupDataProcessingState(service, groupId)
       }
       else
       {
+         logger.info('Group with ID ' + this.groupId + ' does not exist.');
+         this.service.broadcastGroupDestroyed(this.groupId);
          this.service.setGroupDataProcessingState(this.groupId, null);
       }
    };

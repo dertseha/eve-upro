@@ -41,6 +41,11 @@ function GroupServiceComponent(services, groupFactory)
          self.onCharacterOffline(character);
       });
 
+      this.amqp.on('broadcast', function(header, body)
+      {
+         self.onBroadcast(header, body);
+      });
+
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestCreateGroup.name);
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestDestroyGroup.name);
       this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestLeaveGroup.name);
@@ -182,6 +187,30 @@ function GroupServiceComponent(services, groupFactory)
    /**
     * Broadcast handler
     */
+   this.onBroadcast = function(header, body)
+   {
+      this.verifyGroupExistenceFromInterest(header.interest);
+   };
+
+   this.verifyGroupExistenceFromInterest = function(interestList)
+   {
+      if (interestList)
+      {
+         var self = this;
+
+         interestList.forEach(function(interest)
+         {
+            if (interest.scope == 'Group')
+            {
+               self.ensureGroupDataProcessingState(interest.id);
+            }
+         });
+      }
+   };
+
+   /**
+    * Broadcast handler
+    */
    this.onBroadcastClientRequestCreateGroup = function(header, body)
    {
       var character = this.characterAgent.getCharacterBySession(header.sessionId);
@@ -238,11 +267,11 @@ function GroupServiceComponent(services, groupFactory)
       if (character && group.allowsControllingActionsFrom(character))
       {
          logger.info('Character ' + character.toString() + ' destroys group ' + group.toString());
-         group.deleteFromStorage(this.mongodb);
-         delete this.groupDataProcessingStatesById[group.getId()];
 
          this.broadcastGroupMembersRemoved(group, group.getMembers());
          this.broadcastGroupAdvertisements(group, false);
+
+         this.destroyGroup(group);
       }
    };
 
@@ -347,8 +376,7 @@ function GroupServiceComponent(services, groupFactory)
       if (group.isEmpty())
       {
          logger.info('Group ' + group.toString() + ' became empty, destroying');
-         group.deleteFromStorage(this.mongodb);
-         delete this.groupDataProcessingStatesById[group.getId()];
+         this.destroyGroup(group);
       }
       else
       {
@@ -357,6 +385,35 @@ function GroupServiceComponent(services, groupFactory)
       }
 
       return rCode;
+   };
+
+   /**
+    * Destroys given group, performs cleanup tasks
+    */
+   this.destroyGroup = function(group)
+   {
+      group.deleteFromStorage(this.mongodb);
+      delete this.groupDataProcessingStatesById[group.getId()];
+      this.broadcastGroupDestroyed(group.getId());
+   };
+
+   /**
+    * Broadcasts destroyed status of a group
+    * 
+    * @param groupId the ID of the group
+    */
+   this.broadcastGroupDestroyed = function(groupId)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupDestroyed.name,
+      };
+      var body =
+      {
+         groupId: groupId
+      };
+
+      this.amqp.broadcast(header, body);
    };
 
    /**

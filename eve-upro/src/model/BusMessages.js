@@ -145,6 +145,27 @@ var broadcasts =
          },
          isValid: null
       }
+   },
+
+   GroupDestroyed:
+   {
+      name: 0,
+      header:
+      {
+         schema:
+         {
+            type: String
+         },
+         isValid: null
+      },
+      body:
+      {
+         schema:
+         {
+            groupId: commonSchemata.groupIdType,
+         },
+         isValid: null
+      }
    }
 };
 
