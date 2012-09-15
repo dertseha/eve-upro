@@ -14,7 +14,7 @@
    {
       entryType: [ 'Transit', 'Waypoint', 'Checkpoint' ],
       solarSystemId: Number,
-      nextJumpType: [ null, 'None', 'JumpGate', 'JumpDrive', 'JumpBridge', 'StaticWormhole', 'DynamicWormhole' ]
+      nextJumpType: [ 'None', 'JumpGate', 'JumpDrive', 'JumpBridge', 'StaticWormhole', 'DynamicWormhole' ]
    };
 
    context.namespace.groupIdType = context.namespace.uuidSchema;

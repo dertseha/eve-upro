@@ -159,7 +159,7 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
          var isCheckpoint = entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint;
 
          { // create and add new entry
-            var systemEntry = new upro.nav.SystemRouteEntry(solarSystem, entryType);
+            var systemEntry = new upro.nav.SystemRouteEntry(solarSystem, entryType, upro.nav.JumpType.None);
             var routeEntry = this.createRouteEntry(systemEntry);
 
             if (this.routeEntries.length == 0)
@@ -229,6 +229,29 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
       }
 
       this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+   },
+
+   /**
+    * @returns {Array} of SystemRouteEntry objects describing the route
+    */
+   getRoute: function()
+   {
+      var route = [];
+
+      for ( var i = 0; i < this.routeEntries.length; i++)
+      {
+         var routeEntry = this.routeEntries[i];
+
+         route.push(routeEntry.systemEntry);
+         for ( var j = 0; j < routeEntry.transits.length; j++)
+         {
+            var transitEntry = routeEntry.transits[j];
+
+            route.push(transitEntry);
+         }
+      }
+
+      return route;
    },
 
    /**

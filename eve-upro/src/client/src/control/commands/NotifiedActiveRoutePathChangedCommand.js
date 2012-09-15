@@ -13,38 +13,33 @@ upro.ctrl.cmd.NotifiedActiveRoutePathChangedCommand = Class.create(SimpleCommand
       var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
       var sceneMediator = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
       var highlightMediator = this.facade().retrieveMediator(upro.view.mediators.SolarSystemHighlightMediator.NAME);
-      var routeEntry, isReachable;
-      var lastSystem = null, temp = null;
+      var route = activeRouteProxy.getRoute();
+      var lastRouteEntry = null;
       var waypointCounter = 1;
-      var solarSystem = null;
       var okColor = [ 0.2, 1.0, 0.5, 4.0 ];
+      var nokColor = [ 1.0, 0.0, 0.0, 2.0 ];
+      var that = this;
 
       sceneMediator.clearRoute('ActiveRoute');
       highlightMediator.removeHighlights(/RouteOverlay:.*/);
 
-      for ( var i = 0; i < activeRouteProxy.routeEntries.length; i++)
+      route.forEach(function(routeEntry)
       {
-         routeEntry = activeRouteProxy.routeEntries[i];
-         isReachable = routeEntry.isReachable;
-         solarSystem = routeEntry.systemEntry.getSolarSystem();
+         var solarSystem = routeEntry.getSolarSystem();
+         var isReachable = !lastRouteEntry || (lastRouteEntry.getJumpType() != upro.nav.JumpType.None);
+         var color = isReachable ? okColor : nokColor;
 
-         var color = isReachable ? okColor : [ 1.0, 0.0, 0.0, 2.0 ];
-
-         if (lastSystem)
+         if (lastRouteEntry)
          {
-            sceneMediator.addRouteEdge('ActiveRoute', lastSystem, solarSystem, color);
+            sceneMediator.addRouteEdge('ActiveRoute', lastRouteEntry.getSolarSystem(), solarSystem, color);
          }
-         this.setSystemOverlay(highlightMediator, solarSystem, waypointCounter, isReachable);
-         waypointCounter++;
-
-         lastSystem = solarSystem;
-         for ( var j = 0; j < routeEntry.transits.length; j++)
+         if (routeEntry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Transit)
          {
-            temp = routeEntry.transits[j].getSolarSystem();
-            sceneMediator.addRouteEdge('ActiveRoute', lastSystem, temp, okColor);
-            lastSystem = temp;
+            that.setSystemOverlay(highlightMediator, solarSystem, waypointCounter, isReachable);
+            waypointCounter++;
          }
-      }
+         lastRouteEntry = routeEntry;
+      });
    },
 
    /**
