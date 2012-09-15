@@ -182,7 +182,8 @@ exports.sourceFiles = [];
    'control/commands/NotifiedUserRoutingCapJumpDriveToggleCommand.js', //
    'control/commands/NotifiedUserRoutingCapJumpDriveRangeStepCommand.js', //
    'control/commands/NotifiedNewCorridorSetExitCommand.js', //
-   'control/commands/NotifiedNewCorridorPrepareWormholeCommand.js', //
+   'control/commands/NotifiedNewCorridorPrepareStaticWormholeCommand.js', //
+   'control/commands/NotifiedNewCorridorPrepareDynamicWormholeCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareJumpBridgeCommand.js', //
    'control/commands/NotifiedGroupSelectionRequestCommand.js', //
    'control/commands/NotifiedGroupCreateRequestCommand.js', //

@@ -76,7 +76,9 @@ upro.res.text.templates["en"] =
    /** Menu label for specifying the exit system */
    "corridor.exit": "Set Exit",
    /** Menu label for specifying a wormhole entry */
-   "corridor.entry.wormhole": "Wormhole Entry",
+   "corridor.entry.wormhole.static": "Static Wormhole Entry",
+   /** Menu label for specifying a wormhole entry */
+   "corridor.entry.wormhole.dynamic": "Dynamic Wormhole Entry",
    /** Menu label for specifying a jump bridge entry */
    "corridor.entry.jumpBridge": "Jump Bridge Entry",
 

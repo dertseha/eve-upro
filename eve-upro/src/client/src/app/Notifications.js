@@ -83,7 +83,9 @@ upro.app.Notifications =
    /** Sets the exit system for a new corridor. Param: SolarSystem */
    NewCorridorSetExit: 0,
    /** Prepares a new corridor of type wormhole. Param: SolarSystem */
-   NewCorridorPrepareWormhole: 0,
+   NewCorridorPrepareDynamicWormhole: 0,
+   /** Prepares a new corridor of type wormhole. Param: SolarSystem */
+   NewCorridorPrepareStaticWormhole: 0,
    /** Prepares a new corridor of type jump bridge. Param: SolarSystem */
    NewCorridorPrepareJumpBridge: 0,
 

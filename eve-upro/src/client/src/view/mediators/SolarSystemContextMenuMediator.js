@@ -62,19 +62,26 @@ upro.view.mediators.SolarSystemContextMenuMediator = Class.create(upro.view.medi
          corridorMenu.setCommand(4, this.createVectorIcon.bind(this, upro.res.menu.IconData.WormholeOut),
                this.commandCorridorExit);
 
-         this.commandCorridorPrepWormhole = new upro.hud.SimpleCommandAdapter(function()
+         this.commandCorridorPrepDynamicWormhole = new upro.hud.SimpleCommandAdapter(function()
          {
-            mediator.notify(upro.app.Notifications.NewCorridorPrepareWormhole);
+            mediator.notify(upro.app.Notifications.NewCorridorPrepareDynamicWormhole);
             mediator.cancel();
-         }, upro.res.text.Lang.format("corridor.entry.wormhole"));
-         corridorMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.Wormhole),
-               this.commandCorridorPrepWormhole);
+         }, upro.res.text.Lang.format("corridor.entry.wormhole.dynamic"));
+         corridorMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.DynamicWormhole),
+               this.commandCorridorPrepDynamicWormhole);
+         this.commandCorridorPrepStaticWormhole = new upro.hud.SimpleCommandAdapter(function()
+         {
+            mediator.notify(upro.app.Notifications.NewCorridorPrepareStaticWormhole);
+            mediator.cancel();
+         }, upro.res.text.Lang.format("corridor.entry.wormhole.static"));
+         corridorMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.StaticWormhole),
+               this.commandCorridorPrepStaticWormhole);
          this.commandCorridorPrepJumpBridge = new upro.hud.SimpleCommandAdapter(function()
          {
             mediator.notify(upro.app.Notifications.NewCorridorPrepareJumpBridge);
             mediator.cancel();
          }, upro.res.text.Lang.format("corridor.entry.jumpBridge"));
-         corridorMenu.setCommand(1, this.createVectorIcon.bind(this, upro.res.menu.IconData.Bridge),
+         corridorMenu.setCommand(2, this.createVectorIcon.bind(this, upro.res.menu.IconData.Bridge),
                this.commandCorridorPrepJumpBridge);
 
       }
@@ -128,7 +135,7 @@ upro.view.mediators.SolarSystemContextMenuMediator = Class.create(upro.view.medi
             && (solarSystem.security == 0.0);
       var isCorridorPossible = false;
 
-      if (prepJumpType == upro.nav.JumpType.DynamicWormhole)
+      if ((prepJumpType == upro.nav.JumpType.DynamicWormhole) || (prepJumpType == upro.nav.JumpType.StaticWormhole))
       { // wormholes are possible always and anywhere
          isCorridorPossible = true;
       }
