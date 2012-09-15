@@ -218,6 +218,10 @@
          {
             schema:
             {
+               jumpBridges:
+               {
+                  inUse: Boolean
+               },
                jumpGates:
                {
                   inUse: Boolean
@@ -226,6 +230,10 @@
                {
                   inUse: Boolean,
                   range: Number
+               },
+               wormholes:
+               {
+                  inUse: Boolean
                }
             },
             isValid: null

@@ -8,6 +8,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
       this.routingCapabilities =
       {
+         jumpBridges:
+         {
+            inUse: false
+         },
          jumpGates:
          {
             inUse: false
@@ -16,6 +20,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
          {
             inUse: false,
             range: 0.0
+         },
+         wormholes:
+         {
+            inUse: false
          }
       };
 
@@ -95,6 +103,21 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       this.facade().sendNotification(upro.app.Notifications.UserRoutingCapabilitiesChanged);
    },
 
+   getRoutingCapJumpBridgesInUse: function()
+   {
+      return this.routingCapabilities.jumpBridges.inUse;
+   },
+
+   toggleRoutingCapJumpBridges: function()
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest("SetRoutingCapabilityJumpBridges",
+      {
+         inUse: !this.getRoutingCapJumpBridgesInUse()
+      });
+   },
+
    getRoutingCapJumpGatesInUse: function()
    {
       return this.routingCapabilities.jumpGates.inUse;
@@ -122,6 +145,21 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
       {
          inUse: !this.getRoutingCapJumpDriveInUse()
+      });
+   },
+
+   getRoutingCapWormholesInUse: function()
+   {
+      return this.routingCapabilities.wormholes.inUse;
+   },
+
+   toggleRoutingCapWormholes: function()
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest("SetRoutingCapabilityWormholes",
+      {
+         inUse: !this.getRoutingCapWormholesInUse()
       });
    },
 

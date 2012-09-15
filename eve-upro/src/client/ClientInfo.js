@@ -61,9 +61,11 @@ exports.sourceFiles = [];
    'navigation/finder/finder.js', //
    'navigation/finder/PathFinder.js', //
    'navigation/finder/PathFinderCapability.js', //
+   'navigation/finder/PathFinderCapabilityJumpBridges.js', //
    'navigation/finder/PathFinderCapabilityJumpDrive.js', //
    'navigation/finder/PathFinderCapabilityJumpGates.js', //
    'navigation/finder/PathFinderCapabilityWaypoints.js', //
+   'navigation/finder/PathFinderCapabilityWormholes.js', //
    'navigation/finder/PathFinderCost.js', //
    'navigation/finder/PathFinderCostRule.js', //
    'navigation/finder/PathFinderCostRuleJumpFuel.js', //
@@ -178,9 +180,11 @@ exports.sourceFiles = [];
    'control/commands/NotifiedUserRoutingRuleUpCommand.js', //
    'control/commands/NotifiedUserRoutingRuleDownCommand.js', //
    'control/commands/NotifiedUserRoutingCapabilitiesChangedCommand.js', //
+   'control/commands/NotifiedUserRoutingCapJumpBridgesToggleCommand.js', //
    'control/commands/NotifiedUserRoutingCapJumpGatesToggleCommand.js', //
    'control/commands/NotifiedUserRoutingCapJumpDriveToggleCommand.js', //
    'control/commands/NotifiedUserRoutingCapJumpDriveRangeStepCommand.js', //
+   'control/commands/NotifiedUserRoutingCapWormholesToggleCommand.js', //
    'control/commands/NotifiedNewCorridorSetExitCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareStaticWormholeCommand.js', //
    'control/commands/NotifiedNewCorridorPrepareDynamicWormholeCommand.js', //

@@ -62,6 +62,12 @@ upro.res.text.templates["en"] =
    /** Toggling of jump gate capability */
    "routing.caps.jumpGates.toggle": "Turn Jump Gate Capability {0}",
 
+   /** Toggling of jump bridge capability */
+   "routing.caps.jumpBridges.toggle": "Turn Jump Bridge Capability {0}",
+
+   /** Toggling of wormhole capability */
+   "routing.caps.wormholes.toggle": "Turn Wormhole Capability {0}",
+
    /** jump drive menu label */
    "routing.caps.jumpDrive.menuLabel": "Jump Drive",
    /** Toggling of jump drive capability */

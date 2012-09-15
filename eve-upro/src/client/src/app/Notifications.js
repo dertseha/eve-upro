@@ -71,12 +71,16 @@ upro.app.Notifications =
 
    /** User routing capabilities changed */
    UserRoutingCapabilitiesChanged: 0,
+   /** User routing capability jump bridge toggle */
+   UserRoutingCapJumpBridgesToggle: 0,
    /** User routing capability jump gate toggle */
    UserRoutingCapJumpGatesToggle: 0,
    /** User routing capability jump drive toggle */
    UserRoutingCapJumpDriveToggle: 0,
    /** User routing capability jump drive range step. Param: Boolean whether to increment */
    UserRoutingCapJumpDriveRangeStep: 0,
+   /** User routing capability wormhole toggle */
+   UserRoutingCapWormholesToggle: 0,
 
    /** Event when the entry system for a new corridor has been set */
    NewCorridorPreparationChanged: 0,

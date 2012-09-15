@@ -50,8 +50,10 @@ function CharacterServiceComponent(services)
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.EveStatusUpdateRequest.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetActiveGalaxy.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpBridges.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpGates.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityJumpDrive.name);
+      this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingCapabilityWormholes.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleData.name);
       this.registerSessionBroadcastHandler(busMessages.Broadcasts.ClientRequestSetRoutingRuleIndex.name);
 

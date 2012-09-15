@@ -53,6 +53,10 @@ function CharacterServiceData(service, character)
       ignoredSolarSystems: [ 30000142 ],
       routingCapabilities:
       {
+         jumpBridges:
+         {
+            inUse: false
+         },
          jumpGates:
          {
             inUse: true
@@ -61,6 +65,10 @@ function CharacterServiceData(service, character)
          {
             inUse: RoutingCapabilities.jumpDrive.defaultInUse,
             range: RoutingCapabilities.jumpDrive.defaultValue
+         },
+         wormholes:
+         {
+            inUse: false
          }
       },
       routingRules: {}
@@ -367,6 +375,22 @@ function CharacterServiceData(service, character)
    /**
     * Processes the broadcast message
     */
+   this.processClientRequestSetRoutingCapabilityJumpBridges = function(header, body)
+   {
+      var notifier = [];
+
+      if (this.rawData.routingCapabilities.jumpBridges.inUse != body.inUse)
+      {
+         this.rawData.routingCapabilities.jumpBridges.inUse = body.inUse;
+         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities.name);
+      }
+
+      return notifier;
+   };
+
+   /**
+    * Processes the broadcast message
+    */
    this.processClientRequestSetRoutingCapabilityJumpGates = function(header, body)
    {
       var notifier = [];
@@ -395,6 +419,22 @@ function CharacterServiceData(service, character)
       {
          this.rawData.routingCapabilities.jumpDrive.inUse = newData.inUse;
          this.rawData.routingCapabilities.jumpDrive.range = newData.range;
+         notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities.name);
+      }
+
+      return notifier;
+   };
+
+   /**
+    * Processes the broadcast message
+    */
+   this.processClientRequestSetRoutingCapabilityWormholes = function(header, body)
+   {
+      var notifier = [];
+
+      if (this.rawData.routingCapabilities.wormholes.inUse != body.inUse)
+      {
+         this.rawData.routingCapabilities.wormholes.inUse = body.inUse;
          notifier.push(busMessages.Broadcasts.CharacterRoutingCapabilities.name);
       }
 

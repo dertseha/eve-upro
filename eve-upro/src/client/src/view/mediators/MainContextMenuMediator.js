@@ -57,6 +57,18 @@ upro.view.mediators.MainContextMenuMediator = Class
                         });
                         capMenu.setCommand(0, this.createVectorIcon.bind(this, upro.res.menu.IconData.JumpGate),
                               this.commandRoutingCapJumpGates);
+                        this.commandRoutingCapWormholes = new upro.hud.SimpleCommandAdapter(function()
+                        {
+                           mediator.notify(upro.app.Notifications.UserRoutingCapWormholesToggle);
+                        });
+                        capMenu.setCommand(5, this.createVectorIcon.bind(this, upro.res.menu.IconData.Wormhole),
+                              this.commandRoutingCapWormholes);
+                        this.commandRoutingCapJumpBridges = new upro.hud.SimpleCommandAdapter(function()
+                        {
+                           mediator.notify(upro.app.Notifications.UserRoutingCapJumpBridgesToggle);
+                        });
+                        capMenu.setCommand(2, this.createVectorIcon.bind(this, upro.res.menu.IconData.Bridge),
+                              this.commandRoutingCapJumpBridges);
 
                         var driveMenu = capMenu.setSubMenu(1, this.createVectorIcon.bind(this,
                               upro.res.menu.IconData.JumpDrive), upro.res.text.Lang
@@ -178,6 +190,20 @@ upro.view.mediators.MainContextMenuMediator = Class
                      this.commandRoutingCapJumpGates.setActive(inUse);
                      this.commandRoutingCapJumpGates.setLabel(upro.res.text.Lang.format(
                            "routing.caps.jumpGates.toggle", inUse ? offText : onText));
+                  }
+                  { // jump bridge
+                     inUse = settingsProxy.getRoutingCapJumpBridgesInUse();
+
+                     this.commandRoutingCapJumpBridges.setActive(inUse);
+                     this.commandRoutingCapJumpBridges.setLabel(upro.res.text.Lang.format(
+                           "routing.caps.jumpBridges.toggle", inUse ? offText : onText));
+                  }
+                  { // wormhole
+                     inUse = settingsProxy.getRoutingCapWormholesInUse();
+
+                     this.commandRoutingCapWormholes.setActive(inUse);
+                     this.commandRoutingCapWormholes.setLabel(upro.res.text.Lang.format(
+                           "routing.caps.wormholes.toggle", inUse ? offText : onText));
                   }
                   { // jump drive
                      var range = settingsProxy.getRoutingCapJumpDriveRange();

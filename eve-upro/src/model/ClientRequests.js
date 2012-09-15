@@ -124,6 +124,23 @@
       },
 
       /**
+       * Set the jump bridges routing capability
+       */
+      SetRoutingCapabilityJumpBridges:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               inUse: Boolean
+            },
+            isValid: null
+         }
+      },
+
+      /**
        * Set the jump gates routing capability
        */
       SetRoutingCapabilityJumpGates:
@@ -153,6 +170,23 @@
             {
                '?inUse': Boolean,
                '?range': Number
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Set the wormholes routing capability
+       */
+      SetRoutingCapabilityWormholes:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               inUse: Boolean
             },
             isValid: null
          }
