@@ -12,6 +12,8 @@ upro.model.proxies.UniverseProxy = Class.create(Proxy,
 
       this.loadTimer = null;
       this.loaded = 0;
+
+      this.jumpCorridors = {};
    },
 
    onRegister: function()
@@ -186,6 +188,40 @@ upro.model.proxies.UniverseProxy = Class.create(Proxy,
       {
          entry = jumpData[i];
          galaxy.addStaticJumpCorridor(entry[0], entry[1], staticJumpType);
+      }
+   },
+
+   /**
+    * Adds a jump corridor to the universe
+    * 
+    * @param id key for later removal
+    * @param entrySolarSystem entry system
+    * @param exitSolarSystem exit system
+    * @param jumpType jump type for the corridor
+    */
+   addJumpCorridor: function(id, entrySolarSystem, exitSolarSystem, jumpType)
+   {
+      var jumpCorridor = new upro.nav.JumpCorridor(id, entrySolarSystem.galaxy, entrySolarSystem.id,
+            exitSolarSystem.galaxy, exitSolarSystem.id, jumpType);
+
+      this.jumpCorridors[id] = jumpCorridor;
+      this.facade().sendNotification(upro.app.Notifications.UniverseJumpCorridorsChanged);
+   },
+
+   /**
+    * Removes a previously added jump corridor by given key
+    * 
+    * @param id identification of corridor
+    */
+   removeJumpCorridor: function(id)
+   {
+      var jumpCorridor = this.jumpCorridors[id];
+
+      if (jumpCorridor)
+      {
+         jumpCorridor.dispose();
+         delete this.jumpCorridors[id];
+         this.facade().sendNotification(upro.app.Notifications.UniverseJumpCorridorsChanged);
       }
    }
 

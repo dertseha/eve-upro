@@ -16,8 +16,7 @@ upro.hud.HudSystem = Class.create(
       this.paper = temp;
       { // initial resize setup
          this.context.getFrame().addEventListener("resize", this.onResize.bind(this), false);
-         // call resize now - twice, as one call sometimes doesn't help (?)
-         this.onResize();
+         this.resizeTimer = upro.sys.Timer.getSingleTimer(this.applyContextSizeOnPaper.bind(this));
          this.onResize();
       }
 
@@ -169,6 +168,11 @@ upro.hud.HudSystem = Class.create(
     * Resize handler. Scales the paper to the new context frame sizes
     */
    onResize: function()
+   {
+      this.resizeTimer.start(20);
+   },
+
+   applyContextSizeOnPaper: function()
    {
       var frame = this.context.getFrame();
 

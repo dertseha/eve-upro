@@ -154,18 +154,19 @@ upro.model.proxies.JumpCorridorProxy = Class.create(upro.model.proxies.AbstractP
 
    onJumpCorridorInfo: function(broadcastBody)
    {
+      var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
       var dataObject = this.dataObjects[broadcastBody.id];
 
       if (broadcastBody.data)
       {
          if (!dataObject)
          {
-            var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
-
             dataObject = new upro.model.JumpCorridorInfo(broadcastBody.id, this, this.interestChecker,
                   broadcastBody.data, universeProxy);
             this.dataObjects[dataObject.getId()] = dataObject;
             this.facade().sendNotification(upro.app.Notifications.JumpCorridorListChanged);
+            universeProxy.addJumpCorridor(dataObject.getId(), dataObject.getEntrySolarSystem(), dataObject
+                  .getExitSolarSystem(), dataObject.getJumpType());
          }
          if (dataObject.updateData(broadcastBody.data))
          {
@@ -176,6 +177,7 @@ upro.model.proxies.JumpCorridorProxy = Class.create(upro.model.proxies.AbstractP
       {
          delete this.dataObjects[broadcastBody.id];
 
+         universeProxy.removeJumpCorridor(dataObject.getId());
          if (this.selectedInfoId == broadcastBody.id)
          {
             this.selectJumpCorridor(null);
