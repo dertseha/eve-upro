@@ -228,7 +228,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
       {
          var state = this.dataStatesById[documentId];
 
-         state.onCharacterGroupMemberRemoved(groupId, interest);
+         state.onCharacterGroupMemberRemoved(character, groupId, interest);
       }
    };
 
