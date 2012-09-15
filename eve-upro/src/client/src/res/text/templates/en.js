@@ -186,5 +186,26 @@ upro.res.text.templates["en"] =
    /** button to update a jump corridor */
    "panels.jumpCorridor.edit.updateButton": "Update",
    /** button to destroy a jump corridor */
-   "panels.jumpCorridor.edit.destroyButton": "Destroy"
+   "panels.jumpCorridor.edit.destroyButton": "Destroy",
+
+   /** Main menu for shared object control */
+   "sharedObject.menuLabel": "Shared Object Control",
+
+   /** Hint for searching a body for sharing */
+   "panels.sharedObject.edit.searchEntity.hint": "Enter Name to Search",
+   /** Command label for searching */
+   "panels.sharedObject.edit.searchEntity.command": "Search",
+   /** Command label for adding a share */
+   "panels.sharedObject.edit.addShare.command": "Share",
+   /** Command label for removing a share */
+   "panels.sharedObject.edit.removeShare.command": "Remove Share",
+   /** Command label for setting an owner */
+   "panels.sharedObject.edit.addOwner.command": "Add Owner",
+   /** Command label for removing an owner */
+   "panels.sharedObject.edit.removeOwner.command": "Revoke Ownership",
+   /** Restricted entries (not knowing the name) */
+   "panels.sharedObject.edit.restrictedBody": "Restricted",
+
+   /** Panel for shared object interest control */
+   "panels.sharedObject.interest.menuLabel": "Sharing Controls"
 };

@@ -102,6 +102,56 @@ upro.model.proxies.JumpCorridorProxy = Class.create(upro.model.proxies.AbstractP
       });
    },
 
+   addOwner: function(id, interest)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest(upro.data.clientRequests.AddJumpCorridorOwner.name,
+      {
+         id: id,
+         interest: interest
+      });
+   },
+
+   removeOwner: function(id, interest)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest(upro.data.clientRequests.RemoveJumpCorridorOwner.name,
+      {
+         id: id,
+         interest: interest
+      });
+   },
+
+   addShares: function(id, interest)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest(upro.data.clientRequests.AddJumpCorridorShares.name,
+      {
+         id: id,
+         interest: interest
+      });
+   },
+
+   removeShares: function(id, interest)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest(upro.data.clientRequests.RemoveJumpCorridorShares.name,
+      {
+         id: id,
+         interest: interest
+      });
+   },
+
+   notifyDataChanged: function(dataObject)
+   {
+      this.facade().sendNotification(upro.app.Notifications.JumpCorridorDataChanged, dataObject);
+      this.facade().sendNotification(upro.app.Notifications.SharedObjectDataChanged, dataObject);
+   },
+
    onJumpCorridorInfo: function(broadcastBody)
    {
       var dataObject = this.dataObjects[broadcastBody.id];
@@ -112,14 +162,14 @@ upro.model.proxies.JumpCorridorProxy = Class.create(upro.model.proxies.AbstractP
          {
             var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
 
-            dataObject = new upro.model.JumpCorridorInfo(broadcastBody.id, this.interestChecker, broadcastBody.data,
-                  universeProxy);
+            dataObject = new upro.model.JumpCorridorInfo(broadcastBody.id, this, this.interestChecker,
+                  broadcastBody.data, universeProxy);
             this.dataObjects[dataObject.getId()] = dataObject;
             this.facade().sendNotification(upro.app.Notifications.JumpCorridorListChanged);
          }
          if (dataObject.updateData(broadcastBody.data))
          {
-            this.facade().sendNotification(upro.app.Notifications.JumpCorridorDataChanged, dataObject);
+            this.notifyDataChanged(dataObject);
          }
       }
       else if (dataObject)
@@ -141,7 +191,7 @@ upro.model.proxies.JumpCorridorProxy = Class.create(upro.model.proxies.AbstractP
       if (dataObject)
       {
          dataObject.owner = broadcastBody.interest;
-         this.facade().sendNotification(upro.app.Notifications.JumpCorridorDataChanged, dataObject);
+         this.notifyDataChanged(dataObject);
       }
    },
 
@@ -152,7 +202,7 @@ upro.model.proxies.JumpCorridorProxy = Class.create(upro.model.proxies.AbstractP
       if (dataObject)
       {
          dataObject.shares = broadcastBody.interest;
-         this.facade().sendNotification(upro.app.Notifications.JumpCorridorDataChanged, dataObject);
+         this.notifyDataChanged(dataObject);
       }
    }
 });

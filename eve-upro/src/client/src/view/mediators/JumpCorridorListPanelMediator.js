@@ -70,14 +70,25 @@ upro.view.mediators.JumpCorridorListPanelMediator = Class.create(upro.view.media
       this.jumpCorridorList = uki("#jumpCorridorList_list")[0];
    },
 
+   getImageForOwner: function(listEntry)
+   {
+      var link = upro.res.ImageData.Transparent;
+
+      if (listEntry.info.isClientAllowedControl())
+      {
+         link = upro.res.ImageData.Owner;
+      }
+
+      return link;
+   },
+
    listRenderer: function(data, rect, index)
    {
       var result = '';
 
       result = '<table style="width:100%;height:100%"><tr>';
-      // result += '<td style="width:16px;">' + '<div style="height:16px;">'
-      // + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForMembership(data.group) + '">'
-      // + '</img></div>' + '</td>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
+            + this.getImageForOwner(data) + '">' + '</img></div>' + '</td>';
       result += '<td>' + data.info.getName().escapeHTML() + '</td>';
       result += '</tr></table>';
 

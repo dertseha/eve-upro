@@ -37,6 +37,15 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
    },
 
    /**
+    * @param type the type to check
+    * @returns true if the given type is supported
+    */
+   isTypeSupported: function(type)
+   {
+      return this.bodyNamesByType.hasOwnProperty(type);
+   },
+
+   /**
     * Returns an instance of upro.model.AbstractBodyName based on given type and ID
     * 
     * @param type type of the body

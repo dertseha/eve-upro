@@ -3,9 +3,9 @@
  */
 upro.model.JumpCorridorInfo = Class.create(upro.model.AbstractSharedObjectInfo,
 {
-   initialize: function($super, id, interestChecker, data, solarSystemResolver)
+   initialize: function($super, id, controller, interestChecker, data, solarSystemResolver)
    {
-      $super(id, "JumpCorridor", interestChecker);
+      $super(id, "JumpCorridor", controller, interestChecker);
 
       this.data =
       {

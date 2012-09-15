@@ -35,6 +35,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.setupMapMenu(uiMediator);
       this.setupGroupListMenu(uiMediator);
       this.setupGroupEditMenu(uiMediator);
+      this.setupSharedObjectMenu(uiMediator);
 
       if (upro.scene.SceneSystem.SUPPORTED)
       {
@@ -53,6 +54,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.showBaseView("eList", "groupList");
       uiMediator.showBaseView("seCtrl", "groupEdit");
       uiMediator.showBaseView("nwCtrl", "currentLocation");
+      uiMediator.showBaseView("neCtrl", "sharedObjectInterest");
    },
 
    setupHoverPosHighlight: function(highlightMediator)
@@ -163,5 +165,16 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       this.facade()
             .registerMediator(new upro.view.mediators.GroupEditPanelMediator(panelId, panelId + ".groupEdit", 1));
+   },
+
+   setupSharedObjectMenu: function(uiMediator)
+   {
+      var panelId = "neCtrl";
+
+      uiMediator.setSubMenu(panelId, "sharedObject", 1, upro.res.menu.IconData.SharedObject, upro.res.text.Lang
+            .format("sharedObject.menuLabel"));
+
+      this.facade().registerMediator(
+            new upro.view.mediators.SharedObjectInterestPanelMediator(panelId, panelId + ".sharedObject", 1));
    }
 });

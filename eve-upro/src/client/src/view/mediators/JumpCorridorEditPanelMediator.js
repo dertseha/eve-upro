@@ -113,7 +113,7 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
    {
       if (jumpCorridor)
       {
-         var isOwner = jumpCorridor.isClientOwner();
+         var isController = jumpCorridor.isClientAllowedControl();
 
          this.displayedId = jumpCorridor.getId();
          this.nameText.value(jumpCorridor.getName());
@@ -121,8 +121,8 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
          this.entryText.value(jumpCorridor.getEntrySolarSystem().name);
          this.exitText.value(jumpCorridor.getExitSolarSystem().name);
 
-         this.updateButton.disabled(!isOwner);
-         this.destroyButton.disabled(!isOwner);
+         this.updateButton.disabled(!isController);
+         this.destroyButton.disabled(!isController);
       }
       else
       {

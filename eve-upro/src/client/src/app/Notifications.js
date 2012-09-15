@@ -131,6 +131,17 @@ upro.app.Notifications =
    /** List of displayed characters has changed */
    LocationStatusDisplayListChanged: 0,
 
+   /** Generic notification about a changed shared object */
+   SharedObjectDataChanged: 0,
+   /** Request to add owner to a shared object */
+   SharedObjectAddOwnerRequest: 0,
+   /** Request to remove owner of a shared object */
+   SharedObjectRemoveOwnerRequest: 0,
+   /** Request to add shares to a shared object */
+   SharedObjectAddSharesRequest: 0,
+   /** Request to remove shares of a shared object */
+   SharedObjectRemoveSharesRequest: 0,
+
    /** List of jump corridors changed */
    JumpCorridorListChanged: 0,
    /** Data of one jump corridor changed */

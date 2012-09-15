@@ -197,6 +197,10 @@ exports.sourceFiles = [];
    'control/commands/NotifiedJumpCorridorSelectedCommand.js', //
    'control/commands/NotifiedUpdateJumpCorridorRequestCommand.js', //
    'control/commands/NotifiedDestroyJumpCorridorRequestCommand.js', //
+   'control/commands/NotifiedSharedObjectAddOwnerRequestCommand.js', //
+   'control/commands/NotifiedSharedObjectRemoveOwnerRequestCommand.js', //
+   'control/commands/NotifiedSharedObjectAddSharesRequestCommand.js', //
+   'control/commands/NotifiedSharedObjectRemoveSharesRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
@@ -232,6 +236,8 @@ exports.sourceFiles = [];
    'view/mediators/JumpCorridorSceneMediator.js', //
    'view/mediators/JumpCorridorListPanelMediator.js', //
    'view/mediators/JumpCorridorEditPanelMediator.js', //
+   'view/mediators/AbstractSharingPanelMediator.js', //
+   'view/mediators/SharedObjectInterestPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //
