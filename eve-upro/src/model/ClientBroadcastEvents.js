@@ -167,7 +167,7 @@
          {
             schema:
             {
-               route: Array.of(context.commonSchemata.routeSchema)
+               route: Array.of(context.commonSchemata.routeEntrySchema)
             },
             isValid: null
          }

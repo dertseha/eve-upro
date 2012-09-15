@@ -10,7 +10,7 @@
       corporationName: String
    };
 
-   context.namespace.routeSchema =
+   context.namespace.routeEntrySchema =
    {
       entryType: [ 'Transit', 'Waypoint', 'Checkpoint' ],
       solarSystemId: Number,

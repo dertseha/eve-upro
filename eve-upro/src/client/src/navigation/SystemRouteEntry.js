@@ -1,8 +1,6 @@
 /**
- * A system route entry marks a solar system along a list of
- * a route.
- * Apart of the system itself, the type of the entry is stored and
- * the type of the jump /to reach the next system/ is stored.
+ * A system route entry marks a solar system along a list of a route. Apart of the system itself, the type of the entry
+ * is stored and the type of the jump /to reach the next system/ is stored.
  */
 upro.nav.SystemRouteEntry = Class.create(
 {
@@ -14,7 +12,33 @@ upro.nav.SystemRouteEntry = Class.create(
    },
 
    /**
+    * @returns String presentation
+    */
+   toString: function()
+   {
+      return this.entryType + " [" + this.solarSystem.name + "] " + this.jumpType + "|";
+   },
+
+   /**
+    * Creates a raw data presentation of this entry
+    * 
+    * @returns a raw data object
+    */
+   toRawData: function()
+   {
+      var rawData =
+      {
+         entryType: this.entryType,
+         solarSystemId: this.solarSystem.id,
+         nextJumpType: this.jumpType
+      };
+
+      return rawData;
+   },
+
+   /**
     * Returns the solar system
+    * 
     * @return the solar system
     */
    getSolarSystem: function()
@@ -24,6 +48,7 @@ upro.nav.SystemRouteEntry = Class.create(
 
    /**
     * Returns the entry type
+    * 
     * @return the entry type
     */
    getEntryType: function()
@@ -33,6 +58,7 @@ upro.nav.SystemRouteEntry = Class.create(
 
    /**
     * Returns the jump type to reach the next system
+    * 
     * @return the jump type to reach the next system
     */
    getJumpType: function()
@@ -42,6 +68,7 @@ upro.nav.SystemRouteEntry = Class.create(
 
    /**
     * Returns a copy of this with a given entry type
+    * 
     * @return a copy of this with a given entry type
     */
    asEntryType: function(entryType)
@@ -51,6 +78,7 @@ upro.nav.SystemRouteEntry = Class.create(
 
    /**
     * Returns true if the given other entry is allowed to follow this entry
+    * 
     * @param other the other entry to test
     * @return true if the given other entry is allowed to follow this entry
     */
@@ -58,8 +86,8 @@ upro.nav.SystemRouteEntry = Class.create(
    {
       var rCode = false;
 
-      if ((other.entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint) ||
-         (this.solarSystem != other.solarSystem))
+      if ((other.entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint)
+            || (this.solarSystem != other.solarSystem))
       {
          rCode = true;
       }

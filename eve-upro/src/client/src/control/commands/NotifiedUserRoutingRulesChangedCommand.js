@@ -2,6 +2,7 @@ upro.ctrl.cmd.NotifiedUserRoutingRulesChangedCommand = Class.create(SimpleComman
 {
    execute: function(notification)
    {
+      var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
       var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
       var rules = notification.getBody();
       var finderRules = [];
@@ -19,5 +20,6 @@ upro.ctrl.cmd.NotifiedUserRoutingRulesChangedCommand = Class.create(SimpleComman
       }
 
       activeRouteProxy.setRoutingRules(finderRules);
+      routeOptimizerProxy.setRoutingRules(finderRules);
    }
 });

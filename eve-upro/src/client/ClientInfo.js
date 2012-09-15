@@ -145,6 +145,7 @@ exports.sourceFiles = [];
    'model/proxies/GroupProxy.js', //
    'model/proxies/BodyRegisterProxy.js', //
    'model/proxies/JumpCorridorProxy.js', //
+   'model/proxies/RouteOptimizerProxy.js', //
 
    'control/ctrl.js', //
    'control/commands/cmd.js', //
@@ -206,6 +207,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedSharedObjectRemoveOwnerRequestCommand.js', //
    'control/commands/NotifiedSharedObjectAddSharesRequestCommand.js', //
    'control/commands/NotifiedSharedObjectRemoveSharesRequestCommand.js', //
+   'control/commands/NotifiedRouteOptimizerFinishedCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //

@@ -331,7 +331,11 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
          }
          finder = new upro.nav.finder.RouteFinderGeneticTSP(this.routingCapabilities, this.routingRules,
                this.filterSolarSystems, sourceSystem, waypoints, destinationSystem);
-
+         // {
+         // var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
+         //
+         // routeOptimizerProxy.requestRoute(upro.Uuid.newV4(), sourceSystem, waypoints, destinationSystem);
+         // }
          this.optimizersByIndex[endIndex] = finder;
       }
    },

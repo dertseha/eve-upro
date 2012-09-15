@@ -40,6 +40,8 @@ upro.app.Notifications =
    /** pointer activation in 3D scene. Param: realPos */
    ScenePointerActivation: 0,
 
+   /** The route optimizer finished a request */
+   RouteOptimizerFinished: 0,
    /** Resets the active route */
    ActiveRouteReset: 0,
    /** Removes an entry from the active route. Param: SolarSystem */
