@@ -99,61 +99,118 @@ function ActiveDataState(owner, dataObject)
       broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
    };
 
-   this.addShare = function(interest)
+   this.addShares = function(interest)
    {
-      if (this.dataObject.addShare(interest))
+      var dataInterest = [];
+      var self = this;
+
+      interest.forEach(function(entry)
+      {
+         if (self.dataObject.addShare(entry))
+         {
+            dataInterest.push(entry);
+         }
+      });
+      if (dataInterest.length > 0)
       {
          var owner = this.getOwner();
          var broadcaster = owner.getBroadcaster();
 
          this.dataObject.saveToStorage(owner.getStorage());
 
-         broadcaster.broadcastDataInfo(this.dataObject, [ interest ]);
-         broadcaster.broadcastDataOwnership(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataInfo(this.dataObject, dataInterest);
+         broadcaster.broadcastDataOwnership(this.dataObject, dataInterest);
+         broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
       }
    };
 
-   this.removeShare = function(interest)
+   this.removeShares = function(interest)
    {
-      if (this.dataObject.removeShare(interest))
+      var dataInterest = [];
+      var self = this;
+      var changedOwner = false;
+
+      interest.forEach(function(entry)
+      {
+         if (self.dataObject.removeShare(entry))
+         {
+            dataInterest.push(entry);
+            if (self.dataObject.removeOwner(entry))
+            {
+               changedOwner = true;
+            }
+         }
+      });
+      if (dataInterest.length > 0)
       {
          var owner = this.getOwner();
          var broadcaster = owner.getBroadcaster();
 
          this.dataObject.saveToStorage(owner.getStorage());
-         broadcaster.broadcastDataInfoReset(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataInfoReset(this.dataObject, dataInterest);
+         if (changedOwner)
+         {
+            broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
+         }
+         broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
       }
    };
 
    this.addOwner = function(interest)
    {
-      if (this.dataObject.addOwner(interest))
-      {
-         var owner = this.getOwner();
-         var broadcaster = owner.getBroadcaster();
+      var owner = this.getOwner();
+      var broadcaster = owner.getBroadcaster();
+      var ownerInterest = [];
+      var dataInterest = [];
+      var self = this;
 
-         if (this.dataObject.addShare(interest))
+      interest.forEach(function(entry)
+      {
+         if (self.dataObject.addOwner(entry))
          {
-            broadcaster.broadcastDataInfo(this.dataObject, [ interest ]);
+            ownerInterest.push(entry);
+            if (self.dataObject.addShare(entry))
+            {
+               dataInterest.push(entry);
+            }
+         }
+      });
+      if (ownerInterest.length > 0)
+      {
+         if (dataInterest.length > 0)
+         {
+            broadcaster.broadcastDataInfo(this.dataObject, dataInterest);
          }
          this.dataObject.saveToStorage(owner.getStorage());
          broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
-         broadcaster.broadcastDataShare(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
       }
    };
 
    this.removeOwner = function(interest)
    {
-      if (this.dataObject.removeOwner(interest))
+      var ownerInterest = [];
+      var self = this;
+
+      interest.forEach(function(entry)
+      {
+         if (self.dataObject.removeOwner(entry))
+         {
+            ownerInterest.push(entry);
+         }
+      });
+      if (ownerInterest.length > 0)
       {
          var owner = this.getOwner();
          var broadcaster = owner.getBroadcaster();
 
-         broadcaster.broadcastDataOwnershipReset(this.dataObject, [ interest ]);
+         broadcaster.broadcastDataShareReset(this.dataObject, ownerInterest);
+         broadcaster.broadcastDataOwnershipReset(this.dataObject, ownerInterest);
          if (dataObject.hasOwner())
          {
             this.dataObject.saveToStorage(owner.getStorage());
             broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
+            broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
          }
          else
          {
