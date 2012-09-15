@@ -403,14 +403,14 @@
          body: context.commonSchemata.getStandardSharingBodyDefinition()
       },
 
-      AddJumpCorridorShare:
+      AddJumpCorridorShares:
       {
          name: 0,
          header: getStandardHeaderDefinition(),
          body: context.commonSchemata.getStandardSharingBodyDefinition()
       },
 
-      RemoveJumpCorridorShare:
+      RemoveJumpCorridorShares:
       {
          name: 0,
          header: getStandardHeaderDefinition(),
