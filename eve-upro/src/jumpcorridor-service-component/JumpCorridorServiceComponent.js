@@ -29,6 +29,11 @@ function JumpCorridorServiceComponent(services)
 
       this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestUpdateJumpCorridor.name);
       this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestDestroyJumpCorridor.name);
+
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestAddJumpCorridorOwner.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveJumpCorridorOwner.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestAddJumpCorridorShares.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveJumpCorridorShares.name);
    };
 
    /**
@@ -46,11 +51,11 @@ function JumpCorridorServiceComponent(services)
             jumpCorridor: body.data
          };
          var state = new ActiveDataState(this, new JumpCorridorDataObject(id, initData));
-         var interest =
+         var interest = [
          {
             scope: 'Character',
             id: character.getCharacterId()
-         };
+         } ];
 
          logger.info('Character ' + character.toString() + ' creating jump corridor');
          state.activate();
@@ -84,6 +89,54 @@ function JumpCorridorServiceComponent(services)
          var state = this.dataStatesById[dataObject.getDocumentId()];
 
          state.destroy();
+      }
+   };
+
+   this.processClientRequestAddJumpCorridorOwner = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.addOwner(body.interest);
+      }
+   };
+
+   this.processClientRequestRemoveJumpCorridorOwner = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.removeOwner(body.interest);
+      }
+   };
+
+   this.processClientRequestAddJumpCorridorShares = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.addShares(body.interest);
+      }
+   };
+
+   this.processClientRequestRemoveJumpCorridorShares = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.removeShares(body.interest);
       }
    };
 }
