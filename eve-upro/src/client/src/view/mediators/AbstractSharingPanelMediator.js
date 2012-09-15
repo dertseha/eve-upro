@@ -409,7 +409,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
 
       groupProxy.forEachGroup(function(group)
       {
-         if (regexp.test(group.getName()) && (group.getAdvertisements().length > 0))
+         if (regexp.test(group.getName()))
          {
             var listEntry = that.getBodyNameBasedListEntry("Group", group);
 
