@@ -28,3 +28,36 @@ upro.res.ImageData.Group = "data:image/png;base64,"
       + "gZwbowtDB/agPDWGAQX0X/NjA7GB2IBybCyywCCCgUGAgQnd7Ad8iDoRPkSdAAN9ulmAbvnz6erA"
       + "KtRF0deAgYnpUo7HwJjHLChjlj0BvdMGJDatVsDkWyInzbVMk725HdFiQPOAqagG+Me0ZelSsIFZ"
       + "u9YWNUA5lscayYA2frUWMZD3vCexgdhAbOD/GPgCAYTJ0/rAyIUAAAAASUVORK5CYII=";
+
+upro.res.ImageData.DynamicWormhole = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABB0lEQVR42mNgoAX4//+/ChC3AfEe"
+      + "IH7/79+/60B6IRDHAzETIc3JQA2f/+MGB4BYAZfmUiwa/mER+wDE8hgGAG1ejqRoPRAbAzE7SDEQ"
+      + "p4G8Azf137+d2FygDsTzgdgLhwvlgPgtkiVhMAleJEUiSGxhLIakIBkwByTQA8R/gbgViGsgrvu3"
+      + "COrkP0B8CM0AISRvnAP5+xmUfw8kAJX4DMQ7kGwSQwurNzB1IBOLgIxXQDoHiKOA7EdAuhKIPYDs"
+      + "+0B6MpoLBFFcQEYiS0QJAzTJaCA+DsQRuGIB5nyUWEBScBtJcgsQmwMxGxBLEZsOmrCkut9Ep0So"
+      + "IVlA/JWsvIBkiCqxuREAyAspcmdgtJoAAAAASUVORK5CYII=";
+
+upro.res.ImageData.StaticWormhole = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3UlEQVR42mNgoAX4//+/IhC3AvFu"
+      + "IH7379+/60B6IRDHAzETIc2JQA2f/uMGB4BYAZfmPCwa/mER+wDE8tgMWAjX9e/fRiBlCsQcIMVA"
+      + "nAbE75Hkd2IzQA2I5wOxFw4XygHxWySXhJETwClIBswBCRQBnfMFW2gBxZ8DKT80A4SQ5M+BBJ7+"
+      + "xw+2orsCqPEN1IDP5LhAEMUFZIRBIkoYoElGAvEJII7GFQsw52ONBaDkFSTJLUBsDsRsQCxFbDqo"
+      + "whIUv4lOiVBD0nAFKsG8gGSIChC3AfEekLPx5UYAvOQhFhDtD1gAAAAASUVORK5CYII=";
+
+upro.res.ImageData.JumpDrive = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAhUlEQVR42mNgGFTg////3EBc9u/f"
+      + "vw1A+ikIQ9llIDlCmm2B+O5/3AAkZ4tTM9Cmw0A6AIiloBjEPopmyF8MQ6DOTgFiJiwGMwFxOxaX"
+      + "cCMrssamGc0QdJeUkRq4Aci6QQFLqgFSaC54Sk4UowBSNDbgidoGSgxpINULDWRrRjOkYXBlQAB1" + "Ji13QyxWRAAAAABJRU5ErkJggg==";
+
+upro.res.ImageData.JumpGate = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABBUlEQVR42mNgoAX4//+/KhC3AfEe"
+      + "IH7/79+/60B6IRDHAzETIc1ZQPz1P25wAIgVcGkuxKLhHxaxD0Asj82AhXBd//5tBFKmQMwBUgzE"
+      + "aSDvIMnvhGlqAuL1QJwKxE5APB+IvXC4UA6I3yK5JIwBaNIdFPf++3cBGoA2QMyMxZAUJOVzGKD+"
+      + "wQUeALEdmgFCSJadAwn8xmMASNEmdFcAxd5A5T6DOK/xaH4MpNzQXCCI4gIQgSTwCUhtBeJSIDbB"
+      + "EQaJ6GEQCMTlQGwGxLFAfAKIo3HFAsz58FhA89sVJMktQGwOxGxALIUzHaDZUIUlKH4TnRKhhqQB"
+      + "Tf9CVl5AMkSF2NwIACOQcSIXAaBlAAAAAElFTkSuQmCC";
+
+upro.res.ImageData.JumpBridge = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcElEQVR42mNgGAW0Af///3cF4t1A"
+      + "/BKIX/z7928XkPYjRiM7EM/7jxusB2JedE1xQJwDxB1AfA9J8QcgXgzES4D4K5L4EyDuhuqJY8Bh"
+      + "0z8gtkKyxBoqhgGwGgD08yUs3rtIigEXsBhwCqsBo4ByAAD92guKJQ/mXQAAAABJRU5ErkJggg==";

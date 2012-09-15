@@ -82,11 +82,26 @@ upro.view.mediators.JumpCorridorListPanelMediator = Class.create(upro.view.media
       return link;
    },
 
+   getImageForJumpType: function(listEntry)
+   {
+      var link = upro.res.ImageData.Transparent;
+      var jumpType = listEntry.info.getJumpType();
+
+      if (upro.res.ImageData.hasOwnProperty(jumpType))
+      {
+         link = upro.res.ImageData[jumpType];
+      }
+
+      return link;
+   },
+
    listRenderer: function(data, rect, index)
    {
       var result = '';
 
       result = '<table style="width:100%;height:100%"><tr>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
+            + this.getImageForJumpType(data) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForOwner(data) + '">' + '</img></div>' + '</td>';
       result += '<td>' + data.info.getName().escapeHTML() + '</td>';
