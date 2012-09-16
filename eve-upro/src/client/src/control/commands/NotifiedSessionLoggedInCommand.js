@@ -106,6 +106,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             .format("routeList.menuLabel"));
 
       this.facade().registerMediator(
+            new upro.view.mediators.ActiveRouteListPanelMediator(panelId, panelId + ".route", 0));
+      this.facade().registerMediator(
             new upro.view.mediators.AutopilotRoutePanelMediator(panelId, panelId + ".route", 1));
    },
 

@@ -236,6 +236,7 @@ exports.sourceFiles = [];
    'view/mediators/MainContextMenuMediator.js', //
    'view/mediators/UiMediator.js', //
    'view/mediators/HideUiSideButtonMediator.js', //
+   'view/mediators/ActiveRouteListPanelMediator.js', //
    'view/mediators/AutopilotRoutePanelMediator.js', //
    'view/mediators/DebugPanelMediator.js', //
    'view/mediators/SessionPanelMediator.js', //

@@ -2,18 +2,22 @@ upro.ctrl.cmd.NotifiedActiveRoutePathChangedCommand = Class.create(SimpleCommand
 {
    execute: function(notification)
    {
+      var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
+      var activeRouteListMediator = this.facade().retrieveMediator(
+            upro.view.mediators.ActiveRouteListPanelMediator.NAME);
+      var route = activeRouteProxy.getRoute();
+
+      activeRouteListMediator.setRoute(route);
       if (!upro.sys.isRunningInInGameBrowser())
       {
-         this.updateGraphics();
+         this.updateGraphics(route);
       }
    },
 
-   updateGraphics: function()
+   updateGraphics: function(route)
    {
-      var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
       var sceneMediator = this.facade().retrieveMediator(upro.view.mediators.SceneMediator.NAME);
       var highlightMediator = this.facade().retrieveMediator(upro.view.mediators.SolarSystemHighlightMediator.NAME);
-      var route = activeRouteProxy.getRoute();
       var lastRouteEntry = null;
       var waypointCounter = 1;
       var okColor = [ 0.2, 1.0, 0.5, 4.0 ];

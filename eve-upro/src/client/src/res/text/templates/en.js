@@ -112,6 +112,8 @@ upro.res.text.templates["en"] =
 
    /** Routes menu label */
    "routeList.menuLabel": "Routes",
+   /** The active route */
+   "panels.activeRoute.route.menuLabel": "Active Route",
    /** Autopilot Route Panel menu label */
    "panels.autopilot.route.menuLabel": "Autopilot Route",
 

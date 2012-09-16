@@ -1,15 +1,17 @@
 /**
- * This panel shows the autopilot route
+ * This panel shows the active route
  */
-upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediators.AbstractMediator,
+upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
    initialize: function($super, panelId, menuPath, menuIndex)
    {
-      $super(upro.view.mediators.AutopilotRoutePanelMediator.NAME, null);
+      $super(upro.view.mediators.ActiveRouteListPanelMediator.NAME, null);
 
       this.panelId = panelId;
       this.menuPath = menuPath;
       this.menuIndex = menuIndex;
+
+      this.routeList = null;
    },
 
    onRegister: function()
@@ -23,7 +25,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
          view: 'ScrollPane',
          rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
          anchors: 'left top right bottom',
-         id: 'autopilotRoutePanel_base',
+         id: 'activeRouteListPanel_base',
          textSelectable: false,
          style:
          {
@@ -36,7 +38,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
             view: 'List',
             rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
             anchors: 'top left right bottom',
-            id: 'autopilotRoute',
+            id: 'activeRouteListPanel_list',
             style:
             {
                fontSize: '12px',
@@ -51,35 +53,33 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       });
       this.uiBase.attachTo(panel);
 
-      var base = uki('#autopilotRoutePanel_base');
+      var base = uki('#activeRouteListPanel_base');
 
-      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.Autopilot,
-            upro.res.text.Lang.format("panels.autopilot.route.menuLabel"), "autopilotRoute", base);
+      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.ActiveRoute,
+            upro.res.text.Lang.format("panels.activeRoute.route.menuLabel"), "activeRoute", base);
+
+      this.routeList = uki('#activeRouteListPanel_list')[0];
    },
 
    setRoute: function(route)
    {
-      var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
       var data = [];
-      var guiList = uki('#autopilotRoute');
       var jumpType = upro.nav.JumpType.None;
 
-      for ( var i = 0; i < route.length; i++)
+      route.forEach(function(systemRouteEntry)
       {
-         var routeEntry = route[i];
          var displayEntry =
          {
-            routeEntry: routeEntry,
-            jumpType: jumpType,
-            solarSystem: universeProxy.findSolarSystemById(routeEntry.solarSystemId)
+            systemRouteEntry: systemRouteEntry,
+            jumpType: jumpType
          };
 
-         jumpType = routeEntry.nextJumpType;
+         jumpType = systemRouteEntry.getJumpType();
          data.push(displayEntry);
-      }
+      });
 
-      guiList.data(data);
-      guiList.parent().layout();
+      this.routeList.data(data);
+      this.routeList.parent().layout();
    },
 
    getColorBySecurityLevel: function(solarSystem)
@@ -91,7 +91,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       return '#' + colors[index];
    },
 
-   getImageForEntryType: function(routeEntry)
+   getImageForEntryType: function(entryType)
    {
       var entryTypes = {};
 
@@ -99,7 +99,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       entryTypes[upro.nav.SystemRouteEntry.EntryType.Waypoint] = upro.res.ImageData.Waypoint;
       entryTypes[upro.nav.SystemRouteEntry.EntryType.Transit] = upro.res.ImageData.Transparent;
 
-      return entryTypes[routeEntry.entryType];
+      return entryTypes[entryType];
    },
 
    getImageForJumpType: function(jumpType)
@@ -122,10 +122,10 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForJumpType(data.jumpType) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;background:'
-            + this.getColorBySecurityLevel(data.solarSystem) + ';"></div>' + '</td>';
+            + this.getColorBySecurityLevel(data.systemRouteEntry.getSolarSystem()) + ';"></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
-            + this.getImageForEntryType(data.routeEntry) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.solarSystem.name + '</td>';
+            + this.getImageForEntryType(data.systemRouteEntry.getEntryType()) + '">' + '</img></div>' + '</td>';
+      result += '<td>' + data.systemRouteEntry.getSolarSystem().name + '</td>';
       result += '</tr></table>';
 
       return result;
@@ -137,4 +137,4 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
    }
 });
 
-upro.view.mediators.AutopilotRoutePanelMediator.NAME = "AutopilotRoutePanel";
+upro.view.mediators.ActiveRouteListPanelMediator.NAME = "ActiveRouteListPanel";

@@ -61,3 +61,14 @@ upro.res.ImageData.JumpBridge = "data:image/png;base64,"
       + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcElEQVR42mNgGAW0Af///3cF4t1A"
       + "/BKIX/z7928XkPYjRiM7EM/7jxusB2JedE1xQJwDxB1AfA9J8QcgXgzES4D4K5L4EyDuhuqJY8Bh"
       + "0z8gtkKyxBoqhgGwGgD08yUs3rtIigEXsBhwCqsBo4ByAAD92guKJQ/mXQAAAABJRU5ErkJggg==";
+
+upro.res.ImageData.Checkpoint = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfklEQVR42rWSiw3AIAhE2YBRHKEj"
+      + "OBKjdKSOwggUE5sSUvGXvuQSI3CKAuAQEVSRiuWlrAlG0MRL2pQYRsUkfSgyYHdarrK34sjAks1+"
+      + "toFfDbZb2H5E7H3jyBy0TOIZcCbpwyDBDO49CGaprXAVwgpaeBbBKs8c7BgcRVHODf6DmqxQtG1W" + "AAAAAElFTkSuQmCC";
+
+upro.res.ImageData.Waypoint = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAlUlEQVR42rWSiwnAIAxEs4GjOIIj"
+      + "dBRHyCgdwVE6iiOkEZI2iIpV+uBAEj3MB6CCiBwLWZleyhlhBr54UZ+Sc6PHaC4nVhAlE8eRgX47"
+      + "NXJqkkcGSjCGWc5Bk78abJdgmxhNPM420VVjPETPGGf2wJpkU9Z4ByoT31giD1+o+oHwFSlFS3Cw"
+      + "Aj88i2AVncKOQdCt7HEDHOhv1GOG9+IAAAAASUVORK5CYII=";
