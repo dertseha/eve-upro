@@ -1,5 +1,5 @@
 /**
- * 
+ * The active route proxy is the workspace for a route. It provides functions to modify it and request optimizations.
  */
 upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
 {
@@ -104,33 +104,37 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
       {
          var segment = that.findSegment(id);
          var route = segment.addToRoute([]);
-         var waypoints = [];
-         var sourceSolarSystem = route.splice(0, 1)[0].getSolarSystem();
-         var destinationSolarSystem = null;
 
-         { // determine the destination solar system from the start of the next segment
-            var nextSegment = segment.getNext();
-            var nextRoute = nextSegment.addToRoute([]);
-
-            if (nextRoute.length > 0)
-            {
-               destinationSolarSystem = nextRoute[0].getSolarSystem();
-            }
-         }
-         route.forEach(function(entry)
+         if (route.length > 0)
          {
-            if (entry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Transit)
-            {
-               var solarSystem = entry.getSolarSystem();
+            var waypoints = [];
+            var sourceSolarSystem = route.splice(0, 1)[0].getSolarSystem();
+            var destinationSolarSystem = null;
 
-               if (solarSystem !== destinationSolarSystem)
+            { // determine the destination solar system from the start of the next segment
+               var nextSegment = segment.getNext();
+               var nextRoute = nextSegment.addToRoute([]);
+
+               if (nextRoute.length > 0)
                {
-                  waypoints.push(solarSystem);
+                  destinationSolarSystem = nextRoute[0].getSolarSystem();
                }
             }
-         });
+            route.forEach(function(entry)
+            {
+               if (entry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Transit)
+               {
+                  var solarSystem = entry.getSolarSystem();
 
-         routeOptimizerProxy.requestRoute(id, sourceSolarSystem, waypoints, destinationSolarSystem);
+                  if (solarSystem !== destinationSolarSystem)
+                  {
+                     waypoints.push(solarSystem);
+                  }
+               }
+            });
+
+            routeOptimizerProxy.requestRoute(id, sourceSolarSystem, waypoints, destinationSolarSystem);
+         }
       });
    },
 
@@ -160,15 +164,15 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
     */
    addCheckpoint: function(solarSystem)
    {
-      var changedSegments = [];
+      var changedIds = [];
 
-      changedSegments = this.lastSegment.addId(changedSegments);
+      changedIds = this.lastSegment.addId(changedIds);
       this.lastSegment = this.lastSegment.addCheckpoint(solarSystem, upro.nav.JumpType.None);
-      changedSegments = this.lastSegment.addId(changedSegments);
+      changedIds = this.lastSegment.addId(changedIds);
 
       this.notify(upro.app.Notifications.ActiveRoutePathChanged);
 
-      return changedSegments;
+      return changedIds;
    },
 
    /**
@@ -179,18 +183,18 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
     */
    addWaypoint: function(solarSystem)
    {
-      var changedSegments = [];
+      var changedIds = [];
 
       if (this.lastSegment.canWaypointBeAdded(solarSystem))
       {
-         changedSegments = this.lastSegment.addId(changedSegments);
+         changedIds = this.lastSegment.addId(changedIds);
          this.lastSegment = this.lastSegment.addWaypoint(solarSystem, upro.nav.JumpType.None);
-         changedSegments = this.lastSegment.addId(changedSegments);
+         changedIds = this.lastSegment.addId(changedIds);
 
          this.notify(upro.app.Notifications.ActiveRoutePathChanged);
       }
 
-      return changedSegments;
+      return changedIds;
    },
 
    /**
@@ -200,50 +204,39 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
     */
    removeEntry: function(solarSystem)
    {
-      // var searchStart = 0;
-      //
-      // while (searchStart < this.routeEntries.length)
-      // {
-      // var index = this.findSystemInSegmentOf(searchStart, solarSystem);
-      //
-      // if (index >= 0)
-      // {
-      // var routeEntry = this.routeEntries[index];
-      // var entryType = routeEntry.systemEntry.getEntryType();
-      //
-      // if (entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint)
-      // {
-      // if (index < (this.routeEntries.length - 1))
-      // { // the checkpoint was not the last entry, make the next entry a checkpoint
-      // this.routeEntries[index + 1].systemEntry = this.routeEntries[index + 1].systemEntry
-      // .asEntryType(upro.nav.SystemRouteEntry.EntryType.Checkpoint);
-      // this.deleteEntry(index);
-      // }
-      // else
-      // { // was last entry, simply reoptimize
-      // this.deleteEntry(index);
-      // startIndex = index;
-      // }
-      // }
-      // else
-      // { // a waypoint in between
-      // this.deleteEntry(index);
-      // }
-      // }
-      // else
-      // {
-      // if (searchStart == 0)
-      // {
-      // searchStart = 1;
-      // }
-      // else
-      // {
-      // searchStart = this.findSegmentEnd(searchStart) + 1;
-      // }
-      // }
-      // }
-      //
-      // this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+      var that = this;
+      var changedIds = [];
+
+      this.lastSegment = this.headSegment;
+      this.forEachSegment(function(segment)
+      {
+         if (segment.removeSolarSystem(solarSystem))
+         {
+            changedIds = that.lastSegment.addId(changedIds); // removing the first entry affects the previous segment
+            changedIds = segment.addId(changedIds);
+            if (segment.isEmpty())
+            {
+               var nextSegment = segment.getNext();
+
+               that.lastSegment.setNext(nextSegment);
+            }
+            else
+            {
+               segment.resetRouteToMinimum();
+               that.lastSegment = segment;
+            }
+         }
+         else
+         {
+            that.lastSegment = segment;
+         }
+      });
+      if (changedIds.length > 0)
+      {
+         this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+      }
+
+      return changedIds;
    },
 
    /**
@@ -276,7 +269,8 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    },
 
    /**
-    * Resets a segment to minimum - typically when optimization returned no result
+    * Resets a segment to minimum - typically when optimization returned no result; Drops all transit systems and resets
+    * the jump types to None for the remaining systems.
     * 
     * @param id identifying the segment
     */

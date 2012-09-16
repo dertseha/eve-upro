@@ -36,6 +36,12 @@ upro.model.ActiveRouteSegment = Class.create(upro.model.AbstractActiveRouteSegme
    },
 
    /** {@inheritDoc} */
+   isEmpty: function()
+   {
+      return this.entries.length == 0;
+   },
+
+   /** {@inheritDoc} */
    setRoute: function(route)
    {
       var that = this;
@@ -63,6 +69,39 @@ upro.model.ActiveRouteSegment = Class.create(upro.model.AbstractActiveRouteSegme
             this.entries.splice(i, 1);
          }
       }
+   },
+
+   /** {@inheritDoc} */
+   removeSolarSystem: function(solarSystem)
+   {
+      var rCode = false;
+
+      for ( var i = this.entries.length - 1; i >= 0; i--)
+      {
+         var entry = this.entries[i];
+
+         if (entry.getSolarSystem().getId() == solarSystem.getId())
+         {
+            this.entries.splice(i, 1);
+            rCode = true;
+         }
+      }
+      {
+         var toRemove = 0;
+
+         while ((toRemove < this.entries.length)
+               && (this.entries[toRemove].getEntryType() == upro.nav.SystemRouteEntry.EntryType.Transit))
+         {
+            toRemove++;
+         }
+         this.entries.splice(0, toRemove);
+         if (this.entries.length > 0)
+         {
+            this.entries[0] = this.entries[0].asEntryType(upro.nav.SystemRouteEntry.EntryType.Checkpoint);
+         }
+      }
+
+      return rCode;
    },
 
    /** {@inheritDoc} */
