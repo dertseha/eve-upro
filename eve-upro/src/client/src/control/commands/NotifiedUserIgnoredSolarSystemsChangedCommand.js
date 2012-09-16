@@ -1,11 +1,10 @@
-
 upro.ctrl.cmd.NotifiedUserIgnoredSolarSystemsChangedCommand = Class.create(SimpleCommand,
 {
    execute: function(notification)
    {
-      var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
+      var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
       var ignored = notification.getBody();
 
-      activeRouteProxy.setIgnoredSolarSystemIds(ignored);
+      routeOptimizerProxy.setIgnoredSolarSystemIds(ignored);
    }
 });

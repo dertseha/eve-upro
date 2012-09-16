@@ -130,6 +130,10 @@ exports.sourceFiles = [];
    'model/InterestChecker.js', //
    'model/AbstractSharedObjectInfo.js', //
    'model/JumpCorridorInfo.js', //
+   'model/AbstractActiveRouteSegment.js', //
+   'model/ActiveRouteHeadSegment.js', //
+   'model/ActiveRouteSegmentTerminator.js', //
+   'model/ActiveRouteSegment.js', //
 
    'model/proxies/proxies.js', //
    'model/proxies/LocalBasedInterestChecker.js', //

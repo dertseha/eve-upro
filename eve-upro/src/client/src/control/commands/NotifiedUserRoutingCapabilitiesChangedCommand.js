@@ -3,7 +3,6 @@ upro.ctrl.cmd.NotifiedUserRoutingCapabilitiesChangedCommand = Class.create(Simpl
    execute: function(notification)
    {
       var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
-      var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
       var settingsProxy = this.facade().retrieveProxy(upro.model.proxies.UserSettingsProxy.NAME);
       var capabilities = [];
 
@@ -25,7 +24,6 @@ upro.ctrl.cmd.NotifiedUserRoutingCapabilitiesChangedCommand = Class.create(Simpl
          capabilities.push(new upro.nav.finder.PathFinderCapabilityWormholes());
       }
 
-      activeRouteProxy.setRoutingCapabilities(capabilities);
       routeOptimizerProxy.setRoutingCapabilities(capabilities);
    }
 });

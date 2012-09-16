@@ -20,6 +20,16 @@ upro.model.proxies.RouteOptimizerProxy = Class.create(Proxy,
       this.timer = new upro.sys.Timer.getSingleTimer(this.runOptimizers.bind(this));
    },
 
+   /** {@inheritDoc} */
+   onRemove: function()
+   {
+      if (this.timer)
+      {
+         this.timer.stop();
+         this.timer = null;
+      }
+   },
+
    /**
     * Sets the list of ignored solar systems by their ID
     * 

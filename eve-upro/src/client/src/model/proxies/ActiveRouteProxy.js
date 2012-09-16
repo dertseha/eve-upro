@@ -7,30 +7,14 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    {
       $super(upro.model.proxies.ActiveRouteProxy.NAME, null);
 
-      this.routeEntries = [];
-      this.optimizersByIndex = {};
-      this.timer = null;
-
-      this.filterSolarSystems = [];
-      this.routingCapabilities = [];
-      this.routingRules = [];
+      this.headSegment = new upro.model.ActiveRouteHeadSegment(this);
+      this.lastSegment = this.headSegment;
    },
 
    /** {@inheritDoc} */
    onRegister: function()
    {
-      this.timer = new upro.sys.Timer.getSingleTimer(this.runOptimizers.bind(this));
-      this.timer.start(upro.model.proxies.ActiveRouteProxy.IDLE_TIMER_INTERVAL_MSEC);
-   },
 
-   /** {@inheritDoc} */
-   onRemove: function()
-   {
-      if (this.timer)
-      {
-         this.timer.stop();
-         this.timer = null;
-      }
    },
 
    notify: function(event)
@@ -39,52 +23,11 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    },
 
    /**
-    * Sets the list of ignored solar systems by their ID
-    * 
-    * @param solarSystemIds an array of IDs
-    */
-   setIgnoredSolarSystemIds: function(solarSystemIds)
-   {
-      this.filterSolarSystems = [];
-      for ( var i = 0; i < solarSystemIds.length; i++)
-      {
-         var id = solarSystemIds[i];
-
-         this.filterSolarSystems.push(new upro.nav.finder.PathFinderFilterSystem(id));
-      }
-      this.optimizeAll();
-   },
-
-   /**
-    * Sets the routing capabilities
-    * 
-    * @param capabilities an array of PathFinderCapability objects
-    */
-   setRoutingCapabilities: function(capabilities)
-   {
-      this.routingCapabilities = capabilities;
-      this.optimizeAll();
-   },
-
-   /**
-    * Sets the routing rules
-    * 
-    * @param rules an array of PathFinderCostRule objects
-    */
-   setRoutingRules: function(rules)
-   {
-      this.routingRules = rules;
-      this.optimizeAll();
-   },
-
-   /**
-    * Returns true if the route is currently empty
-    * 
     * @return true if the route is currently empty
     */
    isEmpty: function()
    {
-      return this.routeEntries.length == 0;
+      return this.lastSegment === this.headSegment;
    },
 
    /**
@@ -92,10 +35,12 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
     */
    resetRoute: function()
    {
-      if (this.routeEntries.length > 0)
+      if (!this.isEmpty())
       {
-         this.stopOptimizer(0, this.routeEntries.length - 1);
-         this.routeEntries = [];
+         this.cancelAllOptimizer();
+
+         this.headSegment = new upro.model.ActiveRouteHeadSegment(this);
+         this.lastSegment = this.headSegment;
 
          this.notify(upro.app.Notifications.ActiveRoutePathChanged);
       }
@@ -111,34 +56,34 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    {
       var rCode = false;
 
-      for ( var i = 0; !rCode && (i < this.routeEntries.length); i++)
+      this.forEachSegment(function(segment)
       {
-         var routeEntry = this.routeEntries[i];
-
-         if (routeEntry.systemEntry.getSolarSystem().id == solarSystem.id)
+         if (segment.containsNonTransitSystem(solarSystem))
          {
             rCode = true;
          }
-      }
+      });
 
       return rCode;
    },
 
    /**
-    * Verifies whether the given solar sytem can be added as given type. The following rules exist: - Checkpoints can
-    * always be added - Otherwise, the system added must not be in the current segment
+    * Verifies whether the given solar sytem can be added as given type. The following rules exist:
+    * <ul>
+    * <li>Checkpoints can always be added</li>
+    * <li>Otherwise, the system added must not be in the current segment</li>
+    * </ul>
     * 
     * @param solarSystem to test
     * @param entryType as which type to be added (upro.nav.SystemRouteEntry.EntryType)
     */
    canEntryBeAdded: function(solarSystem, entryType)
    {
-      var length = this.routeEntries.length;
-      var isEmpty = length == 0;
+      var isCheckpoint = entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint;
+      var isWaypoint = entryType == upro.nav.SystemRouteEntry.EntryType.Waypoint;
       var rCode = false;
 
-      if ((entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint)
-            || (!isEmpty && (this.findSystemInSegmentOf(length - 1, solarSystem) < 0)))
+      if (isCheckpoint || (isWaypoint && this.lastSegment.canWaypointBeAdded(solarSystem)))
       {
          rCode = true;
       }
@@ -146,36 +91,106 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
       return rCode;
    },
 
-   /**
-    * Adds given solar system as given entry to the end of the route
-    * 
-    * @param solarSystem to add
-    * @param entryType as which type to be added (upro.nav.SystemRouteEntry.EntryType)
-    */
-   addEntry: function(solarSystem, entryType)
+   updateOptimizer: function(removedSegmentIds, changedSegmentIds)
    {
-      if (this.canEntryBeAdded(solarSystem, entryType))
+      var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
+      var that = this;
+
+      removedSegmentIds.forEach(function(id)
       {
-         var isCheckpoint = entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint;
+         routeOptimizerProxy.cancelRequest(id);
+      });
+      changedSegmentIds.forEach(function(id)
+      {
+         var segment = that.findSegment(id);
+         var route = segment.addToRoute([]);
+         var waypoints = [];
+         var sourceSolarSystem = route.splice(0, 1)[0].getSolarSystem();
+         var destinationSolarSystem = null;
 
-         { // create and add new entry
-            var systemEntry = new upro.nav.SystemRouteEntry(solarSystem, entryType, upro.nav.JumpType.None);
-            var routeEntry = this.createRouteEntry(systemEntry);
+         { // determine the destination solar system from the start of the next segment
+            var nextSegment = segment.getNext();
+            var nextRoute = nextSegment.addToRoute([]);
 
-            if (this.routeEntries.length == 0)
-            { // the first entry is always reachable
-               routeEntry.isReachable = true;
+            if (nextRoute.length > 0)
+            {
+               destinationSolarSystem = nextRoute[0].getSolarSystem();
             }
-            this.routeEntries.push(routeEntry);
          }
-         { // run optimization
-            var endPos = this.routeEntries.length - ((isCheckpoint && (this.routeEntries.length > 1)) ? 2 : 1);
-            var startPos = this.findSegmentStart(endPos);
+         route.forEach(function(entry)
+         {
+            if (entry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Transit)
+            {
+               var solarSystem = entry.getSolarSystem();
 
-            this.optimizeSegment(startPos, endPos);
-         }
+               if (solarSystem !== destinationSolarSystem)
+               {
+                  waypoints.push(solarSystem);
+               }
+            }
+         });
+
+         routeOptimizerProxy.requestRoute(id, sourceSolarSystem, waypoints, destinationSolarSystem);
+      });
+   },
+
+   /**
+    * Cancels the optimizer for all segments
+    */
+   cancelAllOptimizer: function()
+   {
+      var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
+
+      this.forEachSegment(function(segment)
+      {
+         var ids = segment.addId([]);
+
+         ids.forEach(function(id)
+         {
+            routeOptimizerProxy.cancelRequest(id);
+         });
+      });
+   },
+
+   /**
+    * Add a checkpoint to the route
+    * 
+    * @param solarSystem solar system to add
+    * @returns {Array} of affected segments
+    */
+   addCheckpoint: function(solarSystem)
+   {
+      var changedSegments = [];
+
+      changedSegments = this.lastSegment.addId(changedSegments);
+      this.lastSegment = this.lastSegment.addCheckpoint(solarSystem, upro.nav.JumpType.None);
+      changedSegments = this.lastSegment.addId(changedSegments);
+
+      this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+
+      return changedSegments;
+   },
+
+   /**
+    * Add a waypoint to the route
+    * 
+    * @param solarSystem solar system to add
+    * @returns {Array} of affected segments
+    */
+   addWaypoint: function(solarSystem)
+   {
+      var changedSegments = [];
+
+      if (this.lastSegment.canWaypointBeAdded(solarSystem))
+      {
+         changedSegments = this.lastSegment.addId(changedSegments);
+         this.lastSegment = this.lastSegment.addWaypoint(solarSystem, upro.nav.JumpType.None);
+         changedSegments = this.lastSegment.addId(changedSegments);
+
          this.notify(upro.app.Notifications.ActiveRoutePathChanged);
       }
+
+      return changedSegments;
    },
 
    /**
@@ -185,50 +200,50 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
     */
    removeEntry: function(solarSystem)
    {
-      var searchStart = 0;
-
-      while (searchStart < this.routeEntries.length)
-      {
-         var index = this.findSystemInSegmentOf(searchStart, solarSystem);
-
-         if (index >= 0)
-         {
-            var routeEntry = this.routeEntries[index];
-            var entryType = routeEntry.systemEntry.getEntryType();
-
-            if (entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint)
-            {
-               if (index < (this.routeEntries.length - 1))
-               { // the checkpoint was not the last entry, make the next entry a checkpoint
-                  this.routeEntries[index + 1].systemEntry = this.routeEntries[index + 1].systemEntry
-                        .asEntryType(upro.nav.SystemRouteEntry.EntryType.Checkpoint);
-                  this.deleteEntry(index);
-               }
-               else
-               { // was last entry, simply reoptimize
-                  this.deleteEntry(index);
-                  startIndex = index;
-               }
-            }
-            else
-            { // a waypoint in between
-               this.deleteEntry(index);
-            }
-         }
-         else
-         {
-            if (searchStart == 0)
-            {
-               searchStart = 1;
-            }
-            else
-            {
-               searchStart = this.findSegmentEnd(searchStart) + 1;
-            }
-         }
-      }
-
-      this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+      // var searchStart = 0;
+      //
+      // while (searchStart < this.routeEntries.length)
+      // {
+      // var index = this.findSystemInSegmentOf(searchStart, solarSystem);
+      //
+      // if (index >= 0)
+      // {
+      // var routeEntry = this.routeEntries[index];
+      // var entryType = routeEntry.systemEntry.getEntryType();
+      //
+      // if (entryType == upro.nav.SystemRouteEntry.EntryType.Checkpoint)
+      // {
+      // if (index < (this.routeEntries.length - 1))
+      // { // the checkpoint was not the last entry, make the next entry a checkpoint
+      // this.routeEntries[index + 1].systemEntry = this.routeEntries[index + 1].systemEntry
+      // .asEntryType(upro.nav.SystemRouteEntry.EntryType.Checkpoint);
+      // this.deleteEntry(index);
+      // }
+      // else
+      // { // was last entry, simply reoptimize
+      // this.deleteEntry(index);
+      // startIndex = index;
+      // }
+      // }
+      // else
+      // { // a waypoint in between
+      // this.deleteEntry(index);
+      // }
+      // }
+      // else
+      // {
+      // if (searchStart == 0)
+      // {
+      // searchStart = 1;
+      // }
+      // else
+      // {
+      // searchStart = this.findSegmentEnd(searchStart) + 1;
+      // }
+      // }
+      // }
+      //
+      // this.notify(upro.app.Notifications.ActiveRoutePathChanged);
    },
 
    /**
@@ -238,313 +253,76 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    {
       var route = [];
 
-      for ( var i = 0; i < this.routeEntries.length; i++)
+      this.forEachSegment(function(segment)
       {
-         var routeEntry = this.routeEntries[i];
-
-         route.push(routeEntry.systemEntry);
-         for ( var j = 0; j < routeEntry.transits.length; j++)
-         {
-            var transitEntry = routeEntry.transits[j];
-
-            route.push(transitEntry);
-         }
-      }
+         route = segment.addToRoute(route);
+      });
 
       return route;
    },
 
    /**
-    * Deletes the entry at given index. Removes any trace of its existence and starts an optimization for the
-    * corresponding segment.
+    * Sets the route for a specific segment - typically the result of an optimization run
     * 
-    * @param index to remove at
+    * @param id identifying the segment
+    * @param route the route to set
     */
-   deleteEntry: function(index)
+   setRouteSegment: function(id, route)
    {
-      this.stopOptimizer(index, index);
-      this.routeEntries.splice(index, 1);
+      var segment = this.findSegment(id);
 
-      if (this.routeEntries.length > 0)
-      {
-         var segmentEnd = this.findSegmentEnd((index > 0) ? index - 1 : 0);
-
-         for ( var i = segmentEnd + 1; i <= this.routeEntries.length; i++)
-         { // deleting an entry also requires all further running optimizers must be moved
-            var finder = this.optimizersByIndex[i];
-
-            if (finder)
-            {
-               this.optimizersByIndex[i - 1] = finder;
-               delete this.optimizersByIndex[i];
-            }
-         }
-         this.optimizeSegment(this.findSegmentStart(segmentEnd), segmentEnd);
-      }
-   },
-
-   /**
-    * Starts an optimization for all segments. Typically needed if some parameters changed
-    */
-   optimizeAll: function()
-   {
-      var startSystem = 0;
-
-      while (startSystem < this.routeEntries.length)
-      {
-         var end = this.findSegmentEnd(startSystem);
-         var start = this.findSegmentStart(end);
-
-         this.optimizeSegment(start, end);
-         startSystem = end + 1;
-      }
+      segment.setRoute(route);
       this.notify(upro.app.Notifications.ActiveRoutePathChanged);
    },
 
    /**
-    * Requests to optimize the segment between given start and end indices
+    * Resets a segment to minimum - typically when optimization returned no result
     * 
-    * @param startIndex inclusive start index (source system)
-    * @param endIndex inclusive end index
+    * @param id identifying the segment
     */
-   optimizeSegment: function(startIndex, endIndex)
+   resetRouteSegmentToMinimum: function(id)
    {
-      var routeEntry;
-      var i;
+      var segment = this.findSegment(id);
 
-      this.stopOptimizer(startIndex, endIndex + 1);
-      for (i = startIndex; i <= endIndex; i++)
-      { // reset previous results
-         routeEntry = this.routeEntries[i];
-         routeEntry.transits = [];
-         if (i > startIndex)
-         { // don't reset the starting checkpoint
-            routeEntry.isReachable = false;
-         }
-      }
-      {
-         var waypoints = [];
-         var sourceSystem = null;
-         var destinationSystem = null;
-         var finder = null;
-
-         sourceSystem = this.routeEntries[startIndex].systemEntry.getSolarSystem();
-         if (endIndex < (this.routeEntries.length - 1))
-         { // got a checkpoint beyond the end
-            routeEntry = this.routeEntries[endIndex + 1];
-            var systemEntry = routeEntry.systemEntry;
-
-            routeEntry.isReachable = false;
-            destinationSystem = systemEntry.getSolarSystem();
-         }
-         for (i = startIndex + 1; i <= endIndex; i++)
-         {
-            var solarSystem = this.routeEntries[i].systemEntry.getSolarSystem();
-
-            if (destinationSystem && (destinationSystem.id == solarSystem.id))
-            { // no need to run a system both as waypoint and destination - make it fix a destination
-               this.routeEntries.splice(i, 1);
-               endIndex--;
-               i--;
-            }
-            else
-            {
-               waypoints.push(solarSystem);
-            }
-         }
-         finder = new upro.nav.finder.RouteFinderGeneticTSP(this.routingCapabilities, this.routingRules,
-               this.filterSolarSystems, sourceSystem, waypoints, destinationSystem);
-         // {
-         // var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
-         //
-         // routeOptimizerProxy.requestRoute(upro.Uuid.newV4(), sourceSystem, waypoints, destinationSystem);
-         // }
-         this.optimizersByIndex[endIndex] = finder;
-      }
+      segment.resetRouteToMinimum();
+      this.notify(upro.app.Notifications.ActiveRoutePathChanged);
    },
 
    /**
-    * Runs all current optimizers for one cycle.
-    * 
-    * @return true if all are currently completed
+    * @param id identifying the segment to find
+    * @returns a segment instance
     */
-   runOptimizers: function()
+   findSegment: function(id)
    {
-      var key = null;
-      var keys = [];
-      var someCompleted = false;
-      var allCompleted = true;
-      var endTime = upro.sys.Time.tickMSec() + upro.model.proxies.ActiveRouteProxy.BULK_LIMIT_TIME_MSEC;
+      var found = upro.model.ActiveRouteSegmentTerminator.INSTANCE;
 
-      for (key in this.optimizersByIndex)
+      this.forEachSegment(function(segment)
       {
-         keys.push(key);
-      }
-      for ( var i = 0; i < keys.length; i++)
-      {
-         key = new Number(keys[i]);
-         var finder = this.optimizersByIndex[key];
-
-         if (this.runFinderBulk(finder, endTime))
+         if (segment.hasId(id))
          {
-            this.onOptimizerCompleted(key);
-            someCompleted = true;
+            found = segment;
          }
-         else
-         {
-            allCompleted = false;
-         }
-      }
-      if (someCompleted)
-      {
-         this.notify(upro.app.Notifications.ActiveRoutePathChanged);
-      }
+      });
 
-      this.timer.start(allCompleted ? upro.model.proxies.ActiveRouteProxy.IDLE_TIMER_INTERVAL_MSEC : 0);
-
-      return allCompleted;
+      return found;
    },
 
    /**
-    * Runs given finder in bulk. Returns true if finder completed
+    * Iterates through all segments and calls given callback with it
     * 
-    * @return true if finder completed
+    * @param callback function with signature function(segment) { }
     */
-   runFinderBulk: function(finder, endTime)
+   forEachSegment: function(callback)
    {
-      var rCode = false;
+      var segment = this.headSegment;
 
-      while (!rCode && (upro.sys.Time.tickMSec() < endTime))
+      while (segment !== upro.model.ActiveRouteSegmentTerminator.INSTANCE)
       {
-         rCode = finder.continueSearch();
+         callback(segment);
+         segment = segment.getNext();
       }
-
-      return rCode;
-   },
-
-   stopOptimizer: function(startIndex, endIndex)
-   {
-      for ( var i = startIndex + 1; i <= endIndex; i++)
-      {
-         if (this.optimizersByIndex[i])
-         {
-            delete this.optimizersByIndex[i];
-         }
-      }
-   },
-
-   onOptimizerCompleted: function(endIndex)
-   {
-      var startIndex = this.findSegmentStart(endIndex);
-      var finder = this.optimizersByIndex[endIndex];
-      var foundRoute = finder.getRouteEntries();
-      var lastRouteEntry = this.routeEntries[startIndex];
-      var systemEntry;
-      var i;
-
-      delete this.optimizersByIndex[endIndex];
-      if (foundRoute.length > 0)
-      { // found a complete route
-         // rewrite the start system, as it might have a different way of reaching the next system (jump type)
-         this.routeEntries[startIndex].systemEntry = foundRoute[0]
-               .asEntryType(upro.nav.SystemRouteEntry.EntryType.Checkpoint);
-         if (endIndex < (this.routeEntries.length - 1))
-         { // mark next checkpoint reachable
-            this.routeEntries[1 + endIndex].isReachable = true;
-         }
-      }
-      startIndex++; // already skip the first entry (is the starting checkpoint)
-      for (i = 1; i < foundRoute.length; i++)
-      {
-         systemEntry = foundRoute[i];
-         if (systemEntry.getEntryType() == upro.nav.SystemRouteEntry.EntryType.Waypoint)
-         {
-            lastRouteEntry = this.createRouteEntry(systemEntry);
-            lastRouteEntry.isReachable = true;
-            this.routeEntries.splice(startIndex, 1, lastRouteEntry);
-            startIndex++;
-         }
-         else
-         {
-            lastRouteEntry.transits.push(systemEntry);
-         }
-      }
-   },
-
-   /**
-    * Returns the end of the segment given index into routeEntries is part of
-    * 
-    * @return the end of the segment
-    */
-   findSegmentEnd: function(index)
-   {
-      var end = index + 1;
-      var limit = this.routeEntries.length;
-
-      while ((end < limit)
-            && (this.routeEntries[end].systemEntry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Checkpoint))
-      {
-         end++;
-      }
-
-      return end - 1;
-   },
-
-   /**
-    * Returns the start of the segment given index into routeEntries is part of
-    * 
-    * @return the start of the segment
-    */
-   findSegmentStart: function(index)
-   {
-      var start = index;
-
-      while ((start >= 0)
-            && (this.routeEntries[start].systemEntry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Checkpoint))
-      {
-         start--;
-      }
-
-      return (start >= 0) ? start : 0;
-   },
-
-   findSystemInSegmentOf: function(index, solarSystem)
-   {
-      var endIndex = this.findSegmentEnd(index);
-      var startIndex = this.findSegmentStart(endIndex);
-      var foundIndex = -1;
-      var routeEntry;
-
-      for ( var i = startIndex; (foundIndex < 0) && (i < (endIndex + 1)); i++)
-      {
-         routeEntry = this.routeEntries[i];
-
-         if (routeEntry.systemEntry.getSolarSystem() == solarSystem)
-         {
-            foundIndex = i;
-         }
-      }
-
-      return foundIndex;
-   },
-
-   createRouteEntry: function(systemEntry)
-   {
-      var routeEntry =
-      {
-         "systemEntry": systemEntry,
-         "transits": [],
-         "isReachable": false
-      };
-
-      return routeEntry;
    }
 
 });
-
-/** How long one go at optimizing the paths shall take */
-upro.model.proxies.ActiveRouteProxy.BULK_LIMIT_TIME_MSEC = 20;
-/** The interval for the timer at idle times */
-upro.model.proxies.ActiveRouteProxy.IDLE_TIMER_INTERVAL_MSEC = 50;
 
 upro.model.proxies.ActiveRouteProxy.NAME = "ActiveRoute";

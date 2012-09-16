@@ -67,13 +67,19 @@ upro.nav.SystemRouteEntry = Class.create(
    },
 
    /**
-    * Returns a copy of this with a given entry type
-    * 
-    * @return a copy of this with a given entry type
+    * @returns {upro.nav.SystemRouteEntry} a copy of this with a given entry type
     */
    asEntryType: function(entryType)
    {
       return new upro.nav.SystemRouteEntry(this.getSolarSystem(), entryType, this.jumpType);
+   },
+
+   /**
+    * @returns {upro.nav.SystemRouteEntry} a copy of this with given jump type
+    */
+   withJumpType: function(jumpType)
+   {
+      return new upro.nav.SystemRouteEntry(this.getSolarSystem(), this.getEntryType(), jumpType);
    },
 
    /**
