@@ -23,6 +23,7 @@ var LocationServiceComponentBuilder = require('./location-service-component/Loca
 var CharacterServiceComponentBuilder = require('./character-service-component/CharacterServiceComponentBuilder.js');
 var AutopilotServiceComponentBuilder = require('./autopilot-service-component/AutopilotServiceComponentBuilder.js');
 var JumpCorridorServiceComponentBuilder = require('./jumpcorridor-service-component/JumpCorridorServiceComponentBuilder.js');
+var RouteServiceComponentBuilder = require('./route-service-component/RouteServiceComponentBuilder.js');
 
 var cloudMongo = null;
 var cloudRabbit = null;
@@ -205,6 +206,11 @@ var serviceControl = new ServiceControl();
 }
 { // jumpcorridor-service
    var builder = new JumpCorridorServiceComponentBuilder();
+
+   serviceControl.setBuilder(builder);
+}
+{ // route-service
+   var builder = new RouteServiceComponentBuilder();
 
    serviceControl.setBuilder(builder);
 }
