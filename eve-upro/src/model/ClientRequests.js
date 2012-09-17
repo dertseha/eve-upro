@@ -449,6 +449,23 @@
          name: 0,
          header: getStandardHeaderDefinition(),
          body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      /**
+       * Sets the active route.
+       */
+      SetActiveRoute:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               route: Array.of(context.commonSchemata.routeEntrySchema)
+            },
+            isValid: null
+         }
       }
    };
 

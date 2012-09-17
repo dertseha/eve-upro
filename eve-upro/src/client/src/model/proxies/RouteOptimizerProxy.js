@@ -31,6 +31,14 @@ upro.model.proxies.RouteOptimizerProxy = Class.create(Proxy,
    },
 
    /**
+    * @returns {Boolean} true if currently no optimization is in progress
+    */
+   isIdle: function()
+   {
+      return this.requests.length == 0;
+   },
+
+   /**
     * Sets the list of ignored solar systems by their ID
     * 
     * @param solarSystemIds an array of IDs
@@ -139,8 +147,8 @@ upro.model.proxies.RouteOptimizerProxy = Class.create(Proxy,
 
          if (this.processRequest(request, endTime))
          {
-            this.finishRequest(request);
             this.requests.splice(i, 1);
+            this.finishRequest(request);
             i--;
          }
       }

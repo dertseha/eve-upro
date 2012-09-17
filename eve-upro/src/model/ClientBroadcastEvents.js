@@ -372,6 +372,23 @@
          name: 0,
          header: getStandardHeaderDefinition(),
          body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      /**
+       * Notifies the current active route of the character
+       */
+      CharacterActiveRoute:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               route: Array.of(context.commonSchemata.routeEntrySchema)
+            },
+            isValid: null
+         }
       }
    };
 

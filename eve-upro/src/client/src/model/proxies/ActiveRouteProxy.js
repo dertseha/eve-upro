@@ -1,7 +1,7 @@
 /**
  * The active route proxy is the workspace for a route. It provides functions to modify it and request optimizations.
  */
-upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
+upro.model.proxies.ActiveRouteProxy = Class.create(upro.model.proxies.AbstractProxy,
 {
    initialize: function($super)
    {
@@ -14,6 +14,7 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    /** {@inheritDoc} */
    onRegister: function()
    {
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterActiveRoute.name);
 
    },
 
@@ -103,38 +104,8 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
       changedSegmentIds.forEach(function(id)
       {
          var segment = that.findSegment(id);
-         var route = segment.addToRoute([]);
 
-         if (route.length > 0)
-         {
-            var waypoints = [];
-            var sourceSolarSystem = route.splice(0, 1)[0].getSolarSystem();
-            var destinationSolarSystem = null;
-
-            { // determine the destination solar system from the start of the next segment
-               var nextSegment = segment.getNext();
-               var nextRoute = nextSegment.addToRoute([]);
-
-               if (nextRoute.length > 0)
-               {
-                  destinationSolarSystem = nextRoute[0].getSolarSystem();
-               }
-            }
-            route.forEach(function(entry)
-            {
-               if (entry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Transit)
-               {
-                  var solarSystem = entry.getSolarSystem();
-
-                  if (solarSystem !== destinationSolarSystem)
-                  {
-                     waypoints.push(solarSystem);
-                  }
-               }
-            });
-
-            routeOptimizerProxy.requestRoute(id, sourceSolarSystem, waypoints, destinationSolarSystem);
-         }
+         that.startOptimizer(segment);
       });
    },
 
@@ -144,16 +115,73 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    cancelAllOptimizer: function()
    {
       var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
+      var ids = [];
 
       this.forEachSegment(function(segment)
       {
-         var ids = segment.addId([]);
-
-         ids.forEach(function(id)
-         {
-            routeOptimizerProxy.cancelRequest(id);
-         });
+         ids = segment.addId(ids);
       });
+      ids.forEach(function(id)
+      {
+         routeOptimizerProxy.cancelRequest(id);
+      });
+   },
+
+   /**
+    * Recalculates all segments
+    */
+   recalculateAllSegments: function()
+   {
+      var that = this;
+
+      this.forEachSegment(function(segment)
+      {
+         segment.resetRouteToMinimum();
+         that.startOptimizer(segment);
+      });
+      this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+   },
+
+   /**
+    * Starts the optimizer for given segment
+    * 
+    * @param segment for which the optimizer should be started
+    */
+   startOptimizer: function(segment)
+   {
+      var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
+      var route = segment.addToRoute([]);
+
+      if (route.length > 0)
+      {
+         var waypoints = [];
+         var sourceSolarSystem = route.splice(0, 1)[0].getSolarSystem();
+         var destinationSolarSystem = null;
+
+         { // determine the destination solar system from the start of the next segment
+            var nextSegment = segment.getNext();
+            var nextRoute = nextSegment.addToRoute([]);
+
+            if (nextRoute.length > 0)
+            {
+               destinationSolarSystem = nextRoute[0].getSolarSystem();
+            }
+         }
+         route.forEach(function(entry)
+         {
+            if (entry.getEntryType() != upro.nav.SystemRouteEntry.EntryType.Transit)
+            {
+               var solarSystem = entry.getSolarSystem();
+
+               if (solarSystem !== destinationSolarSystem)
+               {
+                  waypoints.push(solarSystem);
+               }
+            }
+         });
+
+         routeOptimizerProxy.requestRoute(segment.addId([])[0], sourceSolarSystem, waypoints, destinationSolarSystem);
+      }
    },
 
    /**
@@ -283,6 +311,25 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
    },
 
    /**
+    * Requests to synchronize the current route with the backend (distributed it to other sessions)
+    */
+   syncRoute: function()
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+      var route = this.getRoute();
+      var body =
+      {
+         route: []
+      };
+
+      route.forEach(function(systemRouteEntry)
+      {
+         body.route.push(systemRouteEntry.toRawData());
+      });
+      sessionProxy.sendRequest(upro.data.clientRequests.SetActiveRoute.name, body);
+   },
+
+   /**
     * @param id identifying the segment to find
     * @returns a segment instance
     */
@@ -315,6 +362,25 @@ upro.model.proxies.ActiveRouteProxy = Class.create(Proxy,
          callback(segment);
          segment = segment.getNext();
       }
+   },
+
+   /**
+    * Broadcast Handler
+    */
+   onCharacterActiveRoute: function(broadcastBody)
+   {
+      var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
+      var that = this;
+
+      this.resetRoute();
+      broadcastBody.route.forEach(function(rawData)
+      {
+         var solarSystem = universeProxy.findSolarSystemById(rawData.solarSystemId);
+
+         that.lastSegment = that.lastSegment["add" + rawData.entryType].call(that.lastSegment, solarSystem,
+               rawData.nextJumpType);
+      });
+      this.notify(upro.app.Notifications.ActiveRoutePathChanged);
    }
 
 });

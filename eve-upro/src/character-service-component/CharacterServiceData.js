@@ -81,6 +81,7 @@ function CharacterServiceData(service, character)
    }
 
    this.igbSessions = {};
+   this.activeRoute = [];
 
    this.processingState = new PendingCharacterServiceDataProcessingState(this);
 
@@ -175,6 +176,7 @@ function CharacterServiceData(service, character)
       this.broadcastCharacterIgnoredSolarSystems(interest, queue);
       this.broadcastCharacterRoutingCapabilities(interest, queue);
       this.broadcastCharacterRoutingRules(interest, queue);
+      this.broadcastCharacterActiveRoute(interest, queue);
    };
 
    /**
@@ -523,6 +525,35 @@ function CharacterServiceData(service, character)
       }
 
       return notifier;
+   };
+
+   /**
+    * Processes the broadcast message
+    */
+   this.processClientRequestSetActiveRoute = function(header, body)
+   {
+      var notifier = [];
+
+      this.activeRoute = body.route;
+      notifier.push(busMessages.Broadcasts.CharacterActiveRoute.name);
+
+      return notifier;
+   };
+
+   /**
+    * Broadcast the active route
+    * 
+    * @param interest the interest for the broadcast message
+    * @param queueName optional explicit queue information
+    */
+   this.broadcastCharacterActiveRoute = function(interest, queueName)
+   {
+      var body =
+      {
+         route: this.activeRoute
+      };
+
+      this.broadcast(busMessages.Broadcasts.CharacterActiveRoute.name, body, interest, queueName);
    };
 }
 

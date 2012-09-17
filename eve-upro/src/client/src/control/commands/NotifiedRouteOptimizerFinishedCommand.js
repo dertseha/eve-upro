@@ -2,6 +2,7 @@ upro.ctrl.cmd.NotifiedRouteOptimizerFinishedCommand = Class.create(SimpleCommand
 {
    execute: function(notification)
    {
+      var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);
       var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
       var notifyBody = notification.getBody();
 
@@ -12,6 +13,10 @@ upro.ctrl.cmd.NotifiedRouteOptimizerFinishedCommand = Class.create(SimpleCommand
       else
       {
          activeRouteProxy.resetRouteSegmentToMinimum(notifyBody.id);
+      }
+      if (routeOptimizerProxy.isIdle())
+      {
+         activeRouteProxy.syncRoute();
       }
    }
 });

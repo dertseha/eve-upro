@@ -1,4 +1,3 @@
-
 upro.ctrl.cmd.NotifiedActiveRouteResetCommand = Class.create(SimpleCommand,
 {
    execute: function(notification)
@@ -6,5 +5,6 @@ upro.ctrl.cmd.NotifiedActiveRouteResetCommand = Class.create(SimpleCommand,
       var activeRouteProxy = this.facade().retrieveProxy(upro.model.proxies.ActiveRouteProxy.NAME);
 
       activeRouteProxy.resetRoute();
+      activeRouteProxy.syncRoute();
    }
 });
