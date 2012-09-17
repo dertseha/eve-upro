@@ -7,7 +7,7 @@ upro.model.proxies.ActiveRouteProxy = Class.create(upro.model.proxies.AbstractPr
    {
       $super(upro.model.proxies.ActiveRouteProxy.NAME, null);
 
-      this.headSegment = new upro.model.ActiveRouteHeadSegment(this);
+      this.headSegment = new upro.model.ActiveRouteHeadSegment();
       this.lastSegment = this.headSegment;
    },
 
@@ -69,7 +69,7 @@ upro.model.proxies.ActiveRouteProxy = Class.create(upro.model.proxies.AbstractPr
    },
 
    /**
-    * Verifies whether the given solar sytem can be added as given type. The following rules exist:
+    * Verifies whether the given solar system can be added as given type. The following rules exist:
     * <ul>
     * <li>Checkpoints can always be added</li>
     * <li>Otherwise, the system added must not be in the current segment</li>
@@ -92,6 +92,12 @@ upro.model.proxies.ActiveRouteProxy = Class.create(upro.model.proxies.AbstractPr
       return rCode;
    },
 
+   /**
+    * Updates optimizer for given segment IDs
+    * 
+    * @param removedSegmentIds for which the optimizer should be cancelled
+    * @param changedSegmentIds for which the optimizer should be restarted
+    */
    updateOptimizer: function(removedSegmentIds, changedSegmentIds)
    {
       var routeOptimizerProxy = this.facade().retrieveProxy(upro.model.proxies.RouteOptimizerProxy.NAME);

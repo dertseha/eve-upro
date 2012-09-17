@@ -63,6 +63,7 @@ TestUniverse = Class.create(
       {
          system = this.galaxy.solarSystems.findExact(systemIdOrName);
       }
+      assertNotUndefined("Sanity: Can not resolve " + systemIdOrName + " although test expects it", system);
 
       return system;
    }

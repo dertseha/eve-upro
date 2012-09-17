@@ -203,8 +203,7 @@ RouteFinderGeneticTSPTest.prototype.testSearchTenSystems = function()
 
    this.whenCallingContinueSearchUntilReturnsTrue();
 
-   // TODO check why this one takes only one reported test (?!?)
-   // this.thenTheSearchWasCompletedByFitness();
+   this.thenTheSearchWasCompletedByFitness();
    this.thenTheTransitRouteHasALengthBetween(30, 36);
    // Optimal route below - found in most of the cases
    /*
