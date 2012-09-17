@@ -44,6 +44,8 @@ upro.app.Notifications =
    RouteOptimizerFinished: 0,
    /** Resets the active route */
    ActiveRouteReset: 0,
+   /** Recalculate the active route */
+   ActiveRouteRecalculate: 0,
    /** Removes an entry from the active route. Param: SolarSystem */
    ActiveRouteRemoveEntry: 0,
    /** Add a checkpoint to the active route. Param: SolarSystem */

@@ -26,6 +26,14 @@ upro.view.mediators.MainContextMenuMediator = Class
                      routingMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Delete),
                            this.commandActiveRouteReset);
 
+                     this.commandActiveRouteRecalculate = new upro.hud.SimpleCommandAdapter(function()
+                     {
+                        mediator.notify(upro.app.Notifications.ActiveRouteRecalculate);
+                        mediator.cancel();
+                     }, upro.res.text.Lang.format("routing.recalculate"));
+                     routingMenu.setCommand(4, this.createVectorIcon.bind(this, upro.res.menu.IconData.Reload),
+                           this.commandActiveRouteRecalculate);
+
                      this.commandActiveRouteSetAutopilot = new upro.hud.SimpleCommandAdapter(function()
                      {
                         mediator.notify(upro.app.Notifications.ActiveRouteSetAutopilot);

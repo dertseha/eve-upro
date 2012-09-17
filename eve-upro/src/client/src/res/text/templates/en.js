@@ -18,6 +18,8 @@ upro.res.text.templates["en"] =
    "routing.menuLabel": "Routing",
    /** Command for clearing the route */
    "routing.clearRoute": "Clear Route",
+   /** Command for recalculating the route */
+   "routing.recalculate": "Recalculate Route",
    /** Command for setting the route to the autopilot */
    "routing.setAutopilot": "Send to autopilot",
    /** Label for routing capabilities menu */

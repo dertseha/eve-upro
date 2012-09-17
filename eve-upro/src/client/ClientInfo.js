@@ -173,6 +173,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedUserIgnoredSolarSystemsChangedCommand.js', //
    'control/commands/NotifiedUserIgnoredSolarSystemIgnoreToggleCommand.js', //
    'control/commands/NotifiedActiveRouteResetCommand.js', //
+   'control/commands/NotifiedActiveRouteRecalculateCommand.js', //
    'control/commands/NotifiedActiveRouteRemoveEntryCommand.js', //
    'control/commands/NotifiedActiveRouteAddWaypointCommand.js', //
    'control/commands/NotifiedActiveRouteAddCheckpointCommand.js', //
