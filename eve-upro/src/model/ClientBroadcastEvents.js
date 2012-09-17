@@ -325,24 +325,6 @@
       },
 
       /**
-       * Info message about the current jump corridor entry
-       */
-      JumpCorridorEntry:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               solarSystemId: Number,
-               jumpType: String
-            },
-            isValid: null
-         }
-      },
-
-      /**
        * Informs about the current state of a jump corridor. If the 'data' field is missing, the corridor is destroyed
        */
       JumpCorridorInfo:
@@ -389,6 +371,38 @@
             },
             isValid: null
          }
+      },
+
+      /**
+       * Informs about the current state of a route. If the 'data' field is missing, the route is destroyed
+       */
+      RouteInfo:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema,
+               '?data': context.commonSchemata.routeSchema
+            },
+            isValid: null
+         }
+      },
+
+      RouteOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RouteShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
       }
    };
 

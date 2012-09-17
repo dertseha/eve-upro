@@ -353,24 +353,6 @@
       },
 
       /**
-       * Sets the entry for a new jump corridor
-       */
-      SetJumpCorridorEntry:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               solarSystemId: Number,
-               jumpType: String
-            },
-            isValid: null
-         }
-      },
-
-      /**
        * Creates a new jump corridor
        */
       CreateJumpCorridor:
@@ -466,6 +448,88 @@
             },
             isValid: null
          }
+      },
+
+      /**
+       * Creates a new route
+       */
+      CreateRoute:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               '?id': context.commonSchemata.uuidSchema,
+               data: context.commonSchemata.routeSchema
+            },
+            isValid: null
+         }
+      },
+
+      DestroyRoute:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Updates a route
+       */
+      UpdateRoute:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema,
+               data:
+               {
+                  '?name': String,
+                  '?route': Array.of(context.commonSchemata.routeEntrySchema)
+               }
+            },
+            isValid: null
+         }
+      },
+
+      AddRouteOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RemoveRouteOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      AddRouteShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RemoveRouteShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
       }
    };
 

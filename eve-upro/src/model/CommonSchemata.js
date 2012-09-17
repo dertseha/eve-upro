@@ -69,6 +69,12 @@
       jumpType: String
    };
 
+   context.namespace.routeSchema =
+   {
+      name: String,
+      route: Array.of(context.namespace.routeEntrySchema)
+   };
+
 })((typeof module !== 'undefined') ?
 {
    namespace: module.exports,
