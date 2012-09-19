@@ -165,7 +165,25 @@ upro.app.Notifications =
    /** Request to update a jump corridor */
    UpdateJumpCorridorRequest: 0,
    /** Request to destroy a jump corridor */
-   DestroyJumpCorridorRequest: 0
+   DestroyJumpCorridorRequest: 0,
+
+   /** Request to create a new route from the active one */
+   ActiveRouteCreateNewRouteRequest: 0,
+   /** Request to update an existing route from the active one */
+   ActiveRouteUpdateRouteRequest: 0,
+   /** Request to set the active route */
+   SetActiveRouteRequest: 0,
+
+   /** Request to select a route */
+   RouteSelectionRequest: 0,
+   /** Selection status of the current route */
+   RouteSelected: 0,
+   /** List change of the routes */
+   RouteListChanged: 0,
+   /** Data change of one of the routes */
+   RouteDataChanged: 0,
+   /** Request to destroy a route */
+   DestroyRouteRequest: 0
 };
 
 /**

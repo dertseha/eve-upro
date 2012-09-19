@@ -15,6 +15,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.facade().registerProxy(new upro.model.proxies.AutopilotProxy());
       this.facade().registerProxy(new upro.model.proxies.ActiveRouteProxy());
       this.facade().registerProxy(new upro.model.proxies.JumpCorridorProxy());
+      this.facade().registerProxy(new upro.model.proxies.RouteProxy());
 
       this.facade().registerMediator(new upro.view.mediators.MainContextMenuMediator());
       {
@@ -32,6 +33,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
 
       uiMediator.setVisible(true); // set visible before creating UI panels, so they have proper dimensions
       this.setupRouteListMenu(uiMediator);
+      this.setupRouteDataListMenu(uiMediator);
       this.setupMapListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
       this.setupMapMenu(uiMediator);
@@ -111,6 +113,17 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             new upro.view.mediators.AutopilotRoutePanelMediator(panelId, panelId + ".route", 1));
    },
 
+   setupRouteDataListMenu: function(uiMediator)
+   {
+      var panelId = "eList";
+
+      uiMediator.setSubMenu(panelId, "routeData", 5, upro.res.menu.IconData.Routing, upro.res.text.Lang
+            .format("routeDataList.menuLabel"));
+
+      this.facade()
+            .registerMediator(new upro.view.mediators.RouteListPanelMediator(panelId, panelId + ".routeData", 5));
+   },
+
    setupMapListMenu: function(uiMediator)
    {
       var panelId = "wList";
@@ -151,7 +164,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
    {
       var panelId = "eList";
 
-      uiMediator.setSubMenu(panelId, "groupList", 5, upro.res.menu.IconData.Group, upro.res.text.Lang
+      uiMediator.setSubMenu(panelId, "groupList", 4, upro.res.menu.IconData.Group, upro.res.text.Lang
             .format("groupList.menuLabel"));
 
       this.facade()

@@ -119,6 +119,13 @@ upro.res.text.templates["en"] =
    /** Autopilot Route Panel menu label */
    "panels.autopilot.route.menuLabel": "Autopilot Route",
 
+   /** Hint for the route name */
+   "panels.activeRoute.edit.nameHint": "Enter Name",
+   /** Command name for creating a new route */
+   "panels.activeRoute.edit.create.command": "Create",
+   /** Command name for updating a saved route */
+   "panels.activeRoute.edit.update.command": "Update",
+
    /** Groups menu label (list) */
    "groupList.menuLabel": "Groups",
    /** List of the groups */
@@ -219,5 +226,14 @@ upro.res.text.templates["en"] =
    "panels.sharedObject.edit.restrictedBody": "Restricted",
 
    /** Panel for shared object interest control */
-   "panels.sharedObject.interest.menuLabel": "Sharing Controls"
+   "panels.sharedObject.interest.menuLabel": "Sharing Controls",
+
+   /** Route Data Lists */
+   "routeDataList.menuLabel": "Routes",
+   /** Shared routes */
+   "panels.routes.route.menuLabel": "Shared Routes",
+   /** Set active */
+   "panels.routes.edit.setActive.command": "Set Active",
+   /** Destroy info */
+   "panels.routes.edit.destroy.command": "Destroy"
 };

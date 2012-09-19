@@ -134,6 +134,7 @@ exports.sourceFiles = [];
    'model/ActiveRouteHeadSegment.js', //
    'model/ActiveRouteSegmentTerminator.js', //
    'model/ActiveRouteSegment.js', //
+   'model/RouteInfo.js', //
 
    'model/proxies/proxies.js', //
    'model/proxies/LocalBasedInterestChecker.js', //
@@ -150,6 +151,7 @@ exports.sourceFiles = [];
    'model/proxies/BodyRegisterProxy.js', //
    'model/proxies/JumpCorridorProxy.js', //
    'model/proxies/RouteOptimizerProxy.js', //
+   'model/proxies/RouteProxy.js', //
 
    'control/ctrl.js', //
    'control/commands/cmd.js', //
@@ -213,6 +215,12 @@ exports.sourceFiles = [];
    'control/commands/NotifiedSharedObjectAddSharesRequestCommand.js', //
    'control/commands/NotifiedSharedObjectRemoveSharesRequestCommand.js', //
    'control/commands/NotifiedRouteOptimizerFinishedCommand.js', //
+   'control/commands/NotifiedActiveRouteCreateNewRouteRequestCommand.js', //
+   'control/commands/NotifiedRouteSelectionRequestCommand.js', //
+   'control/commands/NotifiedRouteSelectedCommand.js', //
+   'control/commands/NotifiedSetActiveRouteRequestCommand.js', //
+   'control/commands/NotifiedDestroyRouteRequestCommand.js', //
+   'control/commands/NotifiedActiveRouteUpdateRouteRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
@@ -251,6 +259,7 @@ exports.sourceFiles = [];
    'view/mediators/JumpCorridorEditPanelMediator.js', //
    'view/mediators/AbstractSharingPanelMediator.js', //
    'view/mediators/SharedObjectInterestPanelMediator.js', //
+   'view/mediators/RouteListPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

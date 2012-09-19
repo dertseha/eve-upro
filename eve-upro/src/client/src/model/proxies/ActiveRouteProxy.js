@@ -303,6 +303,24 @@ upro.model.proxies.ActiveRouteProxy = Class.create(upro.model.proxies.AbstractPr
    },
 
    /**
+    * Sets the entire route
+    * 
+    * @param route array of SystemRouteEntry objects
+    */
+   setRoute: function(route)
+   {
+      var that = this;
+
+      this.resetRoute();
+      route.forEach(function(systemRouteEntry)
+      {
+         that.lastSegment = that.lastSegment["add" + systemRouteEntry.getEntryType()].call(that.lastSegment,
+               systemRouteEntry.getSolarSystem(), systemRouteEntry.getJumpType());
+      });
+      this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+   },
+
+   /**
     * Resets a segment to minimum - typically when optimization returned no result; Drops all transit systems and resets
     * the jump types to None for the remaining systems.
     * 
