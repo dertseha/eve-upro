@@ -133,11 +133,25 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
       this.routeList.selectedIndex(selectedIndex);
    },
 
+   getImageForOwner: function(info)
+   {
+      var link = upro.res.ImageData.Transparent;
+
+      if (info.isClientAllowedControl())
+      {
+         link = upro.res.ImageData.Owner;
+      }
+
+      return link;
+   },
+
    listRenderer: function(data, rect, index)
    {
       var result = '';
 
       result = '<table style="width:100%;height:100%"><tr>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
+            + this.getImageForOwner(data.route) + '">' + '</img></div>' + '</td>';
       result += '<td>' + data.route.getName().escapeHTML() + '</td>';
       result += '</tr></table>';
 
