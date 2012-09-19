@@ -1,5 +1,7 @@
 var util = require('util');
 
+var schema = require('js-schema');
+
 var commonSchemata = require('../model/CommonSchemata.js');
 
 var AbstractDataObject = require('../abstract-sharing-component/AbstractDataObject.js');
@@ -64,9 +66,10 @@ util.inherits(JumpCorridorDataObject, AbstractDataObject);
 
 JumpCorridorDataObject.CollectionName = "JumpCorridors";
 
+JumpCorridorDataObject.isSpecificDataValid = schema(commonSchemata.jumpCorridorSchema);
 JumpCorridorDataObject.isDocumentValid = function(data)
 {
-   return true; // TODO
+   return AbstractDataObject.isDocumentValid(data) && JumpCorridorDataObject.isSpecificDataValid(data.jumpCorridor);
 };
 
 module.exports = JumpCorridorDataObject;

@@ -1,5 +1,7 @@
 var util = require('util');
 
+var schema = require('js-schema');
+
 var commonSchemata = require('../model/CommonSchemata.js');
 
 var AbstractDataObject = require('../abstract-sharing-component/AbstractDataObject.js');
@@ -64,9 +66,10 @@ util.inherits(RouteDataObject, AbstractDataObject);
 
 RouteDataObject.CollectionName = "Routes";
 
+RouteDataObject.isSpecificDataValid = schema(commonSchemata.routeSchema);
 RouteDataObject.isDocumentValid = function(data)
 {
-   return true; // TODO
+   return AbstractDataObject.isDocumentValid(data) && RouteDataObject.isSpecificDataValid(data.route);
 };
 
 module.exports = RouteDataObject;
