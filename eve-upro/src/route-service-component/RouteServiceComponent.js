@@ -99,8 +99,9 @@ function RouteServiceComponent(services)
       if (character && dataObject.isCharacterOwner(character))
       {
          var state = this.dataStatesById[dataObject.getDocumentId()];
+         var interest = this.filterInterestByCharacter(body.interest, character);
 
-         state.addOwner(body.interest);
+         state.addOwner(interest);
       }
    };
 
@@ -123,8 +124,9 @@ function RouteServiceComponent(services)
       if (character && dataObject.isCharacterOwner(character))
       {
          var state = this.dataStatesById[dataObject.getDocumentId()];
+         var interest = this.filterInterestByCharacter(body.interest, character);
 
-         state.addShares(body.interest);
+         state.addShares(interest);
       }
    };
 

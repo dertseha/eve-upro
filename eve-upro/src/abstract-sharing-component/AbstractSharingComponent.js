@@ -4,12 +4,14 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 
 var UuidFactory = require('../util/UuidFactory.js');
+var Functional = require('../util/Functional.js');
 var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
 var AbstractDataObject = require('./AbstractDataObject.js');
 var StandardDataBroadcaster = require('./StandardDataBroadcaster.js');
 var DataStateFactory = require('./DataStateFactory.js');
+var InterestFilter = require('./InterestFilter.js');
 
 function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 {
@@ -43,6 +45,14 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
       {
          self.onStarted();
       });
+   };
+
+   /**
+    * Filters the given interest according to given character
+    */
+   this.filterInterestByCharacter = function(interest, character)
+   {
+      return interest.filter(InterestFilter.filterFunctionForCharacter(character));
    };
 
    /**
