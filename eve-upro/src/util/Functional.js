@@ -1,4 +1,4 @@
-if (!Array.prototype.filter)
+if (!Array.prototype.foldLeft)
 {
    /**
     * Extends the array type with a fold method, signature: function(func, seed) { return result; }
@@ -23,7 +23,10 @@ if (!Array.prototype.filter)
 
       return result;
    };
+}
 
+if (!Array.prototype.filter)
+{
    /**
     * Extends the array type with a filter method, signature: function(func) { return array; }
     * 
@@ -46,7 +49,10 @@ if (!Array.prototype.filter)
 
       return result;
    };
+}
 
+if (!Array.prototype.map)
+{
    /**
     * Extends the array type with a map method, signature: function(func) { return result; }
     * 

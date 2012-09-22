@@ -1,18 +1,18 @@
 /**
- * This panel shows the group member list
+ * This panel shows the group banned list
  */
-upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediators.AbstractMediator,
+upro.view.mediators.GroupBannedListPanelMediator = Class.create(upro.view.mediators.AbstractMediator,
 {
    initialize: function($super, panelId, menuPath, menuIndex)
    {
-      $super(upro.view.mediators.GroupMemberListPanelMediator.NAME, null);
+      $super(upro.view.mediators.GroupBannedListPanelMediator.NAME, null);
 
       this.panelId = panelId;
       this.menuPath = menuPath;
       this.menuIndex = menuIndex;
 
       this.memberList = null;
-      this.banButton = null;
+      this.unbanButton = null;
 
       this.selectionTimer = upro.sys.Timer.getSingleTimer(this.onSelectionTimer.bind(this));
    },
@@ -28,14 +28,14 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
          view: 'Box',
          rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
          anchors: 'left top right bottom',
-         id: 'groupMemberListPanel_base',
+         id: 'groupBannedListPanel_base',
          childViews: [
          {
             view: 'Button',
             rect: '0 0 ' + (dimension.width) + ' 25',
             anchors: 'left top right bottom',
-            text: upro.res.text.Lang.format("panels.group.members.ban.command"),
-            id: 'groupMemberList_ban'
+            text: upro.res.text.Lang.format("panels.group.members.unban.command"),
+            id: 'groupBannedList_unban'
          },
          {
             view: 'ScrollPane',
@@ -53,7 +53,7 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
                view: 'List',
                rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 30),
                anchors: 'top left right bottom',
-               id: 'groupMemberList_list',
+               id: 'groupBannedList_list',
                rowHeight: 36,
                multiselect: true,
                style:
@@ -70,15 +70,15 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
       });
       this.uiBase.attachTo(panel);
 
-      var base = uki('#groupMemberListPanel_base');
+      var base = uki('#groupBannedListPanel_base');
 
-      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.GroupMembers,
-            upro.res.text.Lang.format("panels.group.member.list.menuLabel"), "groupMemberList", base);
+      uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.GroupBanned,
+            upro.res.text.Lang.format("panels.group.banned.list.menuLabel"), "groupBannedList", base);
 
-      this.memberList = uki('#groupMemberList_list')[0];
-      this.banButton = uki('#groupMemberList_ban')[0];
-      this.banButton.disabled(true);
-      this.banButton.bind('click', this.onBanButton.bind(this));
+      this.memberList = uki('#groupBannedList_list')[0];
+      this.unbanButton = uki('#groupBannedList_unban')[0];
+      this.unbanButton.disabled(true);
+      this.unbanButton.bind('click', this.onUnbanButton.bind(this));
    },
 
    getImageForBody: function(listEntry)
@@ -136,7 +136,7 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
       {
          var bodyRegisterProxy = this.facade().retrieveProxy(upro.model.proxies.BodyRegisterProxy.NAME);
 
-         group.forEachMember(function(characterId)
+         group.forEachBanned(function(characterId)
          {
             var interest =
             {
@@ -171,11 +171,11 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
       this.memberList.parent().layout();
    },
 
-   onBanButton: function()
+   onUnbanButton: function()
    {
       var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
 
-      if (!this.banButton.disabled())
+      if (!this.unbanButton.disabled())
       {
          var notifyBody =
          {
@@ -183,7 +183,7 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
             characters: this.getSelectedIds()
          };
 
-         this.facade().sendNotification(upro.app.Notifications.BanGroupMembersRequest, notifyBody);
+         this.facade().sendNotification(upro.app.Notifications.UnbanGroupMembersRequest, notifyBody);
       }
    },
 
@@ -210,8 +210,8 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
    {
       var selectionEmpty = this.memberList.selectedRows().length == 0;
 
-      this.banButton.disabled(selectionEmpty);
+      this.unbanButton.disabled(selectionEmpty);
    }
 });
 
-upro.view.mediators.GroupMemberListPanelMediator.NAME = "GroupMemberListPanel";
+upro.view.mediators.GroupBannedListPanelMediator.NAME = "GroupBannedListPanel";

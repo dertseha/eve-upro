@@ -26,6 +26,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupInfo.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupOwner.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupShares.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.GroupBannedList.name);
 
       this.createPredefinedGroupInfoObjects();
    },
@@ -179,10 +180,35 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       });
    },
 
+   banMembers: function(id, characterIdList)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest(upro.data.clientRequests.BanGroupMembers.name,
+      {
+         id: id,
+         characters: characterIdList
+      });
+   },
+
+   unbanMembers: function(id, characterIdList)
+   {
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+
+      sessionProxy.sendRequest(upro.data.clientRequests.UnbanGroupMembers.name,
+      {
+         id: id,
+         characters: characterIdList
+      });
+   },
+
    notifyDataChanged: function(dataObject)
    {
       this.facade().sendNotification(upro.app.Notifications.GroupDataChanged, dataObject);
-      // this.facade().sendNotification(upro.app.Notifications.SharedObjectDataChanged, dataObject);
+      if (this.selectedGroupId == dataObject.getId())
+      {
+         this.notifyGroupSelected();
+      }
    },
 
    onGroupInfo: function(broadcastBody)
@@ -239,6 +265,17 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       }
    },
 
+   onGroupBannedList: function(broadcastBody)
+   {
+      var dataObject = this.dataObjects[broadcastBody.id];
+
+      if (dataObject)
+      {
+         dataObject.blackList = broadcastBody.characters;
+         this.notifyDataChanged(dataObject);
+      }
+   },
+
    /**
     * Broadcast Handler
     * 
@@ -272,7 +309,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
          this.notifyGroupMemberListChanged(group);
          if (this.selectedGroupId == group.getId())
          {
-            this.setSelectedGroup(group);
+            this.notifyGroupSelected();
          }
       }
    },

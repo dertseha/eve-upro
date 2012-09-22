@@ -74,19 +74,23 @@ function GroupDataObject(documentId, initData)
       return this.members;
    };
 
+   this.getBlackList = function()
+   {
+      return this.blackList;
+   };
+
    this.addMember = function(character)
    {
-      return this.addCharacterToGroupList(character, this.members);
+      return this.addCharacterToGroupList(character.getCharacterId(), this.members);
    };
 
-   this.addCharacterToBlackList = function(character)
+   this.addCharacterToBlackList = function(characterId)
    {
-      return this.addCharacterToGroupList(character, this.blackList);
+      return this.addCharacterToGroupList(characterId, this.blackList);
    };
 
-   this.addCharacterToGroupList = function(character, list)
+   this.addCharacterToGroupList = function(characterId, list)
    {
-      var characterId = character.getCharacterId();
       var rCode = false;
 
       if (list.indexOf(characterId) < 0)
@@ -98,19 +102,19 @@ function GroupDataObject(documentId, initData)
       return rCode;
    };
 
-   this.removeMember = function(character)
+   this.removeMember = function(characterId)
    {
-      return this.removeCharacterFromGroupList(character, this.members);
+      return this.removeCharacterFromGroupList(characterId, this.members);
    };
 
-   this.removeCharacterFromBlackList = function(character)
+   this.removeCharacterFromBlackList = function(characterId)
    {
-      return this.removeCharacterFromGroupList(character, this.blackList);
+      return this.removeCharacterFromGroupList(characterId, this.blackList);
    };
 
-   this.removeCharacterFromGroupList = function(character, list)
+   this.removeCharacterFromGroupList = function(characterId, list)
    {
-      var index = list.indexOf(character.getCharacterId());
+      var index = list.indexOf(characterId);
       var rCode = false;
 
       if (index >= 0)

@@ -295,7 +295,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       {
          var isMember = group.isClientMember();
 
-         this.joinButton.disabled(isMember);
+         this.joinButton.disabled(isMember || group.isClientBanned());
          this.leaveButton.disabled(!isMember);
          this.destroyButton.disabled(!group.isClientAllowedControl());
       }

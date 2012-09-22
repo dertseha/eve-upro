@@ -46,6 +46,13 @@ function Fixture()
             .createActiveDataState(group));
    };
 
+   this.givenGroupHasBlackList = function(id, characters)
+   {
+      var group = this.groupService.dataStatesById[id].dataObject;
+
+      group.blackList = characters;
+   };
+
    this.givenGroupHasOwner = function(id, scope, ids)
    {
       var group = this.groupService.dataStatesById[id].dataObject;
@@ -146,6 +153,24 @@ function Fixture()
       {
          id: groupId,
          interest: interest
+      });
+   };
+
+   this.whenBroadcastBanGroupMembersIsReceived = function(sessionId, groupId, characters)
+   {
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestBanGroupMembers.name, sessionId,
+      {
+         id: groupId,
+         characters: characters
+      });
+   };
+
+   this.whenBroadcastUnbanGroupMembersIsReceived = function(sessionId, groupId, characters)
+   {
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestUnbanGroupMembers.name, sessionId,
+      {
+         id: groupId,
+         characters: characters
       });
    };
 }
@@ -507,5 +532,64 @@ exports.testGroupMembershipEmitted_WhenDestroyGroupRequested = function(test)
    });
 
    test.expect(1);
+   test.done();
+};
+
+exports.testGroupBannedEmitted_WhenCharactersBecomeBanned = function(test)
+{
+   var charId = 1234;
+   var charIdToBan1 = 435345;
+   var charIdToBan2 = 536456;
+   var sessionId = UuidFactory.v4();
+   var groupName = 'TestGroup';
+   var groupId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenExistingGroupWithMembers(groupId, groupName, [ charId, charIdToBan1, charIdToBan2 ]);
+   this.fixture.givenGroupHasOwner(groupId, 'Character', [ charId ]);
+
+   this.fixture.whenBroadcastBanGroupMembersIsReceived(sessionId, groupId, [ charIdToBan1, charIdToBan2 ]);
+
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupBannedList.name,
+   {
+      id: groupId,
+      characters: [ charIdToBan1, charIdToBan2 ]
+   }, [
+   {
+      scope: 'Character',
+      id: charId
+   } ]);
+
+   test.expect(2);
+   test.done();
+};
+
+exports.testGroupBannedEmitted_WhenCharactersBecomeUnbanned = function(test)
+{
+   var charId = 1234;
+   var charIdBanned1 = 435345;
+   var charIdBanned2 = 536456;
+   var sessionId = UuidFactory.v4();
+   var groupName = 'TestGroup';
+   var groupId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, sessionId);
+   this.fixture.givenExistingGroupWithMembers(groupId, groupName, [ charId ]);
+   this.fixture.givenGroupHasBlackList(groupId, [ charIdBanned1, charIdBanned2 ]);
+   this.fixture.givenGroupHasOwner(groupId, 'Character', [ charId ]);
+
+   this.fixture.whenBroadcastUnbanGroupMembersIsReceived(sessionId, groupId, [ charIdBanned1 ]);
+
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupBannedList.name,
+   {
+      id: groupId,
+      characters: [ charIdBanned2 ]
+   }, [
+   {
+      scope: 'Character',
+      id: charId
+   } ]);
+
+   test.expect(2);
    test.done();
 };

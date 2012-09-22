@@ -76,6 +76,39 @@ function GroupDataBroadcaster(broadcaster, dataName)
 
       this.broadcaster.broadcast(header, body);
    };
+
+   this.broadcastGroupBannedList = function(dataObject, interest, queueName)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupBannedList.name,
+         interest: interest
+      };
+      var body =
+      {
+         id: dataObject.getDocumentId(),
+         characters: dataObject.getBlackList()
+      };
+
+      this.broadcaster.broadcast(header, body, queueName);
+   };
+
+   this.broadcastGroupBannedListReset = function(dataObject, interest, disinterest)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupBannedList.name,
+         interest: interest,
+         disinterest: disinterest || dataObject.getOwnerInterest()
+      };
+      var body =
+      {
+         id: dataObject.getDocumentId(),
+         characters: []
+      };
+
+      this.broadcaster.broadcast(header, body);
+   };
 }
 util.inherits(GroupDataBroadcaster, StandardDataBroadcaster);
 

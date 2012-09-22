@@ -205,6 +205,8 @@ exports.sourceFiles = [];
    'control/commands/NotifiedGroupJoinRequestCommand.js', //
    'control/commands/NotifiedGroupLeaveRequestCommand.js', //
    'control/commands/NotifiedGroupDestroyRequestCommand.js', //
+   'control/commands/NotifiedBanGroupMembersRequestCommand.js', //
+   'control/commands/NotifiedUnbanGroupMembersRequestCommand.js', //
    'control/commands/NotifiedFindBodyByNameRequestCommand.js', //
    'control/commands/NotifiedGroupAdvertiseRequestCommand.js', //
    'control/commands/NotifiedGroupRemoveAdvertisementRequestCommand.js', //
@@ -255,6 +257,7 @@ exports.sourceFiles = [];
    'view/mediators/SessionPanelMediator.js', //
    'view/mediators/GroupListPanelMediator.js', //
    'view/mediators/GroupMemberListPanelMediator.js', //
+   'view/mediators/GroupBannedListPanelMediator.js', //
    'view/mediators/CurrentLocationPanelMediator.js', //
    'view/mediators/CurrentLocationListPanelMediator.js', //
    'view/mediators/JumpCorridorSceneMediator.js', //

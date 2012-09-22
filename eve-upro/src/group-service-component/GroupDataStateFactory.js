@@ -68,15 +68,34 @@ function GroupDataStateFactory(owner)
       var superActivate = state.activate;
       var superOnCharacterSessionAdded = state.onCharacterSessionAdded;
       var superRemoveShares = state.removeShares;
+      var superBroadcastOwnerData = state.broadcastOwnerData;
+      var superBroadcastOwnerDataReset = state.broadcastOwnerDataReset;
+
+      /** {@inheritDoc} */
+      state.broadcastOwnerData = function(broadcaster, interest, responseQueue)
+      {
+         superBroadcastOwnerData.call(this, broadcaster, interest, responseQueue);
+
+         broadcaster.broadcastGroupBannedList(this.dataObject, interest, responseQueue);
+      };
+
+      /** {@inheritDoc} */
+      state.broadcastOwnerDataReset = function(broadcaster, interest)
+      {
+         superBroadcastOwnerDataReset.call(this, interest);
+
+         broadcaster.broadcastGroupBannedListReset(this.dataObject, interest);
+      };
 
       state.activate = function()
       {
          var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
 
          superActivate.call(this);
 
          this.removeAllMembersWithoutInterest(false);
-         owner.getBroadcaster().broadcastGroupMembership(dataObject, dataObject.getMembers(), []);
+         broadcaster.broadcastGroupMembership(dataObject, dataObject.getMembers(), []);
       };
 
       state.registerSyncState = function(syncState)
@@ -113,14 +132,18 @@ function GroupDataStateFactory(owner)
          }
       };
 
-      state.removeMember = function(character)
+      state.removeMembers = function(characterIdList)
       {
          var owner = this.getOwner();
+         var removed = characterIdList.filter(function(characterId)
+         {
+            return dataObject.removeMember(characterId);
+         });
 
-         if (dataObject.removeMember(character))
+         if (removed.length > 0)
          {
             dataObject.saveToStorage(owner.getStorage());
-            owner.getBroadcaster().broadcastGroupMembership(dataObject, [], [ character.getCharacterId() ]);
+            owner.getBroadcaster().broadcastGroupMembership(dataObject, [], removed);
          }
       };
 
@@ -169,6 +192,41 @@ function GroupDataStateFactory(owner)
          }
 
          return list;
+      };
+
+      state.banMembers = function(characters)
+      {
+         var dataObject = this.dataObject;
+         var banned = characters.filter(function(characterId)
+         {
+            return dataObject.addCharacterToBlackList(characterId);
+         });
+
+         if (banned.length > 0)
+         {
+            var owner = this.getOwner();
+            var broadcaster = owner.getBroadcaster();
+
+            this.removeMembers(banned);
+            broadcaster.broadcastGroupBannedList(dataObject, dataObject.getOwnerInterest());
+         }
+      };
+
+      state.unbanMembers = function(characters)
+      {
+         var dataObject = this.dataObject;
+         var unbanned = characters.filter(function(characterId)
+         {
+            return dataObject.removeCharacterFromBlackList(characterId);
+         });
+
+         if (unbanned.length > 0)
+         {
+            var owner = this.getOwner();
+            var broadcaster = owner.getBroadcaster();
+
+            broadcaster.broadcastGroupBannedList(dataObject, dataObject.getOwnerInterest());
+         }
       };
 
       return state;

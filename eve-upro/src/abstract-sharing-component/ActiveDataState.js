@@ -16,6 +16,22 @@ function ActiveDataState(owner, dataObject)
 
    this.dataObject = dataObject;
 
+   /**
+    * Broadcasts the data for the owner of the object
+    */
+   this.broadcastOwnerData = function(broadcaster, interest, responseQueue)
+   {
+      broadcaster.broadcastDataShare(this.dataObject, interest, responseQueue);
+   };
+
+   /**
+    * Broadcasts the reset data for the owner of the object
+    */
+   this.broadcastOwnerDataReset = function(broadcaster, interest)
+   {
+      broadcaster.broadcastDataShareReset(this.dataObject, interest);
+   };
+
    /** {@inheritDoc} */
    this.onCharacterSessionAdded = function(character, interest, responseQueue)
    {
@@ -29,7 +45,7 @@ function ActiveDataState(owner, dataObject)
       }
       if (this.dataObject.isCharacterOwner(character))
       {
-         broadcaster.broadcastDataShare(this.dataObject, interest, responseQueue);
+         this.broadcastOwnerData(broadcaster, interest, responseQueue);
       }
    };
 
@@ -46,7 +62,7 @@ function ActiveDataState(owner, dataObject)
       }
       if (this.dataObject.isGroupOwner(groupId))
       {
-         broadcaster.broadcastDataShare(this.dataObject, interest);
+         this.broadcastOwnerData(broadcaster, interest);
       }
    };
 
@@ -58,7 +74,7 @@ function ActiveDataState(owner, dataObject)
 
       if (this.dataObject.isGroupOwner(groupId) && !this.dataObject.isCharacterOwner(character))
       {
-         broadcaster.broadcastDataShareReset(this.dataObject, interest);
+         this.broadcastOwnerDataReset(broadcaster, interest);
       }
       if (this.dataObject.isInterestForGroup(groupId) && !this.dataObject.isInterestForCharacter(character))
       {
@@ -89,7 +105,7 @@ function ActiveDataState(owner, dataObject)
 
       broadcaster.broadcastDataInfo(this.dataObject, dataInterest);
       broadcaster.broadcastDataOwnership(this.dataObject, dataInterest);
-      broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+      this.broadcastOwnerData(broadcaster, this.dataObject.getOwnerInterest());
    };
 
    /** {@inheritDoc} */
@@ -119,7 +135,7 @@ function ActiveDataState(owner, dataObject)
 
          broadcaster.broadcastDataInfo(this.dataObject, dataInterest);
          broadcaster.broadcastDataOwnership(this.dataObject, dataInterest);
-         broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+         this.broadcastOwnerData(broadcaster, this.dataObject.getOwnerInterest());
       }
    };
 
@@ -153,7 +169,7 @@ function ActiveDataState(owner, dataObject)
          }
          else
          {
-            broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+            this.broadcastOwnerData(broadcaster, this.dataObject.getOwnerInterest());
          }
       }
    };
@@ -185,7 +201,7 @@ function ActiveDataState(owner, dataObject)
          }
          this.dataObject.saveToStorage(owner.getStorage());
          broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
-         broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+         this.broadcastOwnerData(broadcaster, this.dataObject.getOwnerInterest());
       }
    };
 
@@ -206,7 +222,7 @@ function ActiveDataState(owner, dataObject)
          var owner = this.getOwner();
          var broadcaster = owner.getBroadcaster();
 
-         broadcaster.broadcastDataShareReset(this.dataObject, ownerInterest);
+         this.broadcastOwnerDataReset(broadcaster, ownerInterest);
          broadcaster.broadcastDataOwnershipReset(this.dataObject, ownerInterest);
          this.handleOwnerRemoval();
       }
@@ -221,7 +237,7 @@ function ActiveDataState(owner, dataObject)
       {
          this.dataObject.saveToStorage(owner.getStorage());
          broadcaster.broadcastDataOwnership(this.dataObject, this.dataObject.getDataInterest());
-         broadcaster.broadcastDataShare(this.dataObject, this.dataObject.getOwnerInterest());
+         this.broadcastOwnerData(broadcaster, this.dataObject.getOwnerInterest());
       }
       else
       {

@@ -343,6 +343,36 @@
          }
       },
 
+      BanGroupMembers:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.groupIdType,
+               characters: Array.of(Number)
+            },
+            isValid: null
+         }
+      },
+
+      UnbanGroupMembers:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.groupIdType,
+               characters: Array.of(Number)
+            },
+            isValid: null
+         }
+      },
+
       /**
        * Modify properties about a location status group
        */

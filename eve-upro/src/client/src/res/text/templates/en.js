@@ -135,6 +135,13 @@ upro.res.text.templates["en"] =
 
    /** List of group members */
    "panels.group.member.list.menuLabel": "Group Member List",
+   /** Kick and ban a group member */
+   "panels.group.members.ban.command": "Kick and Ban",
+
+   /** List of banned group members */
+   "panels.group.banned.list.menuLabel": "Group Banned List",
+   /** Unban a group member */
+   "panels.group.members.unban.command": "Unban",
 
    /** Groups menu label (edit) */
    "groupEdit.menuLabel": "Groups",

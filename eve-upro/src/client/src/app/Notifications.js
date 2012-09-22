@@ -122,6 +122,10 @@ upro.app.Notifications =
    GroupLeaveRequest: 0,
    /** Group destroy request */
    GroupDestroyRequest: 0,
+   /** request to ban group members */
+   BanGroupMembersRequest: 0,
+   /** request to unban group members */
+   UnbanGroupMembersRequest: 0,
 
    /** List of known characters has changed */
    KnownCharactersChanged: 0,

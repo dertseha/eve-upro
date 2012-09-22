@@ -10,6 +10,7 @@ upro.model.GroupInfo = Class.create(upro.model.AbstractSharedObjectInfo,
       this.clientCharacterId = clientCharacterId;
       this.data = {};
       this.members = [];
+      this.blackList = [];
    },
 
    toString: function()
@@ -91,5 +92,15 @@ upro.model.GroupInfo = Class.create(upro.model.AbstractSharedObjectInfo,
       });
 
       return rCode;
+   },
+
+   forEachBanned: function(callback)
+   {
+      this.blackList.forEach(callback);
+   },
+
+   isClientBanned: function()
+   {
+      return this.blackList.indexOf(this.clientCharacterId) >= 0;
    }
 });

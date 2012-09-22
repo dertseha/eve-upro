@@ -52,6 +52,9 @@ function GroupServiceComponent(services)
 
       this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestJoinGroup.name);
       this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestLeaveGroup.name);
+
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestBanGroupMembers.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestUnbanGroupMembers.name);
    };
 
    this.forEachSynchronizedCharacter = function(callback)
@@ -309,7 +312,7 @@ function GroupServiceComponent(services)
    {
       var character = this.characterAgent.getCharacterById(characterId);
 
-      if (character && dataObject.isInterestForCharacter(character))
+      if (character && dataObject.isInterestForCharacter(character) && !dataObject.isCharacterBlackListed(character))
       {
          var state = this.dataStatesById[dataObject.getDocumentId()];
 
@@ -328,7 +331,37 @@ function GroupServiceComponent(services)
       {
          var state = this.dataStatesById[dataObject.getDocumentId()];
 
-         state.removeMember(character);
+         state.removeMembers([ character.getCharacterId() ]);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestBanGroupMembers = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.banMembers(body.characters);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestUnbanGroupMembers = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.unbanMembers(body.characters);
       }
    };
 }

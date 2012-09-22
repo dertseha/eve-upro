@@ -30,11 +30,6 @@
       inUse: Boolean,
       parameter: Number
    };
-   var groupDataSchema =
-   {
-      name: String,
-      owner: context.commonSchemata.groupOwnerSchema
-   };
    var groupMemberSchema = Number;
    var bodySchema =
    {
@@ -292,9 +287,23 @@
          body: context.commonSchemata.getStandardSharingBodyDefinition()
       },
 
+      GroupBannedList:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.groupIdType,
+               characters: Array.of(Number)
+            },
+            isValid: null
+         }
+      },
+
       /**
-       * Notifies the list of added or removed members of a group. When members are added, the group data is also
-       * transmitted to allow new members to know about the group.
+       * Notifies the list of added or removed members of a group.
        */
       GroupMembership:
       {
