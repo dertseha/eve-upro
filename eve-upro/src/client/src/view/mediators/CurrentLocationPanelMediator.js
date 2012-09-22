@@ -128,7 +128,7 @@ upro.view.mediators.CurrentLocationPanelMediator = Class.create(upro.view.mediat
             + this.getImageForSendLocation(data.statusGroup) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForDisplayLocation(data.statusGroup) + '">' + '</img></div>' + '</td>';
-      result += '<td style="' + nameStyle + '">' + data.name + '</td>';
+      result += '<td style="' + nameStyle + '">' + data.name.escapeHTML() + '</td>';
       result += '</tr></table>';
 
       return result;

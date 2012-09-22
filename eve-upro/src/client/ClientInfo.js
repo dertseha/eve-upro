@@ -20,8 +20,11 @@ exports.sourceFiles = [];
 (function()
 {
    var shareBase = '../../model/';
+   var utilBase = '../../util/';
 
    var sourceFiles = [ //
+   utilBase + 'Functional.js', //
+
    'upro.js', //
    'Uuid.js', //
 

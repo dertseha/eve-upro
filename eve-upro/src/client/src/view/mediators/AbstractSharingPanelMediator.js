@@ -184,6 +184,9 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       this.memberList.parent().layout();
       this.searchResultList = uki("#" + this.uiKeyPrefix + "_searchResultList")[0];
       this.searchResultList.parent().layout();
+
+      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
+      this.characterInfo = sessionProxy.getCharacterInfo();
    },
 
    getImageForBody: function(listEntry)
@@ -230,7 +233,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       result = '<table style="width:100%;height:100%"><tr>';
       result += '<td style="width:32px;">' + '<div style="height:32px;">' + '<img style="height:32px;" src="'
             + this.getImageForBody(data) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.bodyName.getName() + '</td>';
+      result += '<td>' + data.bodyName.getName().escapeHTML() + '</td>';
       result += '</tr></table>';
 
       return result;
@@ -245,7 +248,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
             + this.getImageForBody(data) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForOwner(data) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.bodyName.getName() + '</td>';
+      result += '<td>' + data.bodyName.getName().escapeHTML() + '</td>';
       result += '</tr></table>';
 
       return result;
@@ -382,6 +385,21 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       return interest;
    },
 
+   isValidCharacterForSharing: function(bodyName)
+   {
+      return bodyName.getId() == this.characterInfo.characterId;
+   },
+
+   isValidCorporationForSharing: function(bodyName)
+   {
+      return bodyName.getId() == this.characterInfo.corporationId;
+   },
+
+   isValidGroupForSharing: function(group)
+   {
+      return group.isClientMember();
+   },
+
    onNotifyFindBodyResult: function(result)
    {
       var value = this.searchTextField.value();
@@ -391,8 +409,10 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
          var data = [];
 
          this.addMatchingGroupsToResultList(value, data);
-         this.extractFindBodyResult(data, "Character", result.characters);
-         this.extractFindBodyResult(data, "Corporation", result.corporations);
+         this.extractFindBodyResult(data, "Character", result.characters.filter(this.isValidCharacterForSharing
+               .bind(this)));
+         this.extractFindBodyResult(data, "Corporation", result.corporations.filter(this.isValidCorporationForSharing
+               .bind(this)));
 
          this.sortListData(data);
 
@@ -409,7 +429,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
 
       groupProxy.forEachGroup(function(group)
       {
-         if (regexp.test(group.getName()))
+         if (that.isValidGroupForSharing(group) && regexp.test(group.getName()))
          {
             var listEntry = that.getBodyNameBasedListEntry("Group", group);
 

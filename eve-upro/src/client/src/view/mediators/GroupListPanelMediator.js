@@ -167,7 +167,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       result += '<td style="width:16px;">' + '<div style="height:16px;">'
             + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForOwnership(data.group) + '">'
             + '</img></div>' + '</td>';
-      result += '<td>' + data.group.getName() + '</td>';
+      result += '<td>' + data.group.getName().escapeHTML() + '</td>';
       result += '</tr></table>';
 
       return result;
