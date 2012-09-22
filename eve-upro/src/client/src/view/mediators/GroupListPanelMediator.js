@@ -279,6 +279,11 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       this.refillGroupList();
    },
 
+   onNotifyGroupDataChanged: function(sharedObject)
+   {
+      this.refillGroupList(); // for ownership changes
+   },
+
    onNotifyGroupMemberListChanged: function()
    {
       this.refillGroupList(); // since the list also displays whether the client is a member

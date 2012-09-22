@@ -4,42 +4,35 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 
 var UuidFactory = require('../util/UuidFactory.js');
-var Component = require('../components/Component.js');
 var busMessages = require('../model/BusMessages.js');
 
+var AbstractSharingComponent = require('../abstract-sharing-component/AbstractSharingComponent.js');
+
 var CharacterGroupDataSync = require('./CharacterGroupDataSync.js');
-var Group = require('./Group.js');
-var PendingGroupDataProcessingState = require('./PendingGroupDataProcessingState.js');
-var ActiveGroupDataProcessingState = require('./ActiveGroupDataProcessingState.js');
 
-function GroupServiceComponent(services, groupFactory)
+var GroupDataObject = require('./GroupDataObject.js');
+var GroupDataStateFactory = require('./GroupDataStateFactory.js');
+var GroupDataBroadcaster = require('./GroupDataBroadcaster.js');
+
+function GroupServiceComponent(services)
 {
-   GroupServiceComponent.super_.call(this);
+   GroupServiceComponent.super_.call(this, services, GroupDataObject, 'Group');
 
-   this.amqp = services['amqp'];
-   this.mongodb = services['mongodb'];
-   this.characterAgent = services['character-agent'];
-   this.groupFactory = groupFactory;
+   this.setBroadcaster(new GroupDataBroadcaster(this.amqp, 'Group'));
 
-   this.groupDataProcessingStatesById = {};
+   var superStart = this.start;
+   var superSetDataState = this.setDataState;
 
    /** {@inheritDoc} */
    this.start = function()
    {
       var self = this;
 
-      this.characterAgent.on('CharacterOnline', function(character)
-      {
-         self.onCharacterOnline(character);
-      });
-      this.characterAgent.on('SessionAdded', function(character, sessionId)
-      {
-         self.onCharacterSessionAdded(character, sessionId);
-      });
-      this.characterAgent.on('CharacterOffline', function(character)
-      {
-         self.onCharacterOffline(character);
-      });
+      superStart.call(this);
+
+      this.setDataStateFactory(new GroupDataStateFactory(this));
+
+      this.registerCharacterHandler('CharacterGroupSyncFinished', '');
 
       this.amqp.on('broadcast', function(header, body)
       {
@@ -47,74 +40,72 @@ function GroupServiceComponent(services, groupFactory)
       });
 
       this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestCreateGroup.name);
-      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestDestroyGroup.name);
-      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestLeaveGroup.name);
-      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestJoinGroup.name);
-      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestAdvertiseGroup.name);
-      this.registerGroupBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveGroupAdvertisements.name);
 
-      this.mongodb.defineCollection(Group.CollectionName, [ 'data.members', 'data.adCharacter', 'data.adCorporation' ],
-            function()
-            {
-               self.onStarted();
-            });
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestUpdateGroup.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestDestroyGroup.name);
+
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestAddGroupOwner.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveGroupOwner.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestAddGroupShares.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestRemoveGroupShares.name);
+
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestJoinGroup.name);
+      this.registerDataBroadcastHandler(busMessages.Broadcasts.ClientRequestLeaveGroup.name);
    };
 
-   this.registerBroadcastHandler = function(broadcastName)
+   this.forEachSynchronizedCharacter = function(callback)
    {
-      var self = this;
-      var handler = this['onBroadcast' + broadcastName];
-
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.characterAgent.forEachCharacter(function(character)
       {
-         handler.call(self, header, body);
+         if (character.isGroupSyncFinished())
+         {
+            callback(character);
+         }
       });
    };
 
-   this.registerGroupBroadcastHandler = function(broadcastName)
+   this.cleanMemberListsOfCharacter = function(character)
    {
-      var self = this;
+      var broadcaster = this.getBroadcaster();
+      var storage = this.getStorage();
+      var removed = [ character.getCharacterId() ];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.forEachDataState(function(state)
       {
-         self.onGroupBroadcast(header, body);
+         if (state.removeMemberIfNotInterest(character))
+         {
+            state.dataObject.saveToStorage(storage);
+            broadcaster.broadcastGroupMembership(state.dataObject, [], removed);
+         }
       });
    };
 
-   this.setGroupDataProcessingState = function(groupId, state)
-   {
-      if (state)
-      {
-         this.groupDataProcessingStatesById[groupId] = state;
-      }
-      else
-      {
-         delete this.groupDataProcessingStatesById[groupId];
-      }
-   };
+   this.superOnCharacterOnline = this.onCharacterOnline;
 
    /**
     * Character state handler
     */
    this.onCharacterOnline = function(character)
    {
-      var self = this;
       var characterId = character.getCharacterId();
       var syncState = new CharacterGroupDataSync(this.amqp, characterId);
       var filter =
       {
          "data.members": characterId
       };
+      var self = this;
+
+      this.superOnCharacterOnline(character);
 
       syncState.broadcastStateMessage(false);
-      this.mongodb.getData(Group.CollectionName, filter, function(err, id, data)
+      this.mongodb.getData(GroupDataObject.CollectionName, filter, function(err, id, data)
       {
          if (id)
          {
             var groupId = UuidFactory.fromMongoId(id);
 
             syncState.addPendingGroup(groupId);
-            var state = self.ensureGroupDataProcessingState(groupId);
+            var state = self.ensureDataState(groupId);
             state.registerSyncState(syncState);
          }
          else
@@ -125,63 +116,22 @@ function GroupServiceComponent(services, groupFactory)
       {
          _id: true
       });
-      this.searchReferencesInAdvertisementsForCharacter(characterId);
    };
 
-   this.searchReferencesInAdvertisementsForCharacter = function(characterId)
+   this.onCharacterGroupSyncFinished = function(character)
    {
-      var self = this;
-      var filter =
-      {
-         $or: [
-         {
-            "data.adCharacter": characterId
-         },
-         {
-            "data.adCorporation": characterId
-         } ]
-      };
-
-      this.mongodb.getData(Group.CollectionName, filter, function(err, id, data)
-      {
-         if (id)
-         {
-            var groupId = UuidFactory.fromMongoId(id);
-
-            self.ensureGroupDataProcessingState(groupId);
-         }
-      },
-      {
-         _id: true
-      });
+      this.cleanMemberListsOfCharacter(character);
    };
 
-   /**
-    * Character state handler
-    */
-   this.onCharacterSessionAdded = function(character, sessionId)
+   this.setDataState = function(documentId, state)
    {
-      var responseQueue = character.getResponseQueue(sessionId);
-      var interest = [
-      {
-         scope: 'Session',
-         id: sessionId
-      } ];
+      superSetDataState.call(this, documentId, state);
 
-      for ( var groupId in this.groupDataProcessingStatesById)
+      if (!state)
       {
-         var state = this.groupDataProcessingStatesById[groupId];
-
-         state.onCharacterSessionAdded(character, interest, responseQueue);
+         logger.info("Groups " + documentId + " destroyed");
+         this.getBroadcaster().broadcastGroupDestroyed(documentId);
       }
-   };
-
-   /**
-    * Character state handler
-    */
-   this.onCharacterOffline = function(character)
-   {
-      // TODO: iterate through all groups and see if this was the last one to go offline - remove it then
    };
 
    /**
@@ -202,7 +152,7 @@ function GroupServiceComponent(services, groupFactory)
          {
             if (interest.scope == 'Group')
             {
-               self.ensureGroupDataProcessingState(interest.id);
+               self.ensureDataState(interest.id);
             }
          });
       }
@@ -217,307 +167,144 @@ function GroupServiceComponent(services, groupFactory)
 
       if (character)
       {
-         var characterId = character.getCharacterId();
-         var group = this.groupFactory.create(body.name, [ characterId ]);
+         var id = UuidFactory.v4();
+         var initData =
+         {
+            group: body.data
+         };
+         var state = this.getDataStateFactory().createActiveDataState(new GroupDataObject(id, initData));
+         var interest = [
+         {
+            scope: 'Character',
+            id: character.getCharacterId()
+         } ];
 
-         logger.info('Character ' + character.toString() + ' creates group ' + group.toString());
-         this.groupDataProcessingStatesById[group.getId()] = new ActiveGroupDataProcessingState(this, group);
-         group.addMember(characterId);
-         group.saveToStorage(this.mongodb);
-         this.broadcastGroupMembersAdded(group, group.getMembers());
+         logger.info('Character ' + character.toString() + ' creating group');
+         state.activate();
+         state.addOwner(interest);
+         state.addMember(character);
       }
    };
 
    /**
-    * Broadcast handler
+    * Broadcast processor
     */
-   this.onGroupBroadcast = function(header, body)
+   this.processClientRequestUpdateGroup = function(dataObject, characterId, body)
    {
-      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character) && dataObject.updateData(body.data))
+      {
+         dataObject.saveToStorage(this.getStorage());
+         this.getBroadcaster().broadcastDataInfo(dataObject, dataObject.getDataInterest());
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestDestroyGroup = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.destroy();
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestAddGroupOwner = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.addOwner(body.interest);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestRemoveGroupOwner = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.removeOwner(body.interest);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestAddGroupShares = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.addShares(body.interest);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestRemoveGroupShares = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isCharacterOwner(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.removeShares(body.interest);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestJoinGroup = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character && dataObject.isInterestForCharacter(character))
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+
+         state.addMember(character);
+      }
+   };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestLeaveGroup = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
 
       if (character)
       {
-         var characterId = character.getCharacterId();
-         var state = this.ensureGroupDataProcessingState(body.groupId);
+         var state = this.dataStatesById[dataObject.getDocumentId()];
 
-         state.processBroadcast(characterId, header, body);
+         state.removeMember(character);
       }
-   };
-
-   this.ensureGroupDataProcessingState = function(groupId)
-   {
-      var state = this.groupDataProcessingStatesById[groupId];
-
-      if (!state)
-      {
-         state = new PendingGroupDataProcessingState(this, groupId);
-         state.activate();
-      }
-
-      return state;
-   };
-
-   /**
-    * Process client request
-    */
-   this.processClientRequestDestroyGroup = function(group, characterId, body)
-   {
-      var character = this.characterAgent.getCharacterById(characterId);
-
-      if (character && group.allowsControllingActionsFrom(character))
-      {
-         logger.info('Character ' + character.toString() + ' destroys group ' + group.toString());
-
-         this.broadcastGroupMembersRemoved(group, group.getMembers());
-         this.broadcastGroupAdvertisements(group, false);
-
-         this.destroyGroup(group);
-      }
-   };
-
-   /**
-    * Process client request
-    */
-   this.processClientRequestLeaveGroup = function(group, characterId, body)
-   {
-      var character = this.characterAgent.getCharacterById(characterId);
-
-      if (character && group.removeMember(characterId))
-      {
-         logger.info('Character ' + character.toString() + ' leaves group ' + group.toString());
-         this.broadcastGroupMembersRemoved(group, [ characterId ]);
-         this.handleGroupDataChange(group);
-      }
-   };
-
-   /**
-    * Process client request
-    */
-   this.processClientRequestJoinGroup = function(group, characterId, body)
-   {
-      var character = this.characterAgent.getCharacterById(characterId);
-
-      if (character && group.isCharacterInvited(character) && group.addMember(characterId))
-      {
-         logger.info('Character ' + character.toString() + ' joins group ' + group.toString());
-         group.saveToStorage(this.mongodb);
-         this.broadcastGroupMembersAdded(group, [ characterId ]);
-         this.broadcastGroupAdvertisementList(group, [
-         {
-            scope: 'Character',
-            id: characterId
-         } ]);
-      }
-   };
-
-   /**
-    * Process client request
-    */
-   this.processClientRequestAdvertiseGroup = function(group, characterId, body)
-   {
-      var character = this.characterAgent.getCharacterById(characterId);
-
-      if (character && group.allowsControllingActionsFrom(character))
-      {
-         var change = false;
-
-         body.interest.forEach(function(interest)
-         {
-            if (group.addAdvertisement(interest.scope, interest.id))
-            {
-               change = true;
-            }
-         });
-         if (change)
-         {
-            group.saveToStorage(this.mongodb);
-            this.broadcastGroupAdvertisementList(group);
-            this.broadcastGroupAdvertisements(group, true);
-         }
-      }
-   };
-
-   /**
-    * Process client request
-    */
-   this.processClientRequestRemoveGroupAdvertisements = function(group, characterId, body)
-   {
-      var character = this.characterAgent.getCharacterById(characterId);
-
-      if (character && group.allowsControllingActionsFrom(character))
-      {
-         var removedInterest = [];
-
-         body.interest.forEach(function(interest)
-         {
-            if (group.removeAdvertisement(interest.scope, interest.id))
-            {
-               removedInterest.push(interest);
-            }
-         });
-         if (removedInterest.length > 0)
-         {
-            this.broadcastGroupAdvertisements(group, false, removedInterest);
-            if (this.handleGroupDataChange(group))
-            {
-               this.broadcastGroupAdvertisementList(group);
-            }
-         }
-      }
-   };
-
-   /**
-    * Handles group data change that possibly can delete the group
-    */
-   this.handleGroupDataChange = function(group)
-   {
-      var rCode = false;
-
-      if (group.isEmpty())
-      {
-         logger.info('Group ' + group.toString() + ' became empty, destroying');
-         this.destroyGroup(group);
-      }
-      else
-      {
-         group.saveToStorage(this.mongodb);
-         rCode = true;
-      }
-
-      return rCode;
-   };
-
-   /**
-    * Destroys given group, performs cleanup tasks
-    */
-   this.destroyGroup = function(group)
-   {
-      group.deleteFromStorage(this.mongodb);
-      delete this.groupDataProcessingStatesById[group.getId()];
-      this.broadcastGroupDestroyed(group.getId());
-   };
-
-   /**
-    * Broadcasts destroyed status of a group
-    * 
-    * @param groupId the ID of the group
-    */
-   this.broadcastGroupDestroyed = function(groupId)
-   {
-      var header =
-      {
-         type: busMessages.Broadcasts.GroupDestroyed.name,
-      };
-      var body =
-      {
-         groupId: groupId
-      };
-
-      this.amqp.broadcast(header, body);
-   };
-
-   /**
-    * Broadcasts all current group data
-    * 
-    * @param group the group to broadcast data about
-    */
-   this.broadcastGroupData = function(group)
-   {
-      this.broadcastGroupAdvertisements(group, true);
-      this.broadcastGroupMembersAdded(group, group.getMembers());
-      this.broadcastGroupAdvertisementList(group);
-   };
-
-   /**
-    * Broadcast membership message for added members
-    * 
-    * @param group the Group object
-    * @param members the list of members to send
-    * @param interest the interest for the broadcast message. if not given, the groups interest will be used
-    * @param queueName optional specific queue name to send to
-    */
-   this.broadcastGroupMembersAdded = function(group, members, interest, queueName)
-   {
-      var header =
-      {
-         type: busMessages.Broadcasts.GroupMembership.name,
-         interest: interest || group.getInterest()
-      };
-      var body =
-      {
-         groupId: group.getId(),
-         added:
-         {
-            groupData: group.getGroupData(),
-            members: members
-         }
-      };
-
-      this.amqp.broadcast(header, body, queueName);
-   };
-
-   /**
-    * Broadcast membership message for removed members
-    * 
-    * @param group the Group object
-    * @param members the list of members to send
-    * @param interest the interest for the broadcast message. if not given, the groups interest will be used
-    * @param queueName optional specific queue name to send to
-    */
-   this.broadcastGroupMembersRemoved = function(group, members, interest, queueName)
-   {
-      var header =
-      {
-         type: busMessages.Broadcasts.GroupMembership.name,
-         interest: interest || group.getInterest()
-      };
-      var body =
-      {
-         groupId: group.getId(),
-         removed:
-         {
-            members: members
-         }
-      };
-
-      this.amqp.broadcast(header, body, queueName);
-   };
-
-   this.broadcastGroupAdvertisements = function(group, invited, interest, queueName)
-   {
-      var header =
-      {
-         type: busMessages.Broadcasts.GroupAdvertisement.name,
-         interest: interest || group.getAdvertisementInterest()
-      };
-      var body =
-      {
-         groupId: group.getId()
-      };
-      if (invited)
-      {
-         body.groupData = group.getGroupData();
-      }
-
-      this.amqp.broadcast(header, body, queueName);
-   };
-
-   this.broadcastGroupAdvertisementList = function(group, interest, queueName)
-   {
-      var header =
-      {
-         type: busMessages.Broadcasts.GroupAdvertisementList.name,
-         interest: interest || group.getInterest()
-      };
-      var body =
-      {
-         groupId: group.getId(),
-         interest: group.getAdvertisementInterest()
-      };
-
-      this.amqp.broadcast(header, body, queueName);
    };
 }
-util.inherits(GroupServiceComponent, Component);
+util.inherits(GroupServiceComponent, AbstractSharingComponent);
 
 module.exports = GroupServiceComponent;

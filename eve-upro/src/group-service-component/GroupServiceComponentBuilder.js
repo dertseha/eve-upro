@@ -3,8 +3,6 @@ var util = require('util');
 var ComponentBuilder = require('../components/ComponentBuilder.js');
 var GroupServiceComponent = require('./GroupServiceComponent.js');
 
-var Group = require('./Group.js');
-
 function GroupServiceComponentBuilder()
 {
    GroupServiceComponentBuilder.super_.call(this);
@@ -24,7 +22,7 @@ function GroupServiceComponentBuilder()
    /** {@inheritDoc} */
    this.getInstance = function(services)
    {
-      return new GroupServiceComponent(services, Group);
+      return new GroupServiceComponent(services);
    };
 }
 util.inherits(GroupServiceComponentBuilder, ComponentBuilder);

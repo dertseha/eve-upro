@@ -1,9 +1,17 @@
-Group = require('../../group-service-component/Group.js');
+var UuidFactory = require('../../util/UuidFactory.js');
+
+GroupDataObject = require('../../group-service-component/GroupDataObject.js');
 Character = require('../../character-agent-component/Character.js');
 
 function Fixture()
 {
-   this.group = Group.create('TestGroup');
+   this.group = new GroupDataObject(UuidFactory.v4(),
+   {
+      group:
+      {
+         name: "TestGroup"
+      }
+   });
 
    this.givenGroupHasMembers = function(members)
    {
@@ -17,12 +25,12 @@ function Fixture()
 
    this.whenGroupHasOwner = function(owner)
    {
-      this.group.groupData.owner = owner;
+      this.group.owner.listCharacter = owner;
    };
 
    this.whenMemberWasRemoved = function(characterId)
    {
-      this.group.removeMember(characterId);
+      this.group.removeMember(new Character(characterId));
    };
 
    this.thenMemberListShouldBe = function(test, expected)
@@ -32,21 +40,21 @@ function Fixture()
 
    this.thenHasMemberShouldReturn = function(test, characterId, expected)
    {
-      var result = this.group.hasMember(characterId);
+      var result = this.group.isCharacterMember(new Character(characterId));
 
       test.equal(result, expected);
    };
 
    this.thenAddMemberShouldReturn = function(test, characterId, expected)
    {
-      var result = this.group.addMember(characterId);
+      var result = this.group.addMember(new Character(characterId));
 
       test.equal(result, expected);
    };
 
    this.thenRemoveMemberShouldReturn = function(test, characterId, expected)
    {
-      var result = this.group.removeMember(characterId);
+      var result = this.group.removeMember(new Character(characterId));
 
       test.equal(result, expected);
    };

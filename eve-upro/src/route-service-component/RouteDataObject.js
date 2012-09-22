@@ -72,4 +72,6 @@ RouteDataObject.isDocumentValid = function(data)
    return AbstractDataObject.isDocumentValid(data) && RouteDataObject.isSpecificDataValid(data.route);
 };
 
+RouteDataObject.addIndexDefinitions = AbstractDataObject.addIndexDefinitions;
+
 module.exports = RouteDataObject;

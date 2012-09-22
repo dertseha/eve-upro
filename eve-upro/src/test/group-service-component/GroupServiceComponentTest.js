@@ -5,9 +5,10 @@ var UuidFactory = require("../../util/UuidFactory.js");
 var busMessages = require('../../model/BusMessages.js');
 var CharacterAgentComponent = require('../../character-agent-component/CharacterAgentComponent.js');
 var GroupServiceComponent = require('../../group-service-component/GroupServiceComponent.js');
-var Group = require('../../group-service-component/Group.js');
+var GroupDataObject = require('../../group-service-component/GroupDataObject.js');
 
-var ActiveGroupDataProcessingState = require('../../group-service-component/ActiveGroupDataProcessingState.js');
+var AbstractDataObject = require('../../abstract-sharing-component/AbstractDataObject.js');
+var ActiveDataState = require('../../abstract-sharing-component/ActiveDataState.js');
 
 var AbstractServiceComponentFixture = require('../TestSupport/AbstractServiceComponentFixture.js');
 
@@ -20,7 +21,7 @@ function Fixture()
       amqp: this.amqp,
       mongodb: this.mongodb,
       'character-agent': this.characterAgent
-   }, Group);
+   });
 
    this.initCharacterServiceData = function(character)
    {
@@ -29,28 +30,41 @@ function Fixture()
 
    this.givenExistingGroupWithMembers = function(id, name, members)
    {
-      var group = new Group(id,
+      var initData =
       {
-         name: name,
+         owner: AbstractDataObject.createMemberList({}),
+         shares: AbstractDataObject.createMemberList({}),
+         group:
+         {
+            name: name
+         },
          members: members
-      });
+      };
+      var group = new GroupDataObject(id, initData);
 
-      this.groupService.setGroupDataProcessingState(group.getId(), new ActiveGroupDataProcessingState(
-            this.groupService, group));
+      this.groupService.setDataState(group.getDocumentId(), this.groupService.getDataStateFactory()
+            .createActiveDataState(group));
+   };
+
+   this.givenGroupHasOwner = function(id, scope, ids)
+   {
+      var group = this.groupService.dataStatesById[id].dataObject;
+
+      group.owner['list' + scope] = ids;
    };
 
    this.givenGroupHasAdsForCharacters = function(id, characterIds)
    {
-      var group = this.groupService.groupDataProcessingStatesById[id].group;
+      var group = this.groupService.dataStatesById[id].dataObject;
 
-      group.adCharacter = characterIds;
+      group.shares.listCharacter = characterIds;
    };
 
    this.givenGroupHasAdsForCorporations = function(id, corporationIds)
    {
-      var group = this.groupService.groupDataProcessingStatesById[id].group;
+      var group = this.groupService.dataStatesById[id].dataObject;
 
-      group.adCorporation = corporationIds;
+      group.shares.listCorporation = corporationIds;
    };
 
    this.givenExistingGroupWithMembersInDatabase = function(id, name, members)
@@ -60,30 +74,33 @@ function Fixture()
          _id: UuidFactory.toMongoId(id),
          data:
          {
-            name: name,
-            owner: [],
-            members: members,
-            adCharacter: [],
-            adCorporation: []
+            owner: AbstractDataObject.createMemberList({}),
+            shares: AbstractDataObject.createMemberList(
+            {
+               listCharacter: members
+            }),
+            group:
+            {
+               name: name
+            },
+            members: members
          }
       };
 
-      this.givenStorageReturnsDataDelayed(Group.CollectionName, [ document ]);
+      this.givenStorageReturnsDataDelayed(GroupDataObject.CollectionName, [ document ]);
    };
 
    this.getExistingGroup = function()
    {
       var group = null;
 
-      for ( var groupId in this.groupService.groupDataProcessingStatesById)
+      this.groupService.forEachDataState(function(state)
       {
-         var state = this.groupService.groupDataProcessingStatesById[groupId];
-
-         if (state instanceof ActiveGroupDataProcessingState)
+         if (state instanceof ActiveDataState)
          {
-            group = state.group;
+            group = state.dataObject;
          }
-      }
+      });
 
       return group;
    };
@@ -92,7 +109,10 @@ function Fixture()
    {
       this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestCreateGroup.name, sessionId,
       {
-         name: name
+         data:
+         {
+            name: name
+         }
       });
    };
 
@@ -100,7 +120,7 @@ function Fixture()
    {
       this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestDestroyGroup.name, sessionId,
       {
-         groupId: groupId
+         id: groupId
       });
    };
 
@@ -108,7 +128,7 @@ function Fixture()
    {
       this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestLeaveGroup.name, sessionId,
       {
-         groupId: groupId
+         id: groupId
       });
    };
 
@@ -116,15 +136,15 @@ function Fixture()
    {
       this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestJoinGroup.name, sessionId,
       {
-         groupId: groupId
+         id: groupId
       });
    };
 
    this.whenBroadcastAdvertiseGroupIsReceived = function(sessionId, groupId, interest)
    {
-      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestAdvertiseGroup.name, sessionId,
+      this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestAddGroupShares.name, sessionId,
       {
-         groupId: groupId,
+         id: groupId,
          interest: interest
       });
    };
@@ -156,17 +176,16 @@ exports.testGroupMembershipEmitted_WhenCreateGroupRequested = function(test)
 
    this.fixture.whenBroadcastCreateGroupIsReceived(sessionId, groupName);
 
-   groupId = this.fixture.getExistingGroup().getId();
+   groupId = this.fixture.getExistingGroup().getDocumentId();
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,
    {
       groupId: groupId,
+      removed:
+      {
+         members: []
+      },
       added:
       {
-         groupData:
-         {
-            name: groupName,
-            owner: [ charId ]
-         },
          members: [ charId ]
       }
    });
@@ -193,6 +212,10 @@ exports.testGroupMembershipEmitted_WhenLeaveGroupRequested = function(test)
       removed:
       {
          members: [ charId ]
+      },
+      added:
+      {
+         members: []
       }
    });
 
@@ -212,9 +235,10 @@ exports.testGroupMembershipEmitted_WhenLeaveGroupRequestedOnLoadedData = functio
 
    this.fixture.whenBroadcastLeaveGroupIsReceived(sessionId, groupId);
 
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID member query
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID ad query
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the data query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the ID member query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the ID ad query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the data query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the data query
 
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,
    {
@@ -222,6 +246,10 @@ exports.testGroupMembershipEmitted_WhenLeaveGroupRequestedOnLoadedData = functio
       removed:
       {
          members: [ charId ]
+      },
+      added:
+      {
+         members: []
       }
    });
 
@@ -247,12 +275,11 @@ exports.testGroupMembershipEmitted_WhenJoinGroupRequestedWithCharAdvert = functi
       groupId: groupId,
       added:
       {
-         groupData:
-         {
-            name: groupName,
-            owner: []
-         },
          members: [ charId ]
+      },
+      removed:
+      {
+         members: []
       }
    });
 
@@ -279,12 +306,11 @@ exports.testGroupMembershipEmitted_WhenJoinGroupRequestedWithCorpAdvert = functi
       groupId: groupId,
       added:
       {
-         groupData:
-         {
-            name: groupName,
-            owner: []
-         },
          members: [ charId ]
+      },
+      removed:
+      {
+         members: []
       }
    });
 
@@ -301,7 +327,8 @@ exports.testGroupAdvertisementEmitted_WhenAdvertisementRequestedForChar = functi
    var groupId = UuidFactory.v4();
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
-   this.fixture.givenExistingGroupWithMembers(groupId, groupName, [ 1234 ]);
+   this.fixture.givenExistingGroupWithMembers(groupId, groupName, [ charId ]);
+   this.fixture.givenGroupHasOwner(groupId, 'Character', [ charId ]);
 
    this.fixture.whenBroadcastAdvertiseGroupIsReceived(sessionId, groupId, [
    {
@@ -309,18 +336,18 @@ exports.testGroupAdvertisementEmitted_WhenAdvertisementRequestedForChar = functi
       id: newCharId
    } ]);
 
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupAdvertisement.name,
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupShares.name,
    {
-      groupId: groupId,
-      groupData:
+      id: groupId,
+      interest: [
       {
-         name: groupName,
-         owner: []
-      }
+         scope: 'Character',
+         id: newCharId
+      } ]
    }, [
    {
       scope: 'Character',
-      id: newCharId
+      id: charId
    } ]);
 
    test.expect(2);
@@ -340,13 +367,12 @@ exports.testGroupAdvertisementEmitted_WhenSessionEstablishedWithAdOfExistingGrou
 
    this.fixture.whenClientConnected(newCharId, sessionId, responseQueue);
 
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupAdvertisement.name,
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupInfo.name,
    {
-      groupId: groupId,
-      groupData:
+      id: groupId,
+      data:
       {
-         name: groupName,
-         owner: []
+         name: groupName
       }
    }, [
    {
@@ -358,7 +384,7 @@ exports.testGroupAdvertisementEmitted_WhenSessionEstablishedWithAdOfExistingGrou
    test.done();
 };
 
-exports.testGroupMembershipEmitted_WhenSessionEstablishedAsMemberOfExistingGroup = function(test)
+exports.testGroupMembershipRevoked_WhenSessionEstablishedAsNonMemberOfExistingGroup = function(test)
 {
    var charId = 5566;
    var sessionId = UuidFactory.v4();
@@ -375,12 +401,46 @@ exports.testGroupMembershipEmitted_WhenSessionEstablishedAsMemberOfExistingGroup
       groupId: groupId,
       added:
       {
-         groupData:
-         {
-            name: groupName,
-            owner: []
-         },
+         members: []
+      },
+      removed:
+      {
+         members: [ charId ]
+      }
+   }, [
+   {
+      scope: 'Group',
+      id: groupId
+   } ]);
+
+   test.expect(2);
+   test.done();
+};
+
+exports.testGroupMembershipEmitted_WhenSessionEstablishedAsMemberOfExistingGroup = function(test)
+{
+   var charId = 5566;
+   var sessionId = UuidFactory.v4();
+   var responseQueue = 'queue';
+   var groupName = 'TestGroup';
+   var groupId = UuidFactory.v4();
+
+   this.fixture.givenExistingCharacterSession(charId, UuidFactory.v4());
+   this.fixture.givenCharacterIsMemberOfGroups(charId, [ groupId ]);
+   this.fixture.givenExistingGroupWithMembers(groupId, groupName, [ charId, 1122, 3344 ]);
+
+   this.fixture.whenClientConnected(charId, sessionId, responseQueue);
+
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,
+   {
+      groupId: groupId,
+      added:
+      {
          members: [ charId, 1122, 3344 ]
+      },
+      removed:
+      {
+         members: []
       }
    }, [
    {
@@ -402,20 +462,20 @@ exports.testGroupMembershipEmitted_WhenCharacterOnlineAsMemberOfLoadedGroup = fu
    this.fixture.givenExistingGroupWithMembersInDatabase(groupId, groupName, [ charId ]);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID member query
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the ID ad query
-   this.fixture.whenStorageReturnsData(Group.CollectionName); // the data query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the ID member query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the ID ad query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the data query
+   this.fixture.whenStorageReturnsData(GroupDataObject.CollectionName); // the data query
 
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,
    {
       groupId: groupId,
+      removed:
+      {
+         members: []
+      },
       added:
       {
-         groupData:
-         {
-            name: groupName,
-            owner: []
-         },
          members: [ charId ]
       }
    }, [
@@ -437,16 +497,13 @@ exports.testGroupMembershipEmitted_WhenDestroyGroupRequested = function(test)
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
    this.fixture.givenExistingGroupWithMembers(groupId, groupName, [ 1234, 5678 ]);
+   this.fixture.givenGroupHasOwner(groupId, 'Character', [ charId ]);
 
    this.fixture.whenBroadcastDestroyGroupIsReceived(sessionId, groupId);
 
-   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupMembership.name,
+   this.fixture.thenTheLastBroadcastShouldHaveBeen(test, busMessages.Broadcasts.GroupInfo.name,
    {
-      groupId: groupId,
-      removed:
-      {
-         members: [ 1234, 5678 ]
-      }
+      id: groupId
    });
 
    test.expect(1);

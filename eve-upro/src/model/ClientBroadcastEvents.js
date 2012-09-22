@@ -261,6 +261,38 @@
       },
 
       /**
+       * Informs about the current state of a group. If the 'data' field is missing, the group is destroyed
+       */
+      GroupInfo:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema,
+               '?data': context.commonSchemata.groupSchema
+            },
+            isValid: null
+         }
+      },
+
+      GroupOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      GroupShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      /**
        * Notifies the list of added or removed members of a group. When members are added, the group data is also
        * transmitted to allow new members to know about the group.
        */
@@ -275,50 +307,12 @@
                groupId: context.commonSchemata.groupIdType,
                '?added':
                {
-                  groupData: groupDataSchema,
                   members: Array.of(groupMemberSchema)
                },
                '?removed':
                {
                   members: Array.of(groupMemberSchema)
                }
-            },
-            isValid: null
-         }
-      },
-
-      /**
-       * Notifies the current list of advertisements
-       */
-      GroupAdvertisementList:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               groupId: context.commonSchemata.groupIdType,
-               interest: Array.of(context.commonSchemata.groupAdvertisementInterestSchema)
-            },
-            isValid: null
-         }
-      },
-
-      /**
-       * Notifies the advertisement of a group. If the optional group data is absent, the advertisement is revoked for
-       * the receiver.
-       */
-      GroupAdvertisement:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               groupId: context.commonSchemata.groupIdType,
-               '?groupData': groupDataSchema
             },
             isValid: null
          }

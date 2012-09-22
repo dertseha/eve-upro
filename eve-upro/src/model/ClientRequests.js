@@ -230,6 +230,86 @@
       },
 
       /**
+       * Creates a new group
+       */
+      CreateGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               data: context.commonSchemata.groupSchema
+            },
+            isValid: null
+         }
+      },
+
+      DestroyGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema
+            },
+            isValid: null
+         }
+      },
+
+      /**
+       * Updates a group
+       */
+      UpdateGroup:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.uuidSchema,
+               data:
+               {
+                  '?name': String
+               }
+            },
+            isValid: null
+         }
+      },
+
+      AddGroupOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RemoveGroupOwner:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      AddGroupShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      RemoveGroupShares:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      /**
        * Leave a group of which the sender is a member
        */
       LeaveGroup:
@@ -240,7 +320,7 @@
          {
             schema:
             {
-               groupId: context.commonSchemata.groupIdType
+               id: context.commonSchemata.groupIdType
             },
             isValid: null
          }
@@ -257,77 +337,7 @@
          {
             schema:
             {
-               groupId: context.commonSchemata.groupIdType
-            },
-            isValid: null
-         }
-      },
-
-      /**
-       * Create a new group
-       */
-      CreateGroup:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               name: String
-            },
-            isValid: null
-         }
-      },
-
-      /**
-       * Destroy a group
-       */
-      DestroyGroup:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               groupId: context.commonSchemata.groupIdType
-            },
-            isValid: null
-         }
-      },
-
-      /**
-       * Add advertisements for a group (invite others to the group)
-       */
-      AdvertiseGroup:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               groupId: context.commonSchemata.groupIdType,
-               interest: Array.of(context.commonSchemata.groupAdvertisementInterestSchema)
-            },
-            isValid: null
-         }
-      },
-
-      /**
-       * Remove advertisements for a group (revoke invitations)
-       */
-      RemoveGroupAdvertisements:
-      {
-         name: 0,
-         header: getStandardHeaderDefinition(),
-         body:
-         {
-            schema:
-            {
-               groupId: context.commonSchemata.groupIdType,
-               interest: Array.of(context.commonSchemata.groupAdvertisementInterestSchema)
+               id: context.commonSchemata.groupIdType
             },
             isValid: null
          }
@@ -363,7 +373,6 @@
          {
             schema:
             {
-               '?id': context.commonSchemata.uuidSchema,
                data: context.commonSchemata.jumpCorridorSchema
             },
             isValid: null
@@ -461,7 +470,6 @@
          {
             schema:
             {
-               '?id': context.commonSchemata.uuidSchema,
                data: context.commonSchemata.routeSchema
             },
             isValid: null

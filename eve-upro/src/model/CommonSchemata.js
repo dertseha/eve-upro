@@ -18,16 +18,10 @@
    };
 
    context.namespace.groupIdType = context.namespace.uuidSchema;
-   context.namespace.groupOwnerSchema = Array.of(Number);
-   context.namespace.groupAdvertisementInterestSchema = [
+   context.namespace.groupSchema =
    {
-      scope: 'Character',
-      id: Number
-   },
-   {
-      scope: 'Corporation',
-      id: Number
-   } ];
+      name: String
+   };
 
    context.namespace.sharingInterestSchema = [
    {

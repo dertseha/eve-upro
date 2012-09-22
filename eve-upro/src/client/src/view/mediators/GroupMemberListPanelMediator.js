@@ -118,9 +118,14 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
 
          group.forEachMember(function(characterId)
          {
+            var interest =
+            {
+               scope: "Character",
+               id: characterId
+            };
             var listEntry =
             {
-               isOwner: group.isCharacterAllowedControl(characterId),
+               isOwner: group.isInterestAllowedControl(interest),
                bodyName: bodyRegisterProxy.getBodyName("Character", characterId)
             };
 

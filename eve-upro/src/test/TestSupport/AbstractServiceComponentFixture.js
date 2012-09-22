@@ -46,7 +46,7 @@ function AbstractServiceComponentFixture()
 
       this.defineCollection = function(name, indexDef, callback)
       {
-         callback();
+         process.nextTick(callback);
       };
       this.getData = function(collectionName, filter, callback)
       {

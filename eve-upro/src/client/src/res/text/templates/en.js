@@ -139,7 +139,7 @@ upro.res.text.templates["en"] =
    /** Groups menu label (edit) */
    "groupEdit.menuLabel": "Groups",
    /** edit panel */
-   "panels.group.edit.menuLabel": "Edit Group Invitations",
+   "panels.group.interest.menuLabel": "Group Sharing Controls",
    /** Join a group command */
    "panels.group.edit.join": "Join",
    /** Leave a group command */

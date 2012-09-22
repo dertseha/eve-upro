@@ -123,12 +123,12 @@ exports.sourceFiles = [];
    'model/LocationTracker.js', //
    'model/LocationStatusGroupInfo.js', //
    'model/UserRoutingRule.js', //
-   'model/GroupInfo.js', //
    'model/AbstractBodyName.js', //
    'model/UnknownBodyName.js', //
    'model/ResolvedBodyName.js', //
    'model/InterestChecker.js', //
    'model/AbstractSharedObjectInfo.js', //
+   'model/GroupInfo.js', //
    'model/JumpCorridorInfo.js', //
    'model/AbstractActiveRouteSegment.js', //
    'model/ActiveRouteHeadSegment.js', //
@@ -251,7 +251,6 @@ exports.sourceFiles = [];
    'view/mediators/SessionPanelMediator.js', //
    'view/mediators/GroupListPanelMediator.js', //
    'view/mediators/GroupMemberListPanelMediator.js', //
-   'view/mediators/GroupEditPanelMediator.js', //
    'view/mediators/CurrentLocationPanelMediator.js', //
    'view/mediators/CurrentLocationListPanelMediator.js', //
    'view/mediators/JumpCorridorSceneMediator.js', //
@@ -260,6 +259,7 @@ exports.sourceFiles = [];
    'view/mediators/AbstractSharingPanelMediator.js', //
    'view/mediators/SharedObjectInterestPanelMediator.js', //
    'view/mediators/RouteListPanelMediator.js', //
+   'view/mediators/GroupInterestPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

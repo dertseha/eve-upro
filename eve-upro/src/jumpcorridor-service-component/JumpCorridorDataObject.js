@@ -72,4 +72,6 @@ JumpCorridorDataObject.isDocumentValid = function(data)
    return AbstractDataObject.isDocumentValid(data) && JumpCorridorDataObject.isSpecificDataValid(data.jumpCorridor);
 };
 
+JumpCorridorDataObject.addIndexDefinitions = AbstractDataObject.addIndexDefinitions;
+
 module.exports = JumpCorridorDataObject;

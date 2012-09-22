@@ -565,5 +565,3 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
    }
 
 });
-
-upro.view.mediators.GroupEditPanelMediator.NAME = "GroupEditPanel";

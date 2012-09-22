@@ -56,7 +56,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.showBaseView("swCtrl", "debug"); // for now, always show debugging output
       uiMediator.showBaseView("wList", "autopilotRoute");
       uiMediator.showBaseView("eList", "groupList");
-      uiMediator.showBaseView("seCtrl", "groupEdit");
+      uiMediator.showBaseView("seCtrl", "groupInterest");
       uiMediator.showBaseView("nwCtrl", "currentLocation");
       uiMediator.showBaseView("neCtrl", "sharedObjectInterest");
    },
@@ -180,8 +180,8 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       uiMediator.setSubMenu(panelId, "groupEdit", 1, upro.res.menu.IconData.Group, upro.res.text.Lang
             .format("groupEdit.menuLabel"));
 
-      this.facade()
-            .registerMediator(new upro.view.mediators.GroupEditPanelMediator(panelId, panelId + ".groupEdit", 1));
+      this.facade().registerMediator(
+            new upro.view.mediators.GroupInterestPanelMediator(panelId, panelId + ".groupEdit", 1));
    },
 
    setupSharedObjectMenu: function(uiMediator)

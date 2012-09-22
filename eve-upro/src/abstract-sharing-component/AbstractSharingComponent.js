@@ -9,7 +9,7 @@ var busMessages = require('../model/BusMessages.js');
 
 var AbstractDataObject = require('./AbstractDataObject.js');
 var StandardDataBroadcaster = require('./StandardDataBroadcaster.js');
-var LoadingDataState = require('./LoadingDataState.js');
+var DataStateFactory = require('./DataStateFactory.js');
 
 function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 {
@@ -22,6 +22,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
    this.dataStatesById = {};
    this.dataObjectConstructor = dataObjectConstructor;
    this.broadcaster = new StandardDataBroadcaster(this.amqp, dataBaseName);
+   this.dataStateFactory = new DataStateFactory(this);
 
    /** {@inheritDoc} */
    this.start = function()
@@ -36,18 +37,25 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 
       this.registerBroadcastHandler(busMessages.Broadcasts.GroupDestroyed.name);
 
-      var index = [];
-
-      AbstractDataObject.Scopes.forEach(function(scope)
-      {
-         index.push('data.owner.list' + scope);
-         index.push('data.shares.list' + scope);
-      });
+      var index = dataObjectConstructor.addIndexDefinitions([]);
 
       this.mongodb.defineCollection(this.dataObjectConstructor.CollectionName, index, function()
       {
          self.onStarted();
       });
+   };
+
+   /**
+    * Iterates through all existing data states and calls given callback
+    */
+   this.forEachDataState = function(callback)
+   {
+      for ( var documentId in this.dataStatesById)
+      {
+         var state = this.dataStatesById[documentId];
+
+         callback(state);
+      }
    };
 
    this.registerCharacterHandler = function(eventName, infix)
@@ -136,7 +144,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 
       if (!state)
       {
-         state = new LoadingDataState(this, this.dataObjectConstructor, documentId);
+         state = this.getDataStateFactory().createLoadingDataState(documentId);
          state.activate();
       }
 
@@ -176,12 +184,10 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
          id: sessionId
       } ];
 
-      for ( var documentId in this.dataStatesById)
+      this.forEachDataState(function(state)
       {
-         var state = this.dataStatesById[documentId];
-
          state.onCharacterSessionAdded(character, interest, responseQueue);
-      }
+      });
    };
 
    /**
@@ -205,12 +211,10 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 
       this.searchObjects('Group', groupId);
 
-      for ( var documentId in this.dataStatesById)
+      this.forEachDataState(function(state)
       {
-         var state = this.dataStatesById[documentId];
-
          state.onCharacterGroupMemberAdded(groupId, interest);
-      }
+      });
    };
 
    /**
@@ -224,12 +228,10 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
          id: character.getCharacterId()
       } ];
 
-      for ( var documentId in this.dataStatesById)
+      this.forEachDataState(function(state)
       {
-         var state = this.dataStatesById[documentId];
-
          state.onCharacterGroupMemberRemoved(character, groupId, interest);
-      }
+      });
    };
 
    this.searchObjects = function(scope, id)
@@ -284,11 +286,35 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
    };
 
    /**
+    * Sets the broadcaster to use
+    */
+   this.setBroadcaster = function(broadcaster)
+   {
+      this.broadcaster = broadcaster;
+   };
+
+   /**
     * @returns a new instance of a data object
     */
    this.createDataObject = function(documentId, initData)
    {
       return new this.dataObjectConstructor(documentId, initData);
+   };
+
+   /**
+    * @returns a factory for data states
+    */
+   this.getDataStateFactory = function()
+   {
+      return this.dataStateFactory;
+   };
+
+   /**
+    * sets the data state factory to use
+    */
+   this.setDataStateFactory = function(factory)
+   {
+      this.dataStateFactory = factory;
    };
 }
 util.inherits(AbstractSharingComponent, Component);

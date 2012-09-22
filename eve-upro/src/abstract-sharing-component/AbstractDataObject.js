@@ -48,6 +48,16 @@ function AbstractDataObject(documentId, initData)
       return rCode;
    };
 
+   this.forEachOwnerList = function(callback)
+   {
+      var memberLists = this.owner;
+
+      AbstractDataObject.Scopes.forEach(function(scope)
+      {
+         callback(scope, memberLists['list' + scope]);
+      });
+   };
+
    /**
     * @returns true if the given character is an owner of the object
     */
@@ -327,5 +337,16 @@ AbstractDataObject.DocumentSchema =
    shares: AbstractDataObject.BodyListSchema
 };
 AbstractDataObject.isDocumentValid = schema(AbstractDataObject.DocumentSchema);
+
+AbstractDataObject.addIndexDefinitions = function(index)
+{
+   AbstractDataObject.Scopes.forEach(function(scope)
+   {
+      index.push('data.owner.list' + scope);
+      index.push('data.shares.list' + scope);
+   });
+
+   return index;
+};
 
 module.exports = AbstractDataObject;

@@ -108,6 +108,8 @@ upro.app.Notifications =
    GroupCreateRequest: 0,
    /** notification about the change of the group list */
    GroupListChanged: 0,
+   /** notification about the change of group data */
+   GroupDataChanged: 0,
    /** List of members changed */
    GroupMemberListChanged: 0,
    /** Group selection request */
@@ -120,10 +122,6 @@ upro.app.Notifications =
    GroupLeaveRequest: 0,
    /** Group destroy request */
    GroupDestroyRequest: 0,
-   /** Group advertise request */
-   GroupAdvertiseRequest: 0,
-   /** Group remove advertisement request */
-   GroupRemoveAdvertisementRequest: 0,
 
    /** List of known characters has changed */
    KnownCharactersChanged: 0,
