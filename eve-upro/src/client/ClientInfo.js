@@ -224,6 +224,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedSetActiveRouteRequestCommand.js', //
    'control/commands/NotifiedDestroyRouteRequestCommand.js', //
    'control/commands/NotifiedActiveRouteUpdateRouteRequestCommand.js', //
+   'control/commands/NotifiedRejectSharedObjectRequestCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //

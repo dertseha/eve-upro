@@ -13,6 +13,7 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
 
       this.setActiveButton = null;
       this.destroyButton = null;
+      this.rejectButton = null;
 
       this.routeList = null;
 
@@ -47,6 +48,13 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
             anchors: 'top right width',
             text: upro.res.text.Lang.format("panels.routes.edit.destroy.command"),
             id: 'routeListPanel_destroy'
+         },
+         {
+            view: 'Button',
+            rect: (halfWidth + 2) + ' 0 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top right width',
+            text: upro.res.text.Lang.format("panels.routes.edit.reject.command"),
+            id: 'routeListPanel_reject'
          },
          {
             view: 'ScrollPane',
@@ -92,6 +100,9 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
       this.destroyButton = uki("#routeListPanel_destroy")[0];
       this.destroyButton.disabled(true);
       this.destroyButton.bind('click', this.onDestroyButton.bind(this));
+      this.rejectButton = uki("#routeListPanel_reject")[0];
+      this.rejectButton.disabled(true);
+      this.rejectButton.bind('click', this.onRejectButton.bind(this));
    },
 
    refillRouteList: function()
@@ -191,11 +202,17 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
 
          this.setActiveButton.disabled(false);
          this.destroyButton.disabled(!isController);
+         this.destroyButton.visible(isController);
+         this.rejectButton.disabled(isController);
+         this.rejectButton.visible(!isController);
       }
       else
       {
          this.setActiveButton.disabled(true);
          this.destroyButton.disabled(true);
+         this.destroyButton.visible(true);
+         this.rejectButton.disabled(true);
+         this.rejectButton.visible(false);
       }
    },
 
@@ -217,7 +234,23 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
 
          this.facade().sendNotification(upro.app.Notifications.DestroyRouteRequest, routeProxy.getSelectedInfoId());
       }
+   },
+
+   onRejectButton: function()
+   {
+      if (!this.rejectButton.disabled())
+      {
+         var routeProxy = this.facade().retrieveProxy(upro.model.proxies.RouteProxy.NAME);
+         var notifyBody =
+         {
+            objectType: "Route",
+            id: routeProxy.getSelectedInfoId()
+         };
+
+         this.facade().sendNotification(upro.app.Notifications.RejectSharedObjectRequest, notifyBody);
+      }
    }
+
 });
 
 upro.view.mediators.RouteListPanelMediator.NAME = "RouteListPanel";

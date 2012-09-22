@@ -20,6 +20,7 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
 
       this.updateButton = null;
       this.destroyButton = null;
+      this.rejectButton = null;
    },
 
    onRegister: function()
@@ -83,6 +84,13 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
                   anchors: 'left top',
                   id: 'jumpCorridorEdit_destroyButton',
                   text: upro.res.text.Lang.format("panels.jumpCorridor.edit.destroyButton")
+               },
+               {
+                  view: 'Button',
+                  rect: '100 155 ' + 100 + ' ' + 25,
+                  anchors: 'left top',
+                  id: 'jumpCorridorEdit_rejectButton',
+                  text: upro.res.text.Lang.format("panels.jumpCorridor.edit.rejectButton")
                } ]
       });
       this.uiBase.attachTo(panel);
@@ -107,6 +115,10 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
       this.destroyButton = uki('#jumpCorridorEdit_destroyButton')[0];
       this.destroyButton.bind('click', this.onDestroyButton.bind(this));
       this.destroyButton.disabled(true);
+      this.rejectButton = uki('#jumpCorridorEdit_rejectButton')[0];
+      this.rejectButton.bind('click', this.onRejectButton.bind(this));
+      this.rejectButton.disabled(true);
+      this.rejectButton.visible(false);
    },
 
    showJumpCorridor: function(jumpCorridor)
@@ -122,7 +134,10 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
          this.exitText.value(jumpCorridor.getExitSolarSystem().name);
 
          this.updateButton.disabled(!isController);
+         this.destroyButton.visible(isController);
          this.destroyButton.disabled(!isController);
+         this.rejectButton.visible(!isController);
+         this.rejectButton.disabled(isController);
       }
       else
       {
@@ -134,6 +149,9 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
 
          this.updateButton.disabled(true);
          this.destroyButton.disabled(true);
+         this.destroyButton.visible(true);
+         this.rejectButton.disabled(true);
+         this.rejectButton.visible(false);
       }
    },
 
@@ -160,6 +178,20 @@ upro.view.mediators.JumpCorridorEditPanelMediator = Class.create(upro.view.media
       if (!this.destroyButton.disabled())
       {
          this.facade().sendNotification(upro.app.Notifications.DestroyJumpCorridorRequest, this.displayedId);
+      }
+   },
+
+   onRejectButton: function()
+   {
+      if (!this.rejectButton.disabled())
+      {
+         var notifyBody =
+         {
+            objectType: "JumpCorridor",
+            id: this.displayedId
+         };
+
+         this.facade().sendNotification(upro.app.Notifications.RejectSharedObjectRequest, notifyBody);
       }
    },
 

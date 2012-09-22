@@ -13,7 +13,7 @@ var StandardDataBroadcaster = require('./StandardDataBroadcaster.js');
 var DataStateFactory = require('./DataStateFactory.js');
 var InterestFilter = require('./InterestFilter.js');
 
-function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
+function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBaseName)
 {
    AbstractSharingComponent.super_.call(this);
 
@@ -23,7 +23,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 
    this.dataStatesById = {};
    this.dataObjectConstructor = dataObjectConstructor;
-   this.broadcaster = new StandardDataBroadcaster(this.amqp, dataBaseName);
+   this.broadcaster = new StandardDataBroadcaster(this.amqp, objectTypeBaseName);
    this.dataStateFactory = new DataStateFactory(this);
 
    /** {@inheritDoc} */
@@ -38,6 +38,8 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
       this.registerCharacterHandler('CharacterGroupMemberRemoved', '');
 
       this.registerBroadcastHandler(busMessages.Broadcasts.GroupDestroyed.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.ClientRequestRejectSharedObject.name);
+      this.registerBroadcastHandler(busMessages.Broadcasts.GroupOwnerRejectsSharedDataObject.name);
 
       var index = dataObjectConstructor.addIndexDefinitions([]);
 
@@ -109,11 +111,19 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
     */
    this.onDataBroadcast = function(header, body)
    {
-      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+      var characterId = header.characterId;
 
-      if (character)
+      if (!characterId)
       {
-         var characterId = character.getCharacterId();
+         var character = this.characterAgent.getCharacterBySession(header.sessionId);
+
+         if (character)
+         {
+            characterId = character.getCharacterId();
+         }
+      }
+      if (characterId)
+      {
          var state = this.ensureDataState(body.id);
          var message =
          {
@@ -146,6 +156,22 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
 
          dataState.onGroupDestroyed(interest);
       });
+   };
+
+   this.onBroadcastClientRequestRejectSharedObject = function(header, body)
+   {
+      if (body.objectType === objectTypeBaseName)
+      {
+         this.onDataBroadcast(header, body);
+      }
+   };
+
+   this.onBroadcastGroupOwnerRejectsSharedDataObject = function(header, body)
+   {
+      if (body.objectType === objectTypeBaseName)
+      {
+         this.onDataBroadcast(header, body);
+      }
    };
 
    this.ensureDataState = function(documentId)
@@ -326,6 +352,55 @@ function AbstractSharingComponent(services, dataObjectConstructor, dataBaseName)
    {
       this.dataStateFactory = factory;
    };
+
+   /**
+    * Broadcast processor
+    */
+   this.processClientRequestRejectSharedObject = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character)
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+         var interest = [
+         {
+            scope: 'Character',
+            id: character.getCharacterId()
+         },
+         {
+            scope: 'Corporation',
+            id: character.getCorporationId()
+         } ];
+
+         logger.info('Character ' + character + ' rejects object ' + state.dataObject);
+         state.removeShares(interest);
+      }
+   };
+
+   this.processGroupOwnerRejectsSharedDataObject = function(dataObject, characterId, body)
+   {
+      var character = this.characterAgent.getCharacterById(characterId);
+
+      if (character)
+      {
+         var state = this.dataStatesById[dataObject.getDocumentId()];
+         var interest = [];
+
+         body.groups.forEach(function(groupId)
+         {
+            interest.push(
+            {
+               scope: 'Group',
+               id: groupId
+            });
+         });
+         logger.info('Character ' + character + ' rejects object ' + state.dataObject + ' through ' + interest.length
+               + ' groups as owner');
+         state.removeShares(interest);
+      }
+   };
+
 }
 util.inherits(AbstractSharingComponent, Component);
 

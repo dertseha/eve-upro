@@ -59,6 +59,23 @@ function GroupDataBroadcaster(broadcaster, dataName)
 
       this.broadcaster.broadcast(header, body, queueName);
    };
+
+   this.broadcastGroupOwnerRejectsSharedObject = function(characterId, objectType, id, groups)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupOwnerRejectsSharedDataObject.name,
+         characterId: characterId
+      };
+      var body =
+      {
+         objectType: objectType,
+         id: id,
+         groups: groups
+      };
+
+      this.broadcaster.broadcast(header, body);
+   };
 }
 util.inherits(GroupDataBroadcaster, StandardDataBroadcaster);
 

@@ -233,7 +233,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       result = '<table style="width:100%;height:100%"><tr>';
       result += '<td style="width:32px;">' + '<div style="height:32px;">' + '<img style="height:32px;" src="'
             + this.getImageForBody(data) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.bodyName.getName().escapeHTML() + '</td>';
+      result += '<td>' + data.bodyName.getName() + '</td>';
       result += '</tr></table>';
 
       return result;
@@ -248,7 +248,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
             + this.getImageForBody(data) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForOwner(data) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.bodyName.getName().escapeHTML() + '</td>';
+      result += '<td>' + data.bodyName.getName() + '</td>';
       result += '</tr></table>';
 
       return result;
@@ -431,7 +431,8 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       {
          if (that.isValidGroupForSharing(group) && regexp.test(group.getName()))
          {
-            var listEntry = that.getBodyNameBasedListEntry("Group", group);
+            var listEntry = that.getBodyNameBasedListEntry("Group", new upro.model.ResolvedBodyName(group.getId(),
+                  group.getName().escapeHTML()));
 
             data.push(listEntry);
          }
@@ -548,7 +549,7 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
 
          if (group)
          {
-            bodyName = new upro.model.ResolvedBodyName(id, group.getName());
+            bodyName = new upro.model.ResolvedBodyName(id, group.getName().escapeHTML());
          }
       }
 

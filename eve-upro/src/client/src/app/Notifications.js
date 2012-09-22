@@ -181,7 +181,10 @@ upro.app.Notifications =
    /** Data change of one of the routes */
    RouteDataChanged: 0,
    /** Request to destroy a route */
-   DestroyRouteRequest: 0
+   DestroyRouteRequest: 0,
+
+   /** Request to reject a shared object */
+   RejectSharedObjectRequest: 0
 };
 
 /**

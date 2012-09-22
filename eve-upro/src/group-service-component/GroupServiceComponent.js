@@ -22,6 +22,7 @@ function GroupServiceComponent(services)
 
    var superStart = this.start;
    var superSetDataState = this.setDataState;
+   var superOnBroadcastClientRequestRejectSharedObject = this.onBroadcastClientRequestRejectSharedObject;
 
    /** {@inheritDoc} */
    this.start = function()
@@ -140,6 +141,32 @@ function GroupServiceComponent(services)
    this.onBroadcast = function(header, body)
    {
       this.verifyGroupExistenceFromInterest(header.interest);
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastClientRequestRejectSharedObject = function(header, body)
+   {
+      var character = this.characterAgent.getCharacterBySession(header.sessionId);
+
+      superOnBroadcastClientRequestRejectSharedObject.call(this, header, body);
+
+      if (character)
+      {
+         var idList = [];
+
+         this.forEachDataState(function(state)
+         {
+            idList = state.addGroupIdIfCharacterIsOwner(idList, character);
+         });
+
+         if (idList.length > 0)
+         {
+            this.getBroadcaster().broadcastGroupOwnerRejectsSharedObject(character.getCharacterId(), body.objectType,
+                  body.id, idList);
+         }
+      }
    };
 
    this.verifyGroupExistenceFromInterest = function(interestList)

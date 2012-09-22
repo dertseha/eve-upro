@@ -185,6 +185,16 @@ upro.model.proxies.SessionControlProxy = Class.create(Proxy,
          this.facade().sendNotification(upro.app.Notifications.ActiveInGameBrowserControlChanged,
                this.activeInGameBrowserControl);
       }
+   },
+
+   rejectSharedObject: function(objectType, id)
+   {
+      upro.sys.log("Requesting to reject shared object [" + objectType + "], id " + id);
+      this.sendRequest(upro.data.clientRequests.RejectSharedObject.name,
+      {
+         objectType: objectType,
+         id: id
+      });
    }
 
 });

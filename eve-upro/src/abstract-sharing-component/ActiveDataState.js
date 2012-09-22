@@ -72,7 +72,10 @@ function ActiveDataState(owner, dataObject)
       var owner = this.getOwner();
       var handler = owner['process' + message.header.type];
 
-      handler.call(owner, this.dataObject, message.characterId, message.body);
+      if (handler)
+      {
+         handler.call(owner, this.dataObject, message.characterId, message.body);
+      }
    };
 
    /** {@inheritDoc} */

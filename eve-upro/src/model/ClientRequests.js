@@ -538,6 +538,30 @@
          name: 0,
          header: getStandardHeaderDefinition(),
          body: context.commonSchemata.getStandardSharingBodyDefinition()
+      },
+
+      /**
+       * A reject message requests that the sending user wants to remove all shares from the described object, even if
+       * not owner. Shares eligible to be removed this way:
+       * <ul>
+       * <li>specifically for the character</li>
+       * <li>for the same corporation</li>
+       * <li>for any group for which the sender is an owner</li>
+       * </ul>
+       */
+      RejectSharedObject:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               objectType: String,
+               id: context.commonSchemata.uuidSchema
+            },
+            isValid: null
+         }
       }
    };
 

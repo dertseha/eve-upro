@@ -51,6 +51,11 @@ function GroupDataStateFactory(owner)
          return false;
       };
 
+      state.addGroupIdIfCharacterIsOwner = function(list, character)
+      {
+         return list;
+      };
+
       return state;
    };
 
@@ -154,6 +159,16 @@ function GroupDataStateFactory(owner)
                owner.getBroadcaster().broadcastGroupMembership(dataObject, [], removed);
             }
          }
+      };
+
+      state.addGroupIdIfCharacterIsOwner = function(list, character)
+      {
+         if (this.dataObject.isCharacterOwner(character))
+         {
+            list.push(this.dataObject.getDocumentId());
+         }
+
+         return list;
       };
 
       return state;

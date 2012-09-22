@@ -206,6 +206,8 @@ upro.res.text.templates["en"] =
    "panels.jumpCorridor.edit.updateButton": "Update",
    /** button to destroy a jump corridor */
    "panels.jumpCorridor.edit.destroyButton": "Destroy",
+   /** button for rejecting a shared jump corridor */
+   "panels.jumpCorridor.edit.rejectButton": "Reject",
 
    /** Main menu for shared object control */
    "sharedObject.menuLabel": "Shared Object Control",
@@ -235,5 +237,7 @@ upro.res.text.templates["en"] =
    /** Set active */
    "panels.routes.edit.setActive.command": "Set Active",
    /** Destroy info */
-   "panels.routes.edit.destroy.command": "Destroy"
+   "panels.routes.edit.destroy.command": "Destroy",
+   /** Reject the shared route */
+   "panels.routes.edit.reject.command": "Reject"
 };

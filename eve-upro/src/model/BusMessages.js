@@ -147,6 +147,9 @@ var broadcasts =
       }
    },
 
+   /**
+    * Notification by the group service component if a group was destroyed
+    */
    GroupDestroyed:
    {
       name: 0,
@@ -163,6 +166,34 @@ var broadcasts =
          schema:
          {
             groupId: commonSchemata.groupIdType,
+         },
+         isValid: null
+      }
+   },
+
+   /**
+    * Notification by the group service component based on a ClientRequestRejectSharedDataObject. This message contains
+    * the original request information, augmented by the verified ownership information of groups.
+    */
+   GroupOwnerRejectsSharedDataObject:
+   {
+      name: 0,
+      header:
+      {
+         schema:
+         {
+            type: String,
+            characterId: Number
+         },
+         isValid: null
+      },
+      body:
+      {
+         schema:
+         {
+            objectType: String,
+            id: commonSchemata.uuidSchema,
+            groups: Array.of(commonSchemata.groupIdType)
          },
          isValid: null
       }
