@@ -82,7 +82,7 @@ function GroupDataStateFactory(owner)
       /** {@inheritDoc} */
       state.broadcastOwnerDataReset = function(broadcaster, interest)
       {
-         superBroadcastOwnerDataReset.call(this, interest);
+         superBroadcastOwnerDataReset.call(this, broadcaster, interest);
 
          broadcaster.broadcastGroupBannedListReset(this.dataObject, interest);
       };
@@ -96,6 +96,8 @@ function GroupDataStateFactory(owner)
 
          this.removeAllMembersWithoutInterest(false);
          broadcaster.broadcastGroupMembership(dataObject, dataObject.getMembers(), []);
+         broadcaster.broadcastGroupBannedStatus(dataObject, true, state.characterIdsToInterest(dataObject
+               .getBlackList()));
       };
 
       state.registerSyncState = function(syncState)
@@ -105,12 +107,18 @@ function GroupDataStateFactory(owner)
 
       state.onCharacterSessionAdded = function(character, interest, responseQueue)
       {
+         var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
+
          superOnCharacterSessionAdded.call(this, character, interest, responseQueue);
 
          if (dataObject.isCharacterMember(character))
          {
-            this.getOwner().getBroadcaster().broadcastGroupMembership(dataObject, dataObject.getMembers(), [],
-                  interest, responseQueue);
+            broadcaster.broadcastGroupMembership(dataObject, dataObject.getMembers(), [], interest, responseQueue);
+         }
+         if (dataObject.isCharacterBlackListed(character))
+         {
+            broadcaster.broadcastGroupBannedStatus(dataObject, true, interest, responseQueue);
          }
       };
 
@@ -124,11 +132,20 @@ function GroupDataStateFactory(owner)
       state.addMember = function(character)
       {
          var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
+         var oldMembers = dataObject.getMembers().slice(0);
 
          if (dataObject.addMember(character))
          {
+            var interest = [
+            {
+               scope: 'Character',
+               id: character.getCharacterId()
+            } ];
+
             dataObject.saveToStorage(owner.getStorage());
-            owner.getBroadcaster().broadcastGroupMembership(dataObject, [ character.getCharacterId() ], []);
+            broadcaster.broadcastGroupMembership(dataObject, oldMembers, [], interest);
+            broadcaster.broadcastGroupMembership(dataObject, [ character.getCharacterId() ], []);
          }
       };
 
@@ -208,7 +225,9 @@ function GroupDataStateFactory(owner)
             var broadcaster = owner.getBroadcaster();
 
             this.removeMembers(banned);
+            dataObject.saveToStorage(owner.getStorage());
             broadcaster.broadcastGroupBannedList(dataObject, dataObject.getOwnerInterest());
+            broadcaster.broadcastGroupBannedStatus(dataObject, true, state.characterIdsToInterest(banned));
          }
       };
 
@@ -225,8 +244,24 @@ function GroupDataStateFactory(owner)
             var owner = this.getOwner();
             var broadcaster = owner.getBroadcaster();
 
+            dataObject.saveToStorage(owner.getStorage());
             broadcaster.broadcastGroupBannedList(dataObject, dataObject.getOwnerInterest());
+            broadcaster.broadcastGroupBannedStatus(dataObject, false, state.characterIdsToInterest(unbanned));
          }
+      };
+
+      state.characterIdsToInterest = function(characterIdList)
+      {
+         return characterIdList.map(function(characterId)
+         {
+            var interest =
+            {
+               scope: 'Character',
+               id: characterId
+            };
+
+            return interest;
+         });
       };
 
       return state;

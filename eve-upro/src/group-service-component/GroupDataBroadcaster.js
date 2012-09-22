@@ -109,6 +109,22 @@ function GroupDataBroadcaster(broadcaster, dataName)
 
       this.broadcaster.broadcast(header, body);
    };
+
+   this.broadcastGroupBannedStatus = function(dataObject, banned, interest, queueName)
+   {
+      var header =
+      {
+         type: busMessages.Broadcasts.GroupBannedStatus.name,
+         interest: interest
+      };
+      var body =
+      {
+         id: dataObject.getDocumentId(),
+         banned: banned
+      };
+
+      this.broadcaster.broadcast(header, body, queueName);
+   };
 }
 util.inherits(GroupDataBroadcaster, StandardDataBroadcaster);
 

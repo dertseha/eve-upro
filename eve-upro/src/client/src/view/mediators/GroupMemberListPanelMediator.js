@@ -208,9 +208,11 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
 
    onSelectionTimer: function()
    {
+      var groupProxy = this.facade().retrieveProxy(upro.model.proxies.GroupProxy.NAME);
+      var group = groupProxy.getSelectedGroup();
       var selectionEmpty = this.memberList.selectedRows().length == 0;
 
-      this.banButton.disabled(selectionEmpty);
+      this.banButton.disabled(selectionEmpty || !group || !group.isClientAllowedControl());
    }
 });
 

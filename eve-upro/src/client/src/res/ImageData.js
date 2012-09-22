@@ -3,6 +3,17 @@ upro.res.ImageData = {};
 upro.res.ImageData.Transparent = "data:image/png;base64,"
       + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ" + "AAGvRYgsAAAAAElFTkSuQmCC";
 
+upro.res.ImageData.Check = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAVklEQVR42mNgGHLg////84H4PBDz"
+      + "k6sZBkgzBE0z3BBKNIPAfJgCfqiT5lOiGVWCGM1QReexKSBKMwFbCGsm0ZD55IY0Yc0EDJlPSWqb"
+      + "T0l6n0+XzAUAB/N36Dezi8oAAAAASUVORK5CYII=";
+
+upro.res.ImageData.Banned = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAkElEQVR42q1TWw3AIAysEyRMAlIq"
+      + "BSlImQSk4IAOkrJk0FISdkl/Cnd9cAAMICIspdw0gHMIGuqhq5HIRrvjJHKmfeSPyGblqZN3ZqVC"
+      + "qOENcQRhYY18sXhctdC4IOTDDrlDEvALctoR0GaOLG4KiGQeK0wCkusU8jV6pS8RDdd5rpzFZzw2"
+      + "0i9WPv5MJ9/5AdZ0UwbkUDcxAAAAAElFTkSuQmCC";
+
 upro.res.ImageData.SendLocation = "data:image/png;base64,"
       + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mP4jx3MZ0ADIDFsChmI"
       + "0YzPEGwG6OMxQJ8YA95jMwSq+T0uA+ajKXiPxYD3yBbAvMOA7GckQ+KxGBCP7jp84TWiAMWBSI1o"

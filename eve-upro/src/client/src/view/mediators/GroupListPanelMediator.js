@@ -128,14 +128,11 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
    getImageForMembership: function(group)
    {
-      var image = 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ'
-            + 'AAGvRYgsAAAAAElFTkSuQmCC';
+      var image = upro.res.ImageData.Transparent;
 
       if (group.isClientMember())
       {
-         image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAVklEQVR42mNgGHLg////84H4PBDz"
-               + "k6sZBkgzBE0z3BBKNIPAfJgCfqiT5lOiGVWCGM1QReexKSBKMwFbCGsm0ZD55IY0Yc0EDJlPSWqb"
-               + "T0l6n0+XzAUAB/N36Dezi8oAAAAASUVORK5CYII=";
+         image = upro.res.ImageData.Check;
       }
 
       return image;
@@ -143,14 +140,15 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
 
    getImageForOwnership: function(group)
    {
-      var image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAEklEQVR42mNgGAWjYBSMAggAAAQQ"
-            + "AAGvRYgsAAAAAElFTkSuQmCC";
+      var image = upro.res.ImageData.Transparent;
 
-      if (group.isClientAllowedControl())
+      if (group.isClientBanned())
       {
-         image = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYklEQVR42mNgwAJ+/Pjh/+vXr/t/"
-               + "/vz5D8IgNkiMgRgAUgjTiI6JMgTZZnQMkiNoAC7NMEx7Ayj2AsWBSHE0Ug0AbY3//v27PQiD2CQb"
-               + "QHLoD1MDgIE3H4TJMgCkERsbHQAAwGZIIPOJWqUAAAAASUVORK5CYII=";
+         image = upro.res.ImageData.Banned;
+      }
+      else if (group.isClientAllowedControl())
+      {
+         image = upro.res.ImageData.Owner;
       }
 
       return image;
@@ -161,12 +159,10 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       var result = '';
 
       result = '<table style="width:100%;height:100%"><tr>';
-      result += '<td style="width:16px;">' + '<div style="height:16px;">'
-            + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForMembership(data.group) + '">'
-            + '</img></div>' + '</td>';
-      result += '<td style="width:16px;">' + '<div style="height:16px;">'
-            + '<img style="height:16px;" src="data:image/png;base64,' + this.getImageForOwnership(data.group) + '">'
-            + '</img></div>' + '</td>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
+            + this.getImageForMembership(data.group) + '">' + '</img></div>' + '</td>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
+            + this.getImageForOwnership(data.group) + '">' + '</img></div>' + '</td>';
       result += '<td>' + data.group.getName().escapeHTML() + '</td>';
       result += '</tr></table>';
 

@@ -303,6 +303,24 @@
       },
 
       /**
+       * Sent as status for a given group - receiver is either banned or not
+       */
+      GroupBannedStatus:
+      {
+         name: 0,
+         header: getStandardHeaderDefinition(),
+         body:
+         {
+            schema:
+            {
+               id: context.commonSchemata.groupIdType,
+               banned: Boolean
+            },
+            isValid: null
+         }
+      },
+
+      /**
        * Notifies the list of added or removed members of a group.
        */
       GroupMembership:

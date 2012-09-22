@@ -11,6 +11,7 @@ upro.model.GroupInfo = Class.create(upro.model.AbstractSharedObjectInfo,
       this.data = {};
       this.members = [];
       this.blackList = [];
+      this.banned = false;
    },
 
    toString: function()
@@ -80,16 +81,24 @@ upro.model.GroupInfo = Class.create(upro.model.AbstractSharedObjectInfo,
       var that = this;
       var rCode = false;
 
-      members.forEach(function(memberId)
+      if (members.indexOf(this.clientCharacterId) >= 0)
       {
-         var index = that.members.indexOf(memberId);
-
-         if (index >= 0)
+         this.members = [];
+         rCode = true;
+      }
+      else
+      {
+         members.forEach(function(memberId)
          {
-            that.members.splice(index, 1);
-            rCode = true;
-         }
-      });
+            var index = that.members.indexOf(memberId);
+
+            if (index >= 0)
+            {
+               that.members.splice(index, 1);
+               rCode = true;
+            }
+         });
+      }
 
       return rCode;
    },
@@ -101,6 +110,6 @@ upro.model.GroupInfo = Class.create(upro.model.AbstractSharedObjectInfo,
 
    isClientBanned: function()
    {
-      return this.blackList.indexOf(this.clientCharacterId) >= 0;
+      return this.banned;
    }
 });

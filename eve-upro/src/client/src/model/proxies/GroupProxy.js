@@ -27,6 +27,7 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupOwner.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupShares.name);
       this.registerBroadcast(upro.data.clientBroadcastEvents.GroupBannedList.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.GroupBannedStatus.name);
 
       this.createPredefinedGroupInfoObjects();
    },
@@ -272,6 +273,17 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       if (dataObject)
       {
          dataObject.blackList = broadcastBody.characters;
+         this.notifyDataChanged(dataObject);
+      }
+   },
+
+   onGroupBannedStatus: function(broadcastBody)
+   {
+      var dataObject = this.dataObjects[broadcastBody.id];
+
+      if (dataObject)
+      {
+         dataObject.banned = broadcastBody.banned;
          this.notifyDataChanged(dataObject);
       }
    },
