@@ -13,7 +13,7 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
       this.bodyNamesByType = {};
       this.pendingLookupRequest = {};
 
-      [ "Character", "Corporation" ].forEach(function(type)
+      [ "Character", "Corporation", "Alliance" ].forEach(function(type)
       {
          that.bodyNamesByType[type] = {};
          that.pendingLookupRequest[type] = [];
@@ -34,6 +34,11 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
             characterInfo.characterId, characterInfo.characterName);
       this.bodyNamesByType["Corporation"][characterInfo.corporationId] = new upro.model.ResolvedBodyName(
             characterInfo.corporationId, characterInfo.corporationName);
+      if (characterInfo.allianceId)
+      {
+         this.bodyNamesByType["Alliance"][characterInfo.allianceId] = new upro.model.ResolvedBodyName(
+               characterInfo.allianceId, characterInfo.allianceName);
+      }
    },
 
    /**
@@ -101,7 +106,8 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
       sessionProxy.sendRequest(upro.data.clientRequests.GetNameOfBody.name,
       {
          characters: this.pendingLookupRequest["Character"],
-         corporations: this.pendingLookupRequest["Corporation"]
+         corporations: this.pendingLookupRequest["Corporation"],
+         alliances: this.pendingLookupRequest["Alliance"]
       });
       for ( var type in this.pendingLookupRequest)
       {
@@ -116,7 +122,8 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
       {
          query: broadcastBody.query,
          characters: [],
-         corporations: []
+         corporations: [],
+         alliances: []
       };
 
       this.updateBodiesFromBroadcast(broadcastBody);
@@ -127,6 +134,10 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
       broadcastBody.corporations.forEach(function(data)
       {
          result.corporations.push(that.getBodyName("Corporation", data.id));
+      });
+      broadcastBody.alliances.forEach(function(data)
+      {
+         result.alliances.push(that.getBodyName("Alliance", data.id));
       });
 
       this.facade().sendNotification(upro.app.Notifications.FindBodyResult, result);
@@ -146,6 +157,7 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
    {
       var newCharacters = this.updateBodies("Character", broadcastBody.characters);
       var newCorporations = this.updateBodies("Corporation", broadcastBody.corporations);
+      var newAlliances = this.updateBodies("Alliance", broadcastBody.alliances);
 
       if (newCharacters.length > 0)
       {
@@ -154,6 +166,10 @@ upro.model.proxies.BodyRegisterProxy = Class.create(upro.model.proxies.AbstractP
       if (newCorporations.length > 0)
       {
          this.facade().sendNotification(upro.app.Notifications.KnownCorporationsChanged, newCorporations);
+      }
+      if (newAlliances.length > 0)
+      {
+         this.facade().sendNotification(upro.app.Notifications.KnownAlliancesChanged, newAlliances);
       }
    },
 

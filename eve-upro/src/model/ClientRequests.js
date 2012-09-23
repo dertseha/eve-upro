@@ -65,7 +65,8 @@
             schema:
             {
                characters: Array.of(Number),
-               corporations: Array.of(Number)
+               corporations: Array.of(Number),
+               alliances: Array.of(Number)
             },
             isValid: null
          }

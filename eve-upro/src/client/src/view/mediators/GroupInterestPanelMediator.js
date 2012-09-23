@@ -28,6 +28,11 @@ upro.view.mediators.GroupInterestPanelMediator = Class.create(upro.view.mediator
       return true;
    },
 
+   isValidAllianceForSharing: function(bodyName)
+   {
+      return true;
+   },
+
    requestAddOwner: function(notifyBody)
    {
       this.facade().sendNotification(upro.app.Notifications.SharedObjectAddOwnerRequest, notifyBody);

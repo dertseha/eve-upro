@@ -201,6 +201,10 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       {
          link = "http://image.eveonline.com/Corporation/" + listEntry.bodyName.getId() + "_32.png";
       }
+      else if (listEntry.type == "Alliance")
+      {
+         link = "http://image.eveonline.com/Alliance/" + listEntry.bodyName.getId() + "_32.png";
+      }
       else if (listEntry.type == "Group")
       {
          link = upro.res.ImageData.Group;
@@ -395,6 +399,11 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
       return bodyName.getId() == this.characterInfo.corporationId;
    },
 
+   isValidAllianceForSharing: function(bodyName)
+   {
+      return this.characterInfo.allianceId && (bodyName.getId() == this.characterInfo.allianceId);
+   },
+
    isValidGroupForSharing: function(group)
    {
       return group.isClientMember();
@@ -413,6 +422,8 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
                .bind(this)));
          this.extractFindBodyResult(data, "Corporation", result.corporations.filter(this.isValidCorporationForSharing
                .bind(this)));
+         this.extractFindBodyResult(data, "Alliance", result.alliances
+               .filter(this.isValidAllianceForSharing.bind(this)));
 
          this.sortListData(data);
 
@@ -568,6 +579,11 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
    },
 
    onNotifyKnownCorporationsChanged: function()
+   {
+      this.fillMemberList();
+   },
+
+   onNotifyKnownAlliancesChanged: function()
    {
       this.fillMemberList();
    },

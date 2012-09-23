@@ -51,12 +51,21 @@ exports.testFindBodyResultEmitted_WhenRequested = function(test)
          name: 'testCorp'
       }
    } ]);
+   this.fixture.givenStorageReturnsDataDelayed(BodyRegisterServiceComponent.CollectionNameAlliance, [
+   {
+      _id: 1122,
+      data:
+      {
+         name: 'testAlliance'
+      }
+   } ]);
 
    this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestFindBodiesByName.name, sessionId,
    {
       searchText: searchText
    });
 
+   this.fixture.whenStorageReturnsData(BodyRegisterServiceComponent.CollectionNameAlliance);
    this.fixture.whenStorageReturnsData(BodyRegisterServiceComponent.CollectionNameCorporation);
    this.fixture.whenStorageReturnsData(BodyRegisterServiceComponent.CollectionNameCharacter);
 
@@ -75,6 +84,11 @@ exports.testFindBodyResultEmitted_WhenRequested = function(test)
       {
          id: 5678,
          name: 'testCorp'
+      } ],
+      alliances: [
+      {
+         id: 1122,
+         name: 'testAlliance'
       } ]
    }, [
    {
@@ -89,7 +103,6 @@ exports.testFindBodyResultEmitted_WhenRequested = function(test)
 exports.testGetNameOfBodyReplyEmitted_WhenRequested = function(test)
 {
    var sessionId = UuidFactory.v4();
-   var searchText = 'est';
 
    this.fixture.givenStorageReturnsDataDelayed(BodyRegisterServiceComponent.CollectionNameCharacter, [
    {
@@ -107,13 +120,23 @@ exports.testGetNameOfBodyReplyEmitted_WhenRequested = function(test)
          name: 'testCorp'
       }
    } ]);
+   this.fixture.givenStorageReturnsDataDelayed(BodyRegisterServiceComponent.CollectionNameAlliance, [
+   {
+      _id: 2233,
+      data:
+      {
+         name: 'testAlliance'
+      }
+   } ]);
 
    this.fixture.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestGetNameOfBody.name, sessionId,
    {
       characters: [ 1234 ],
-      corporations: [ 5678 ]
+      corporations: [ 5678 ],
+      alliances: [ 1122 ]
    });
 
+   this.fixture.whenStorageReturnsData(BodyRegisterServiceComponent.CollectionNameAlliance);
    this.fixture.whenStorageReturnsData(BodyRegisterServiceComponent.CollectionNameCorporation);
    this.fixture.whenStorageReturnsData(BodyRegisterServiceComponent.CollectionNameCharacter);
 
@@ -128,6 +151,11 @@ exports.testGetNameOfBodyReplyEmitted_WhenRequested = function(test)
       {
          id: 5678,
          name: 'testCorp'
+      } ],
+      alliances: [
+      {
+         id: 2233,
+         name: 'testAlliance'
       } ]
    }, [
    {

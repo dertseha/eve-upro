@@ -131,6 +131,8 @@ upro.app.Notifications =
    KnownCharactersChanged: 0,
    /** List of known corporations has changed */
    KnownCorporationsChanged: 0,
+   /** List of known alliances has changed */
+   KnownAlliancesChanged: 0,
    /** request to find bodies by name */
    FindBodyByNameRequest: 0,
    /** result of a body search */

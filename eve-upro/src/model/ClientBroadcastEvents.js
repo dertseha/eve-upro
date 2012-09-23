@@ -72,7 +72,8 @@
                   searchText: String
                },
                characters: Array.of(bodySchema),
-               corporations: Array.of(bodySchema)
+               corporations: Array.of(bodySchema),
+               alliances: Array.of(bodySchema)
             },
             isValid: null
          }
@@ -90,7 +91,8 @@
             schema:
             {
                characters: Array.of(bodySchema),
-               corporations: Array.of(bodySchema)
+               corporations: Array.of(bodySchema),
+               alliances: Array.of(bodySchema)
             },
             isValid: null
          }

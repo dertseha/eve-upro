@@ -76,6 +76,10 @@ function BodyRegisterServiceComponent(services)
       {
          name: body.user.corporationName
       };
+      var allianceData =
+      {
+         name: body.user.allianceName
+      };
 
       this.mongodb.setData(BodyRegisterServiceComponent.CollectionNameCharacter, body.user.characterId, characterData,
             function()
@@ -85,6 +89,13 @@ function BodyRegisterServiceComponent(services)
             corporationData, function()
             {
             });
+      if (body.user.allianceId)
+      {
+         this.mongodb.setData(BodyRegisterServiceComponent.CollectionNameAlliance, body.user.allianceId, allianceData,
+               function()
+               {
+               });
+      }
    };
 
    this.bodyResultHandler = function(id, data, destArray, finishCallback)
@@ -166,6 +177,13 @@ function BodyRegisterServiceComponent(services)
             '$in': body.corporations
          }
       };
+      filter['Alliance'] =
+      {
+         _id:
+         {
+            '$in': body.alliances
+         }
+      };
 
       var searchCompleted = function()
       {
@@ -208,7 +226,8 @@ function BodyRegisterServiceComponent(services)
             searchText: searchText
          },
          characters: result.listCharacter,
-         corporations: result.listCorporation
+         corporations: result.listCorporation,
+         alliances: result.listAlliance
       };
 
       this.amqp.broadcast(header, body);
@@ -231,7 +250,8 @@ function BodyRegisterServiceComponent(services)
       var body =
       {
          characters: result.listCharacter,
-         corporations: result.listCorporation
+         corporations: result.listCorporation,
+         alliances: result.listAlliance
       };
 
       this.amqp.broadcast(header, body);
@@ -239,7 +259,7 @@ function BodyRegisterServiceComponent(services)
 }
 util.inherits(BodyRegisterServiceComponent, Component);
 
-BodyRegisterServiceComponent.SupportedBodies = [ 'Character', 'Corporation' ];
+BodyRegisterServiceComponent.SupportedBodies = [ 'Character', 'Corporation', 'Alliance' ];
 BodyRegisterServiceComponent.SupportedBodies.forEach(function(bodyName)
 {
    BodyRegisterServiceComponent['CollectionName' + bodyName] = 'BodyRegister' + bodyName;
