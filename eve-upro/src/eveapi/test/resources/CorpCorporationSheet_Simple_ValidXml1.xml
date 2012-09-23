@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?> 
+<eveapi version='2'>
+  <currentTime>
+    2012-09-23 17:59:25
+  </currentTime>
+  <result>
+    <corporationID>
+      264653893
+    </corporationID>
+    <corporationName>
+      Blame The Bunny
+    </corporationName>
+    <ticker>
+      -BTB-
+    </ticker>
+    <ceoID>
+      149226614
+    </ceoID>
+    <ceoName>
+      Liu Ellens
+    </ceoName>
+    <stationID>
+      60006808
+    </stationID>
+    <stationName>
+      Mili VIII - Moon 10 - Ducia Foundry Refinery
+    </stationName>
+    <description>
+      (redacted)
+    </description>
+    <url/>
+    <allianceID>
+      99000290
+    </allianceID>
+    <allianceName>
+      The Dark Nation
+    </allianceName>
+    <taxRate>
+      10
+    </taxRate>
+    <memberCount>
+      54
+    </memberCount>
+    <shares>
+      10000
+    </shares>
+    <logo>
+      <graphicID>
+        0
+      </graphicID>
+      <shape1>
+        564
+      </shape1>
+      <shape2>
+        564
+      </shape2>
+      <shape3>
+        564
+      </shape3>
+      <color1>
+        674
+      </color1>
+      <color2>
+        677
+      </color2>
+      <color3>
+        677
+      </color3>
+    </logo>
+  </result>
+  <cachedUntil>
+    2012-09-23 23:43:36
+  </cachedUntil>
+</eveapi>

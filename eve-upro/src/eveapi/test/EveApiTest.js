@@ -143,6 +143,11 @@ function Fixture()
       this.api.request(eveapi.ApiFunctions.AccountApiKeyInfo, apiKey, this.callback);
    };
 
+   this.whenRequestingCorpCorporationSheet = function(parameters)
+   {
+      this.api.request(eveapi.ApiFunctions.CorpCorporationSheet, parameters, this.callback);
+   };
+
    this.whenRequestingDummyFunction = function(err, cacheTime, data, storageKey)
    {
       var parameters = {};
@@ -248,7 +253,7 @@ exports.testCallbackCalled_WhenRequestedAfterOneFinished = function(test)
    this.fixture.whenRequestingApiKeyInfo(apiKey);
 };
 
-exports.testRemoteApiCalled_WhenStorageReturnsError = function(test)
+exports.testRemoteApiCalled_WhenStorageReturnsError_ForAccountApiKeyInfo = function(test)
 {
    var apiKey =
    {
@@ -262,6 +267,21 @@ exports.testRemoteApiCalled_WhenStorageReturnsError = function(test)
 
    test.expect(3);
    this.fixture.whenRequestingApiKeyInfo(apiKey);
+};
+
+exports.testRemoteApiCalled_WhenStorageReturnsError_ForCorpCorporationSheet = function(test)
+{
+   var apiKey =
+   {
+      'corporationID': 1234
+   };
+
+   this.fixture.givenAnApiInstance();
+
+   this.fixture.expectingRemoteApiGetToBeCalled(test, '/corp/CorporationSheet.xml.aspx', apiKey);
+
+   test.expect(3);
+   this.fixture.whenRequestingCorpCorporationSheet(apiKey);
 };
 
 exports.testCallbackReceivesData_WhenProvidedByRemoteApi = function(test)

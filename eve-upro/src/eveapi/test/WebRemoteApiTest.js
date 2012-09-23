@@ -64,6 +64,21 @@ exports.setUp = function(callback)
 // this.fixture.whenGettingData('/account/APIKeyInfo.xml.aspx', parameters);
 // }
 
+// exports.testDataIsReturned_WhenCalledWithValidInformation_CorpCorporationSheet = function(test)
+// {
+// var parameters =
+// {
+// 'corporationID': 1000046
+// };
+//
+// this.fixture.givenAnApiInstance('api.eveonline.com');
+//
+// this.fixture.expectingCallbackToBeCalledWithData(test);
+//
+// test.expect(2);
+// this.fixture.whenGettingData('/corp/CorporationSheet.xml.aspx', parameters);
+// };
+
 // exports.testErrorIsReturned_WhenCalledWithInvalidUri = function(test)
 // {
 // var parameters =

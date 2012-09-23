@@ -8,7 +8,8 @@ var WebRemoteApi = require('./WebRemoteApi');
  */
 exports.ApiFunctions =
 {
-   AccountApiKeyInfo: new (require('./functions/AccountApiKeyInfo'))()
+   AccountApiKeyInfo: new (require('./functions/AccountApiKeyInfo'))(),
+   CorpCorporationSheet: new (require('./functions/CorpCorporationSheet'))()
 };
 
 EveApi = function(options, storage, remoteApi)
