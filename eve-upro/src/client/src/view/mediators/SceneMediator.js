@@ -306,6 +306,16 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
          this.visibleGalaxyId = galaxyId;
          galaxyRender.setVisible(true);
       }
+   },
+
+   centerOnSolarSystem: function(solarSystem)
+   {
+      var galaxyRender = this.galaxies[solarSystem.galaxy.id];
+      var dest = vec3.create(galaxyRender.addSolarSystemVertices(solarSystem, []));
+
+      vec3.negate(dest);
+      galaxyRender.positionTarget = dest;
+      galaxyRender.setOrientationModified(true);
    }
 
 });

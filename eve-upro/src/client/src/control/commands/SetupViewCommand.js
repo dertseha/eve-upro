@@ -11,7 +11,9 @@ upro.ctrl.cmd.SetupViewCommand = Class.create(SimpleCommand,
       if (upro.scene.SceneSystem.SUPPORTED)
       {
          uiMediator.setBaseBlur();
+         this.facade().registerMediator(new upro.view.mediators.DocumentKeyboardMediator());
          this.facade().registerMediator(new upro.view.mediators.DocumentMouseMediator());
+         this.facade().registerMediator(new upro.view.mediators.SystemSearchOverlayMediator());
          this.facade().registerMediator(new upro.view.mediators.SceneMediator());
          this.facade().registerMediator(new upro.view.mediators.HideUiSideButtonMediator("westBar"));
       }

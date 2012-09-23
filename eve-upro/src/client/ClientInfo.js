@@ -227,6 +227,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedDestroyRouteRequestCommand.js', //
    'control/commands/NotifiedActiveRouteUpdateRouteRequestCommand.js', //
    'control/commands/NotifiedRejectSharedObjectRequestCommand.js', //
+   'control/commands/NotifiedSelectSolarSystemCommand.js', //
 
    'view/view.js', //
    'view/SceneObjectRotationOperation.js', //
@@ -240,6 +241,7 @@ exports.sourceFiles = [];
    'view/mediators/mediators.js', //
    'view/mediators/AbstractMediator.js', //
    'view/mediators/AbstractSideButtonMediator.js', //
+   'view/mediators/DocumentKeyboardMediator.js', //
    'view/mediators/DocumentMouseMediator.js', //
    'view/mediators/HudMediator.js', //
    'view/mediators/InGameBrowserMediator.js', //
@@ -267,6 +269,7 @@ exports.sourceFiles = [];
    'view/mediators/SharedObjectInterestPanelMediator.js', //
    'view/mediators/RouteListPanelMediator.js', //
    'view/mediators/GroupInterestPanelMediator.js', //
+   'view/mediators/SystemSearchOverlayMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

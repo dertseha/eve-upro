@@ -188,7 +188,10 @@ upro.app.Notifications =
    DestroyRouteRequest: 0,
 
    /** Request to reject a shared object */
-   RejectSharedObjectRequest: 0
+   RejectSharedObjectRequest: 0,
+
+   /** A request to select a specific solar system */
+   SelectSolarSystem: 0
 };
 
 /**

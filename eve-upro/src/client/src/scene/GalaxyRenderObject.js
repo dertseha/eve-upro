@@ -38,14 +38,21 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       }
    },
 
-   addSolarSystem: function(solarSystem)
+   addSolarSystemVertices: function(solarSystem, list)
    {
       var galaxy = solarSystem.galaxy;
       var systemScale = galaxy.scale;
       var center = galaxy.position;
 
-      this.systemVertices.push((solarSystem.position[0] - center[0]) / systemScale,
-            (solarSystem.position[1] - center[1]) / systemScale, (solarSystem.position[2] - center[2]) / systemScale);
+      list.push((solarSystem.position[0] - center[0]) / systemScale, (solarSystem.position[1] - center[1])
+            / systemScale, (solarSystem.position[2] - center[2]) / systemScale);
+
+      return list;
+   },
+
+   addSolarSystem: function(solarSystem)
+   {
+      this.systemVertices = this.addSolarSystemVertices(solarSystem, this.systemVertices);
       this.systemColors.push(solarSystem.security, 0.0, 0.0);
 
       this.systems.push(solarSystem);
