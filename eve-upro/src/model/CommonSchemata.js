@@ -7,7 +7,9 @@
       characterId: Number,
       characterName: String,
       corporationId: Number,
-      corporationName: String
+      corporationName: String,
+      '?allianceId': Number,
+      '?allianceName': String
    };
 
    context.namespace.routeEntrySchema =

@@ -1,7 +1,10 @@
 extends layout
 
 block title
-   title="upro :: " + user.characterName + " (" + user.corporationName + ")"
+   if user.allianceId
+      title="upro :: " + user.characterName + " (" + user.corporationName + " - " + user.allianceName + ")"
+   else
+      title="upro :: " + user.characterName + " (" + user.corporationName + ")"
 
 block pre-scripts
    link(rel='stylesheet', href='/stylesheets/upro.css')

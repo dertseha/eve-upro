@@ -11,6 +11,7 @@ var clientRequests = require('../model/ClientRequests').clientRequests;
 var clientBroadcastEvents = require('../model/ClientBroadcastEvents').clientBroadcastEvents;
 var busMessages = require('../model/BusMessages.js');
 
+var LogInRequest = require('./LogInRequest.js');
 var EveInfoExtractorNull = require('./EveInfoExtractorNull.js');
 var EveInfoExtractorHeaders = require('./EveInfoExtractorHeaders.js');
 
@@ -182,7 +183,7 @@ function ClientSessionComponent(services, options)
    };
 
    /**
-    * a message received from the response queue
+    * Handles a message received from the response queue
     * 
     * @param message the message object
     * @param headers message headers
@@ -194,47 +195,16 @@ function ClientSessionComponent(services, options)
       var request = this.logInRequests[correlationId];
       var struct = JSON.parse(message.data);
 
-      delete this.logInRequests[correlationId];
-
-      if (struct.err)
+      if (request)
       {
-         logger.error('Failed login request, technical: ' + JSON.stringify(struct.err));
-         request.done('Request Error', null);
-      }
-      else if (struct.response.err)
-      {
-         logger.warn('Failed login request, API: ' + JSON.stringify(struct.response.err));
-         request.done(null, false);
-      }
-      else if ((struct.response.key.accessMask === 0) && (struct.response.key.type == "Character")
-            && (struct.response.characters.length == 1))
-      {
-         var character = struct.response.characters[0];
-         var user =
+         if (request.onEveApiMessage(struct))
          {
-            characterId: character.characterID,
-            characterName: character.characterName,
-            corporationId: character.corporationID,
-            corporationName: character.corporationName
-         };
-
-         if (this.isUserAllowed(user))
-         {
-            logger.info('Successful login request for character ' + user.characterId + ' [' + user.characterName + ']');
-            request.done(null, user);
-         }
-         else
-         {
-            logger.warn('Denied login request for character ' + user.characterId + ' [' + user.characterName + ']');
-            request.done(null, false);
+            delete this.logInRequests[correlationId];
          }
       }
       else
       {
-         logger.warn('Failed login request, API key did not match expectations; Type: [' + struct.response.key.type
-               + '], accessMask: ' + struct.response.key.accessMask + ' Character(s): '
-               + struct.response.characters.length);
-         request.done(null, false);
+         logger.warn('Received message without correlating request, ID: ' + correlationId);
       }
    };
 
@@ -304,19 +274,22 @@ function ClientSessionComponent(services, options)
     */
    this.onLogInRequest = function(keyId, vCode, done)
    {
-      var parameter =
+      var parameters =
       {
          keyId: keyId,
          vCode: vCode
       };
       var id = this.correlationIdCounter++;
+      var request = new LogInRequest(this, id, done);
 
-      this.logInRequests[id] =
-      {
-         done: done
-      };
+      this.logInRequests[id] = request;
 
-      this.eveapiMsg.request('AccountApiKeyInfo', parameter, this.responseQueue.name, id);
+      this.eveApiRequest('AccountApiKeyInfo', parameters, id);
+   };
+
+   this.eveApiRequest = function(name, parameters, id)
+   {
+      this.eveapiMsg.request(name, parameters, this.responseQueue.name, id);
    };
 
    this.onDataPortOpened = function(user, stream, sendFunction)
