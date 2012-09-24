@@ -133,7 +133,7 @@ function GroupServiceComponent(services)
 
       if (!state)
       {
-         logger.info("Groups " + documentId + " destroyed");
+         logger.info("Groups " + documentId + " destroyed (might occur several times because of late broadcasts)");
          this.getBroadcaster().broadcastGroupDestroyed(documentId);
       }
    };

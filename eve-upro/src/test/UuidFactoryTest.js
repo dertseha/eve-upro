@@ -79,3 +79,19 @@ exports.testV5 = function(test)
    test.equal(result, '5b23436d8e7c51cf81625cd5fd379ecf');
    test.done();
 };
+
+exports.testV5_PredefinedCorporation = function(test)
+{
+   var result = uuid.v5('6c7599b0e34b4dfab0e8b646164e8c6d', 'Corporation');
+
+   test.equal(result, '48cf12d7dabd5f5e97e43a98258aaa78');
+   test.done();
+};
+
+exports.testV5_PredefinedAlliance = function(test)
+{
+   var result = uuid.v5('6c7599b0e34b4dfab0e8b646164e8c6d', 'Alliance');
+
+   test.equal(result, '77662cfa2c345ea39ffcea905332c8be');
+   test.done();
+};

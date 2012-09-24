@@ -35,6 +35,10 @@
       id: Number
    },
    {
+      scope: 'Alliance',
+      id: Number
+   },
+   {
       scope: 'Group',
       id: context.namespace.groupIdType
    } ];

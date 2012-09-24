@@ -64,16 +64,17 @@ function ConfirmingLocationStatusGroupState(service, character, group)
 
    this.handleGroupSyncFinished = function()
    {
+      var groupInterest = this.group.getInterest();
       var nextState = null;
 
-      if (this.character.hasInterestIn(this.group.getInterest()))
+      if (this.character.hasInterestIn(groupInterest))
       {
          nextState = this.getNextState();
       }
       else
       {
-         logger.info('Character ' + this.character.toString() + ' is not a member of the group '
-               + this.group.getGroupId() + ' anymore. Entering null State');
+         logger.info('Character ' + this.character.toString() + ' is not a member of ' + groupInterest[0].scope + ' ('
+               + groupInterest[0].id + ') anymore. Entering null State');
          nextState = new NullLocationStatusGroupState(this.service, this.character, this.group);
       }
       nextState.activate();

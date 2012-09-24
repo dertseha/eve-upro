@@ -85,7 +85,8 @@ function CharacterAgentComponent(services)
 
       if (!character)
       {
-         character = new Character(charId, body.user.characterName, body.user.corporationId, body.user.corporationName);
+         character = new Character(charId, body.user.characterName, body.user.corporationId, body.user.corporationName,
+               body.user.allianceId, body.userAllianceName);
          this.characters[charId] = character;
       }
       if (!character.hasClientSession(body.sessionId))

@@ -1,9 +1,11 @@
-function Character(charId, charName, corpId, corpName)
+function Character(charId, charName, corpId, corpName, allyId, allyName)
 {
    this.characterId = charId;
    this.characterName = charName;
    this.corporationId = corpId;
    this.corporationName = corpName;
+   this.allianceId = allyId;
+   this.allianceName = allyName;
 
    this.clients = {};
    this.groupMemberships = [];
@@ -26,6 +28,14 @@ function Character(charId, charName, corpId, corpName)
    this.getCorporationId = function()
    {
       return this.corporationId;
+   };
+
+   /**
+    * @returns the alliance ID of the character
+    */
+   this.getAllianceId = function()
+   {
+      return this.allianceId;
    };
 
    /**
@@ -232,6 +242,11 @@ function Character(charId, charName, corpId, corpName)
    this.hasInterestForCorporation = function(id)
    {
       return id == this.corporationId;
+   };
+
+   this.hasInterestForAlliance = function(id)
+   {
+      return this.allianceId && (id == this.allianceId);
    };
 
    this.hasInterestForSession = function(id)

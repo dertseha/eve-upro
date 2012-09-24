@@ -18,6 +18,10 @@ var interestSchema = [
    id: Number
 },
 {
+   scope: 'Alliance',
+   id: Number
+},
+{
    scope: 'Group',
    id: commonSchemata.groupIdType
 } ];

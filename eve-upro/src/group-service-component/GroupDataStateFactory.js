@@ -70,6 +70,7 @@ function GroupDataStateFactory(owner)
       var superRemoveShares = state.removeShares;
       var superBroadcastOwnerData = state.broadcastOwnerData;
       var superBroadcastOwnerDataReset = state.broadcastOwnerDataReset;
+      var superDestroy = state.destroy;
 
       /** {@inheritDoc} */
       state.broadcastOwnerData = function(broadcaster, interest, responseQueue)
@@ -168,7 +169,7 @@ function GroupDataStateFactory(owner)
       {
          var rCode = false;
 
-         if (!dataObject.isInterestForCharacter(character) && dataObject.removeMember(character))
+         if (!dataObject.isInterestForCharacter(character) && dataObject.removeMember(character.getCharacterId()))
          {
             logger.info("Character " + character + " does not have an interest for group " + dataObject
                   + " anymore, removing membership");
@@ -262,6 +263,16 @@ function GroupDataStateFactory(owner)
 
             return interest;
          });
+      };
+
+      state.destroy = function()
+      {
+         var owner = this.getOwner();
+         var broadcaster = owner.getBroadcaster();
+
+         broadcaster.broadcastGroupMembership(dataObject, [], this.dataObject.getMembers());
+
+         superDestroy.call(state);
       };
 
       return state;

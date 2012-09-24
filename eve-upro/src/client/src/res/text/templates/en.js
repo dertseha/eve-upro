@@ -13,6 +13,8 @@ upro.res.text.templates["en"] =
 
    /** The "own corporation" predefined group */
    "predefined.groups.Corporation": "Own Corporation",
+   /** The "own alliance" predefined group */
+   "predefined.groups.Alliance": "Own Alliance",
 
    /** Label for routing menu */
    "routing.menuLabel": "Routing",

@@ -576,7 +576,7 @@
        * not owner. Shares eligible to be removed this way:
        * <ul>
        * <li>specifically for the character</li>
-       * <li>for the same corporation</li>
+       * <li>for the same corporation/alliance</li>
        * <li>for any group for which the sender is an owner</li>
        * </ul>
        */

@@ -95,8 +95,12 @@ function LocationServiceComponent(services)
       for ( var groupType in predefinedGroupIds)
       {
          var groupId = predefinedGroupIds[groupType];
+         var getter = character['get' + groupType + 'Id'];
 
-         this.ensureGroupState(character, groupId);
+         if (getter && getter.call(character))
+         {
+            this.ensureGroupState(character, groupId);
+         }
       }
    };
 

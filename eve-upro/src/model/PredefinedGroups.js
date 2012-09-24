@@ -6,7 +6,8 @@
    // Created based on UuidFactory.v5(predefinedGroupIdNamespace, name)
    context.namespace.predefinedGroupIds =
    {
-      'Corporation': '48cf12d7dabd5f5e97e43a98258aaa78'
+      'Corporation': '48cf12d7dabd5f5e97e43a98258aaa78',
+      'Alliance': '77662cfa2c345ea39ffcea905332c8be'
    };
 
    // Reverse lookup of the group type by its predefined ID
