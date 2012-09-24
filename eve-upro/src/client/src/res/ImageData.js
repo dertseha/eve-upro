@@ -8,6 +8,12 @@ upro.res.ImageData.Check = "data:image/png;base64,"
       + "k6sZBkgzBE0z3BBKNIPAfJgCfqiT5lOiGVWCGM1QReexKSBKMwFbCGsm0ZD55IY0Yc0EDJlPSWqb"
       + "T0l6n0+XzAUAB/N36Dezi8oAAAAASUVORK5CYII=";
 
+upro.res.ImageData.ArrowRight = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz"
+      + "AAAG7AAABuwBHnU4NQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABuSURB"
+      + "VDiNtZNLCoAwDAWfnzt5L7eCduN9vcG4KbiwSQPRga6aDqQvGQA57JJGScWsAKyz8VCsOuvxypum"
+      + "xBIswBWReC2EJJ4gJFHjMkoBNHsZdjhUM86RbeGTT/wlxvQgpUc5vEzeHJySJnXW+QaYw5H0ctPw" + "LQAAAABJRU5ErkJggg==";
+
 upro.res.ImageData.Banned = "data:image/png;base64,"
       + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAkElEQVR42q1TWw3AIAysEyRMAlIq"
       + "BSlImQSk4IAOkrJk0FISdkl/Cnd9cAAMICIspdw0gHMIGuqhq5HIRrvjJHKmfeSPyGblqZN3ZqVC"

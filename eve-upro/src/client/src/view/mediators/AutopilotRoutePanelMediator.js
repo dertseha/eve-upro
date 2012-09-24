@@ -10,6 +10,8 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       this.panelId = panelId;
       this.menuPath = menuPath;
       this.menuIndex = menuIndex;
+
+      this.routeList = null;
    },
 
    onRegister: function()
@@ -55,13 +57,14 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
 
       uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.Autopilot,
             upro.res.text.Lang.format("panels.autopilot.route.menuLabel"), "autopilotRoute", base);
+
+      this.routeList = uki('#autopilotRoute');
    },
 
    setRoute: function(route)
    {
       var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
       var data = [];
-      var guiList = uki('#autopilotRoute');
       var jumpType = upro.nav.JumpType.None;
 
       for ( var i = 0; i < route.length; i++)
@@ -70,6 +73,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
          var displayEntry =
          {
             routeEntry: routeEntry,
+            isNext: false,
             jumpType: jumpType,
             solarSystem: universeProxy.findSolarSystemById(routeEntry.solarSystemId)
          };
@@ -78,8 +82,22 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
          data.push(displayEntry);
       }
 
-      guiList.data(data);
-      guiList.parent().layout();
+      this.routeList.data(data);
+      this.routeList.parent().layout();
+   },
+
+   setNextRouteIndex: function(index)
+   {
+      var data = this.routeList.data();
+      var i = 0;
+
+      data.forEach(function(listEntry)
+      {
+         listEntry.isNext = i === index;
+         i++;
+      });
+      this.routeList.data(data);
+      this.routeList.parent().layout();
    },
 
    getColorBySecurityLevel: function(solarSystem)
@@ -114,11 +132,25 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       return link;
    },
 
+   getImageForNext: function(listEntry)
+   {
+      var link = upro.res.ImageData.Transparent;
+
+      if (listEntry.isNext)
+      {
+         link = upro.res.ImageData.ArrowRight;
+      }
+
+      return link;
+   },
+
    routeRenderer: function(data, rect, index)
    {
       var result = '';
 
       result = '<table style="width:100%;height:100%"><tr>';
+      result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
+            + this.getImageForNext(data) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForJumpType(data.jumpType) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;background:'
