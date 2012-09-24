@@ -60,6 +60,16 @@ function AbstractDataState(owner)
    {
 
    };
+
+   /**
+    * If the given character has interest for this group, the state shall add itself to the given object by ID.
+    * 
+    * @return object containing the sum of given object and the entry
+    */
+   this.addIfCharacterHasInterest = function(obj, character)
+   {
+      return obj;
+   };
 }
 
 module.exports = AbstractDataState;

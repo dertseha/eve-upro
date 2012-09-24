@@ -114,6 +114,17 @@ function ActiveDataState(owner, dataObject)
       this.removeShares(interest);
    };
 
+   /** {@inheritDoc} */
+   this.addIfCharacterHasInterest = function(obj, character)
+   {
+      if (this.dataObject.isInterestForCharacter(character))
+      {
+         obj[this.dataObject.getDocumentId()] = this;
+      }
+
+      return obj;
+   };
+
    this.addShares = function(interest)
    {
       var dataInterest = [];

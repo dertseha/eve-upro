@@ -232,11 +232,41 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
    };
 
    /**
-    * Character state handler
+    * Character state handler. Removes all references to shared objects that are not needed by any remaining character.
     */
    this.onCharacterOffline = function(character)
    {
-      // TODO: check whether a data object is still needed, remove otherwise
+      var candidates = {};
+      var inUse;
+      var state;
+
+      this.forEachDataState(function(state)
+      {
+         candidates = state.addIfCharacterHasInterest(candidates, character);
+      });
+      for ( var documentId in candidates)
+      {
+         state = candidates[documentId];
+         inUse = {};
+
+         this.characterAgent.forEachCharacter(function(existingChar)
+         {
+            if (existingChar.isGroupSyncFinished())
+            {
+               inUse = state.addIfCharacterHasInterest(inUse, existingChar);
+            }
+            else
+            { // the character is not yet complete, can't determine whether interest exists
+               inUse[documentId] = state;
+            }
+         });
+         if (!inUse[documentId])
+         {
+            logger.debug('Shared Object ' + objectTypeBaseName + ' [' + documentId
+                  + '] is not referenced anymore. Cleanup.');
+            delete this.dataStatesById[documentId];
+         }
+      }
    };
 
    /**
