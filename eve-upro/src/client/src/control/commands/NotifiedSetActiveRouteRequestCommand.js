@@ -8,6 +8,7 @@ upro.ctrl.cmd.NotifiedSetActiveRouteRequestCommand = Class.create(SimpleCommand,
       var route = notification.getBody();
 
       activeRouteProxy.setRoute(route.getRoute());
+      activeRouteProxy.syncRoute();
       activeRouteListMediator.setRouteInfo(route);
    }
 });
