@@ -87,7 +87,7 @@ exports.testHasOwnerShouldReturnFalse_WhenEmptyInitialized = function(test)
    test.done();
 };
 
-[ 'Character', 'Corporation', 'Group' ].forEach(function(scope)
+[ 'Character', 'Corporation', 'Group', 'Alliance' ].forEach(function(scope)
 {
    var scopeIds =
    {

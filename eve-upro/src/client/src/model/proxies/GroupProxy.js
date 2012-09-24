@@ -299,7 +299,13 @@ upro.model.proxies.GroupProxy = Class.create(upro.model.proxies.AbstractProxy,
       {
          var charId = broadcastBody.characterInfo.characterId;
 
-         this.predefinedGroups[upro.model.predefinedGroupIds['Corporation']].addMembers([ charId ]);
+         this.predefinedGroups[upro.model.predefinedGroupIds["Corporation"]].addMembers([ charId ]);
+      }
+      if (this.characterInfo.allianceId && (this.characterInfo.allianceId === broadcastBody.characterInfo.allianceId))
+      {
+         var charId = broadcastBody.characterInfo.characterId;
+
+         this.predefinedGroups[upro.model.predefinedGroupIds["Alliance"]].addMembers([ charId ]);
       }
    },
 

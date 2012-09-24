@@ -89,6 +89,10 @@ function AbstractDataObject(documentId, initData)
       {
          rCode = true;
       }
+      else if (this.hasListEntry(listsMember, 'Alliance', character.getAllianceId()))
+      {
+         rCode = true;
+      }
       else
       {
          var self = this;
@@ -296,7 +300,7 @@ function AbstractDataObject(documentId, initData)
    };
 };
 
-AbstractDataObject.Scopes = [ 'Character', 'Corporation', 'Group' ];
+AbstractDataObject.Scopes = [ 'Character', 'Corporation', 'Alliance', 'Group' ];
 AbstractDataObject.createMemberList = function(initData)
 {
    var memberList = {};
@@ -329,6 +333,7 @@ AbstractDataObject.BodyListSchema =
 {
    listCharacter: Array.of(Number),
    listCorporation: Array.of(Number),
+   listAlliance: Array.of(Number),
    listGroup: Array.of(commonSchemata.groupIdType)
 };
 AbstractDataObject.DocumentSchema =

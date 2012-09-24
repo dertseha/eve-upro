@@ -206,6 +206,11 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
    {
       this.searchObjects('Character', character.getCharacterId());
       this.searchObjects('Corporation', character.getCorporationId());
+
+      if (character.isInAlliance())
+      {
+         this.searchObjects('Alliance', character.getAllianceId());
+      }
    };
 
    /**
@@ -372,6 +377,15 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
             scope: 'Corporation',
             id: character.getCorporationId()
          } ];
+
+         if (character.isInAlliance())
+         {
+            interest.push(
+            {
+               scope: 'Alliance',
+               id: character.getAllianceId()
+            });
+         }
 
          logger.info('Character ' + character + ' rejects object ' + state.dataObject);
          state.removeShares(interest);

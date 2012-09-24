@@ -16,15 +16,19 @@ upro.model.proxies.LocalBasedInterestChecker = Class.create(upro.model.InterestC
    {
       var rCode = false;
 
-      if (interest.scope === 'Character')
+      if (interest.scope === "Character")
       {
          rCode = this.characterInfo.characterId == interest.id;
       }
-      else if (interest.scope === 'Corporation')
+      else if (interest.scope === "Corporation")
       {
          rCode = this.characterInfo.corporationId == interest.id;
       }
-      else if (interest.scope === 'Group')
+      else if ((interest.scope === "Alliance") && this.characterInfo.allianceId)
+      {
+         rCode = this.characterInfo.allianceId == interest.id;
+      }
+      else if (interest.scope === "Group")
       {
          var group = this.groupProxy.getGroup(interest.id);
 

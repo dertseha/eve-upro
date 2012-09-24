@@ -31,6 +31,14 @@ function Character(charId, charName, corpId, corpName, allyId, allyName)
    };
 
    /**
+    * @returns true if the character is in an alliance
+    */
+   this.isInAlliance = function()
+   {
+      return !!this.allianceId;
+   };
+
+   /**
     * @returns the alliance ID of the character
     */
    this.getAllianceId = function()

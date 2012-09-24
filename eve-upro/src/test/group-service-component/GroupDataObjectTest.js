@@ -30,7 +30,7 @@ function Fixture()
 
    this.whenMemberWasRemoved = function(characterId)
    {
-      this.group.removeMember(new Character(characterId));
+      this.group.removeMember(characterId);
    };
 
    this.thenMemberListShouldBe = function(test, expected)
@@ -54,7 +54,7 @@ function Fixture()
 
    this.thenRemoveMemberShouldReturn = function(test, characterId, expected)
    {
-      var result = this.group.removeMember(new Character(characterId));
+      var result = this.group.removeMember(characterId);
 
       test.equal(result, expected);
    };
