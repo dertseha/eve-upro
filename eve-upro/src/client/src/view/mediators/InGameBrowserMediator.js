@@ -55,6 +55,9 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
    {
       var igb = this.getViewComponent();
       var limit = nextRouteIndex + upro.view.mediators.InGameBrowserMediator.AUTOPILOT_NEXT_SYSTEM_COUNT;
+      var i;
+      var routeEntry;
+      var lastJumpType = upro.nav.JumpType.None;
 
       if (limit > route.length)
       {
@@ -67,13 +70,21 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
          igb.clearAllWaypoints();
          this.lastReportedRouteIndex = nextRouteIndex - 1;
       }
-
-      for ( var i = this.lastReportedRouteIndex + 1; i < limit; i++)
+      if (this.lastReportedRouteIndex < nextRouteIndex)
       {
-         var routeEntry = route[i];
+         this.lastReportedRouteIndex = nextRouteIndex - 1;
+      }
+      if (this.lastReportedRouteIndex >= 0)
+      {
+         lastJumpType = route[this.lastReportedRouteIndex].nextJumpType;
+      }
 
+      for (i = this.lastReportedRouteIndex + 1; (i < limit) && (lastJumpType == upro.nav.JumpType.JumpGate); i++)
+      {
+         routeEntry = route[i];
          igb.addWaypoint(routeEntry.solarSystemId);
          this.lastReportedRouteIndex = i;
+         lastJumpType = routeEntry.nextJumpType;
       }
       this.expectedNextRouteIndex = nextRouteIndex + 1;
    }
