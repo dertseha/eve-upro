@@ -65,10 +65,7 @@ function CharacterGroupDataSync(broadcaster, characterId)
 
       if (index >= 0)
       {
-         var part1 = this.pendingGroupIds.slice(0, index);
-         var part2 = this.pendingGroupIds.slice(index + 1);
-
-         this.pendingGroupIds = part1.concat(part2);
+         this.pendingGroupIds.splice(index, 1);
          this.updateOnChange();
       }
    };

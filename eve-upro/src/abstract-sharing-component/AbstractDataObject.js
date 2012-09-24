@@ -215,10 +215,7 @@ function AbstractDataObject(documentId, initData)
 
          if (index >= 0)
          {
-            var part1 = list.slice(0, index);
-            var part2 = list.slice(index + 1);
-
-            listsMember[memberName] = part1.concat(part2);
+            list.splice(index, 1);
             rCode = true;
          }
       }

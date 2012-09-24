@@ -202,10 +202,7 @@ function Character(charId, charName, corpId, corpName, allyId, allyName)
 
       if (index >= 0)
       {
-         var part1 = this.groupMemberships.slice(0, index);
-         var part2 = this.groupMemberships.slice(index + 1);
-
-         this.groupMemberships = part1.concat(part2);
+         this.groupMemberships.splice(index, 1);
          rCode = true;
       }
 

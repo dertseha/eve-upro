@@ -14,7 +14,7 @@ upro.model.LocationTracker = Class.create(
    {
       for ( var locationId in this.charactersByLocation)
       {
-         callback(locationId | 0);
+         callback(+locationId);
       }
    },
 
@@ -22,7 +22,7 @@ upro.model.LocationTracker = Class.create(
    {
       for ( var charId in this.locationsByCharacter)
       {
-         callback(charId | 0);
+         callback(+charId);
       }
    },
 
@@ -52,10 +52,8 @@ upro.model.LocationTracker = Class.create(
          {
             charList = this.charactersByLocation[oldLocationId];
             var index = charList.indexOf(characterId);
-            var part1 = charList.slice(0, index);
-            var part2 = charList.slice(index + 1);
 
-            charList = part1.concat(part2);
+            charList.splice(index, 1);
             this.charactersByLocation[oldLocationId] = charList;
             this.listener.onCharactersByLocationChanged(oldLocationId, charList);
          }

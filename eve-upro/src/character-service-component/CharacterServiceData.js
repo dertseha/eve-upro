@@ -335,10 +335,7 @@ function CharacterServiceData(service, character)
       }
       else if (!body.ignore && (index >= 0))
       {
-         var part1 = this.rawData.ignoredSolarSystems.slice(0, index);
-         var part2 = this.rawData.ignoredSolarSystems.slice(index + 1);
-
-         this.rawData.ignoredSolarSystems = part1.concat(part2);
+         this.rawData.ignoredSolarSystems.splice(index, 1);
          changed = true;
       }
 
