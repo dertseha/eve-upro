@@ -37,6 +37,7 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
       this.setupMapListMenu(uiMediator);
       this.setupSettingsMenu(uiMediator);
       this.setupMapMenu(uiMediator);
+      this.setupRoutingMenu(uiMediator);
       this.setupGroupListMenu(uiMediator);
       this.setupGroupEditMenu(uiMediator);
       this.setupSharedObjectMenu(uiMediator);
@@ -160,6 +161,17 @@ upro.ctrl.cmd.NotifiedSessionLoggedInCommand = Class.create(SimpleCommand,
             .registerMediator(new upro.view.mediators.CurrentLocationPanelMediator(panelId, panelId + ".map", 1));
       this.facade().registerMediator(
             new upro.view.mediators.JumpCorridorEditPanelMediator(panelId, panelId + ".map", 2));
+   },
+
+   setupRoutingMenu: function(uiMediator)
+   {
+      var panelId = "nwCtrl";
+
+      uiMediator.setSubMenu(panelId, "routing", 2, upro.res.menu.IconData.Routing, upro.res.text.Lang
+            .format("routing.menuLabel"));
+
+      this.facade().registerMediator(
+            new upro.view.mediators.RoutingRulesPanelMediator(panelId, panelId + ".routing", 1));
    },
 
    setupGroupListMenu: function(uiMediator)

@@ -89,3 +89,25 @@ upro.res.ImageData.Waypoint = "data:image/png;base64,"
       + "dBRHyCgdwVE6iiOkEZI2iIpV+uBAEj3MB6CCiBwLWZleyhlhBr54UZ+Sc6PHaC4nVhAlE8eRgX47"
       + "NXJqkkcGSjCGWc5Bk78abJdgmxhNPM420VVjPETPGGf2wJpkU9Z4ByoT31giD1+o+oHwFSlFS3Cw"
       + "Aj88i2AVncKOQdCt7HEDHOhv1GOG9+IAAAAASUVORK5CYII=";
+
+upro.res.ImageData.Hash = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAZ0lEQVR42mNgQAP///8X+A8BH4gR"
+      + "Z8BigAFI1b9//y4QI47NgACowg3EiGMzoADq1AnEiMMkyQLUMwAZgAIJKm9AjDg273yAKhQgRnyQ"
+      + "pIHBEwugRAKVKyBGHFsUboAqDCBGfHCkAQCp6+Yc2RK44gAAAABJRU5ErkJggg==";
+
+upro.res.ImageData.Fuel = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA50lEQVR42p2TzQoBURSAxxsoZWWp"
+      + "PIOVbKwsrEQkj+A/jzFJkaw0YUE8gY2ylp2d9SxkwQKZ8d26ahbuTHdOfd1zz5zzdbo1hqEI13XH"
+      + "rk84jnM2fIbzcKPpzjkA0wt1W0hUwyl4wofGhaLH9BPU5ZZvsMIKrvBgg1kYQR8acIG1omekFIjX"
+      + "5VtTCsRrn+DohfLrr4BaVsxA6yfwi3+CJaygrS3gnmC9PWcNOtoChifUclCFrpaAPAk7mVegpyuw"
+      + "ICPzsraA9bceWSnMBnOIQwQ2kEZ6CPgbba8gBkOYQlHWogELFETfF7cLf8FTbBSrAAAAAElFTkSu" + "QmCC";
+
+upro.res.ImageData.MinSecurity = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAVElEQVR42mNgwAH+owEGUsGoASPb"
+      + "AKDaDiC+8R8TgMQ6iDGAE4hPYDEAJMZJrCtE//37dwemE8oWJTUMVIEa34AwiE2MBg8suBGKMeQI"
+      + "hjohQDUDALgpdtBgMM3yAAAAAElFTkSuQmCC";
+
+upro.res.ImageData.MaxSecurity = "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWElEQVR42mNggIL/JAIGdEANAzyw"
+      + "4EYoxpBjIASAilT//fv3BoRBbAZSAFCDKFDjHZhzoWxRYjVzAvEJLN4GiXESY0AHEN/AYgBIrIMU"
+      + "b+AP9VEDRg1AAgBEHXbQPNKNLgAAAABJRU5ErkJggg==";

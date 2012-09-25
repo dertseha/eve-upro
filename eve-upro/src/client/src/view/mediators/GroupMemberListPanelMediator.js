@@ -33,7 +33,7 @@ upro.view.mediators.GroupMemberListPanelMediator = Class.create(upro.view.mediat
          {
             view: 'Button',
             rect: '0 0 ' + (dimension.width) + ' 25',
-            anchors: 'left top right bottom',
+            anchors: 'left top right',
             text: upro.res.text.Lang.format("panels.group.members.ban.command"),
             id: 'groupMemberList_ban'
          },

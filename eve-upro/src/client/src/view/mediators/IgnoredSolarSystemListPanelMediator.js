@@ -33,7 +33,7 @@ upro.view.mediators.IgnoredSolarSystemListPanelMediator = Class.create(upro.view
          {
             view: 'Button',
             rect: '0 0 ' + (dimension.width) + ' 25',
-            anchors: 'left top right bottom',
+            anchors: 'left top right',
             text: upro.res.text.Lang.format("panels.ignoredSystems.allow.command"),
             id: 'ignoredSystemsPanel_allow'
          },

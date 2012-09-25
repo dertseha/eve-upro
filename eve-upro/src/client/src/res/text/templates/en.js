@@ -253,5 +253,16 @@ upro.res.text.templates["en"] =
    /** Destroy info */
    "panels.routes.edit.destroy.command": "Destroy",
    /** Reject the shared route */
-   "panels.routes.edit.reject.command": "Reject"
+   "panels.routes.edit.reject.command": "Reject",
+
+   /** menu label for routing rules */
+   "panels.routing.rules.menuLabel": "Routing Rules",
+   /** Routing rule parameter should be increased */
+   "panels.routing.rules.increase.command": "Increase Value",
+   /** Routing rule parameter should be decreased */
+   "panels.routing.rules.decrease.command": "Decrease Value",
+   /** Routing rule should be turned on */
+   "panels.routing.rules.on.command": "Turn Rule On",
+   /** Routing rule should be turned off */
+   "panels.routing.rules.off.command": "Turn Rule Off"
 };

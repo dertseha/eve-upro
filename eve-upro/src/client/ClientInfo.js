@@ -273,6 +273,7 @@ exports.sourceFiles = [];
    'view/mediators/SystemSearchOverlayMediator.js', //
    'view/mediators/RouteListPanelMediator.js', //
    'view/mediators/IgnoredSolarSystemListPanelMediator.js', //
+   'view/mediators/RoutingRulesPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //
