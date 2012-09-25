@@ -1,4 +1,4 @@
-upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
+upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractProxy,
 {
    initialize: function($super)
    {
@@ -42,29 +42,10 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
    onRegister: function()
    {
-      var self = this;
-      var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
-
-      sessionProxy.addBroadcastHandler("CharacterActiveGalaxy", function(broadcastBody)
-      {
-         self.onCharacterActiveGalaxy(broadcastBody);
-      });
-      sessionProxy.addBroadcastHandler("CharacterIgnoredSolarSystems", function(broadcastBody)
-      {
-         self.onCharacterIgnoredSolarSystems(broadcastBody);
-      });
-      sessionProxy.addBroadcastHandler("CharacterRoutingCapabilities", function(broadcastBody)
-      {
-         self.onCharacterRoutingCapabilities(broadcastBody);
-      });
-      sessionProxy.addBroadcastHandler("CharacterRoutingRules", function(broadcastBody)
-      {
-         self.onCharacterRoutingRules(broadcastBody);
-      });
-
-      this.onRoutingCapabilitiesChanged();
-      this.onIgnoredSolarSystemsChanged();
-      this.onRoutingRulesChanged();
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterActiveGalaxy.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterIgnoredSolarSystems.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterRoutingCapabilities.name);
+      this.registerBroadcast(upro.data.clientBroadcastEvents.CharacterRoutingRules.name);
    },
 
    onRemove: function()
@@ -76,7 +57,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetActiveGalaxy",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetActiveGalaxy.name,
       {
          galaxyId: +galaxyId
       });
@@ -112,7 +93,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetRoutingCapabilityJumpBridges",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingCapabilityJumpBridges.name,
       {
          inUse: !this.getRoutingCapJumpBridgesInUse()
       });
@@ -127,7 +108,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetRoutingCapabilityJumpGates",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingCapabilityJumpGates.name,
       {
          inUse: !this.getRoutingCapJumpGatesInUse()
       });
@@ -142,7 +123,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingCapabilityJumpDrive.name,
       {
          inUse: !this.getRoutingCapJumpDriveInUse()
       });
@@ -157,7 +138,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetRoutingCapabilityWormholes",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingCapabilityWormholes.name,
       {
          inUse: !this.getRoutingCapWormholesInUse()
       });
@@ -179,7 +160,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       var value = this.getRoutingCapJumpDriveRange() + (increment ? rangeStep : -rangeStep);
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetRoutingCapabilityJumpDrive",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingCapabilityJumpDrive.name,
       {
          range: value
       });
@@ -199,12 +180,17 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
 
    toggleIgnoredSolarSystem: function(solarSystemId)
    {
+      this.setIgnoredSolarSystemsIgnoreState(!this.isSolarSystemIgnored(solarSystemId), [ solarSystemId ]);
+   },
+
+   setIgnoredSolarSystemsIgnoreState: function(ignore, solarSystemIdList)
+   {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-      sessionProxy.sendRequest("SetIgnoredSolarSystem",
+      sessionProxy.sendRequest(upro.data.clientRequests.SetIgnoredSolarSystem.name,
       {
-         solarSystemId: solarSystemId,
-         ignore: !this.isSolarSystemIgnored(solarSystemId)
+         solarSystemIds: solarSystemIdList,
+         ignore: ignore
       });
    },
 
@@ -283,7 +269,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       {
          var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-         sessionProxy.sendRequest("SetRoutingRuleData",
+         sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingRuleData.name,
          {
             name: ruleType,
             inUse: !rule.inUse
@@ -305,7 +291,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
       {
          var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-         sessionProxy.sendRequest("SetRoutingRuleData",
+         sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingRuleData.name,
          {
             name: ruleType,
             parameter: rule.parameter + (increment ? rule.template.increment : -rule.template.increment)
@@ -332,7 +318,7 @@ upro.model.proxies.UserSettingsProxy = Class.create(Proxy,
          {
             var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
 
-            sessionProxy.sendRequest("SetRoutingRuleIndex",
+            sessionProxy.sendRequest(upro.data.clientRequests.SetRoutingRuleIndex.name,
             {
                name: ruleType,
                index: newIndex

@@ -183,6 +183,11 @@ upro.res.text.templates["en"] =
    /** Display others location of given group */
    "panels.currentLocation.display.command": "Display Others",
 
+   /** Menu label for ignored solar systems */
+   "panels.map.ignoredSystems.menuLabel": "Ignored Solar Systems",
+   /** Command for allowing an ignored system again */
+   "panels.ignoredSystems.allow.command": "Allow System",
+
    /** Session control panel */
    "panels.session.menuLabel": "Session Control",
    /** Logout command */

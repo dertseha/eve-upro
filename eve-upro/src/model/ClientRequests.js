@@ -117,7 +117,7 @@
          {
             schema:
             {
-               solarSystemId: Number,
+               solarSystemIds: Array.of(Number),
                ignore: Boolean
             },
             isValid: null

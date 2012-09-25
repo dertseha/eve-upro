@@ -326,18 +326,23 @@ function CharacterServiceData(service, character)
    this.processClientRequestSetIgnoredSolarSystem = function(header, body)
    {
       var changed = false;
-      var index = this.rawData.ignoredSolarSystems.indexOf(body.solarSystemId);
+      var rawData = this.rawData;
 
-      if (body.ignore && (index < 0))
+      body.solarSystemIds.forEach(function(solarSystemId)
       {
-         this.rawData.ignoredSolarSystems.push(body.solarSystemId);
-         changed = true;
-      }
-      else if (!body.ignore && (index >= 0))
-      {
-         this.rawData.ignoredSolarSystems.splice(index, 1);
-         changed = true;
-      }
+         var index = rawData.ignoredSolarSystems.indexOf(solarSystemId);
+
+         if (body.ignore && (index < 0))
+         {
+            rawData.ignoredSolarSystems.push(solarSystemId);
+            changed = true;
+         }
+         else if (!body.ignore && (index >= 0))
+         {
+            rawData.ignoredSolarSystems.splice(index, 1);
+            changed = true;
+         }
+      });
 
       return changed ? [ busMessages.Broadcasts.CharacterIgnoredSolarSystems.name ] : [];
    };

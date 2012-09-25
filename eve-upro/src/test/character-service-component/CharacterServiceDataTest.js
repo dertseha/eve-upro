@@ -44,12 +44,12 @@ function Fixture()
       this.serviceData.rawData.ignoredSolarSystems = ignoredSolarSystems;
    };
 
-   this.whenProcessingCharacterSetIgnoredSolarSystem = function(solarSystemId, ignore)
+   this.whenProcessingCharacterSetIgnoredSolarSystem = function(solarSystemIds, ignore)
    {
       var header = {};
       var body =
       {
-         solarSystemId: solarSystemId,
+         solarSystemIds: solarSystemIds,
          ignore: ignore
       };
 
@@ -61,9 +61,9 @@ function Fixture()
       test.deepEqual(this.serviceData.rawData.ignoredSolarSystems, expected);
    };
 
-   this.thenProcessCharacterSetIgnoredSolarSystemShouldReturn = function(test, solarSystem, ignore, expectedResult)
+   this.thenProcessCharacterSetIgnoredSolarSystemShouldReturn = function(test, solarSystems, ignore, expectedResult)
    {
-      var result = this.whenProcessingCharacterSetIgnoredSolarSystem(solarSystem, ignore);
+      var result = this.whenProcessingCharacterSetIgnoredSolarSystem(solarSystems, ignore);
 
       test.deepEqual(result, expectedResult);
    };
@@ -254,7 +254,7 @@ exports.testIgnoredSolarSystemsChanged_WhenANewOneGettingIgnored = function(test
 {
    this.fixture.givenIgnoredSolarSystems([]);
 
-   this.fixture.whenProcessingCharacterSetIgnoredSolarSystem(100, true);
+   this.fixture.whenProcessingCharacterSetIgnoredSolarSystem([ 100 ], true);
 
    this.fixture.thenIgnoredSolarSystemsShouldBe(test, [ 100 ]);
 
@@ -265,7 +265,7 @@ exports.testIgnoredSolarSystemsChanged_WhenAnIgnoredOneGettingAllowed = function
 {
    this.fixture.givenIgnoredSolarSystems([ 100, 110 ]);
 
-   this.fixture.whenProcessingCharacterSetIgnoredSolarSystem(100, false);
+   this.fixture.whenProcessingCharacterSetIgnoredSolarSystem([ 100 ], false);
 
    this.fixture.thenIgnoredSolarSystemsShouldBe(test, [ 110 ]);
 
@@ -276,7 +276,7 @@ exports.testProcessSetIgnoredSolarSystemShouldReturnEmptyArray_WhenUnchanged = f
 {
    this.fixture.givenIgnoredSolarSystems([ 100, 110 ]);
 
-   this.fixture.thenProcessCharacterSetIgnoredSolarSystemShouldReturn(test, 110, true, []);
+   this.fixture.thenProcessCharacterSetIgnoredSolarSystemShouldReturn(test, [ 110 ], true, []);
 
    test.done();
 };
@@ -285,7 +285,7 @@ exports.testProcessSetIgnoredSolarSystemShouldReturnNotifier_WhenChanged = funct
 {
    this.fixture.givenIgnoredSolarSystems([ 100, 110 ]);
 
-   this.fixture.thenProcessCharacterSetIgnoredSolarSystemShouldReturn(test, 210, true,
+   this.fixture.thenProcessCharacterSetIgnoredSolarSystemShouldReturn(test, [ 210 ], true,
          [ 'CharacterIgnoredSolarSystems' ]);
 
    test.done();

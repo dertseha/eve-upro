@@ -83,11 +83,11 @@ function Fixture()
       };
    };
 
-   this.whenBroadcastSetIgnoredSolarSystemIsReceived = function(sessionId, solarSystemId, ignore)
+   this.whenBroadcastSetIgnoredSolarSystemIsReceived = function(sessionId, solarSystemIds, ignore)
    {
       this.whenBroadcastReceived(busMessages.Broadcasts.ClientRequestSetIgnoredSolarSystem.name, sessionId,
       {
-         solarSystemId: solarSystemId,
+         solarSystemIds: solarSystemIds,
          ignore: ignore
       });
    };
@@ -230,12 +230,12 @@ exports.testCharacterIgnoredSolarSystemsSent_WhenDisabledGetsEnabled = function(
       id: charId,
       data:
       {
-         ignoredSolarSystems: [ 123, 456, 789 ]
+         ignoredSolarSystems: [ 123, 456, 789, 111 ]
       }
    } ]);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
-   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, 456, false);
+   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, [ 111, 456 ], false);
 
    test.expect(1);
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',
@@ -261,7 +261,7 @@ exports.testCharacterIgnoredSolarSystemsSent_WhenEnabledGetsDisabled = function(
    } ]);
    this.fixture.givenExistingCharacterSession(charId, sessionId);
 
-   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, 123, true);
+   this.fixture.whenBroadcastSetIgnoredSolarSystemIsReceived(sessionId, [ 123 ], true);
 
    test.expect(1);
    this.fixture.thenTheLastBroadcastShouldHaveBeen(test, 'CharacterIgnoredSolarSystems',

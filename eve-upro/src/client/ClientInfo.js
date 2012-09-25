@@ -177,6 +177,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedScenePointerActivationCommand.js', //
    'control/commands/NotifiedUserIgnoredSolarSystemsChangedCommand.js', //
    'control/commands/NotifiedUserIgnoredSolarSystemIgnoreToggleCommand.js', //
+   'control/commands/NotifiedUserIgnoredSolarSystemsSetIgnoreStateCommand.js', //
    'control/commands/NotifiedActiveRouteResetCommand.js', //
    'control/commands/NotifiedActiveRouteRecalculateCommand.js', //
    'control/commands/NotifiedActiveRouteRemoveEntryCommand.js', //
@@ -270,6 +271,8 @@ exports.sourceFiles = [];
    'view/mediators/RouteListPanelMediator.js', //
    'view/mediators/GroupInterestPanelMediator.js', //
    'view/mediators/SystemSearchOverlayMediator.js', //
+   'view/mediators/RouteListPanelMediator.js', //
+   'view/mediators/IgnoredSolarSystemListPanelMediator.js', //
 
    'app/app.js', //
    'app/Notifications.js', //

@@ -61,6 +61,8 @@ upro.app.Notifications =
    UserIgnoredSolarSystemsChanged: 0,
    /** Have a system change its ignored status. Param: SolarSystem */
    UserIgnoredSolarSystemIgnoreToggle: 0,
+   /** Set the ignore state for a list of systems */
+   UserIgnoredSolarSystemsSetIgnoreState: 0,
 
    /** Notified when the routing rules have been changed */
    UserRoutingRulesChanged: 0,
