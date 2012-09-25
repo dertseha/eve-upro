@@ -4,6 +4,8 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractP
    {
       $super(upro.model.proxies.UserSettingsProxy.NAME);
 
+      this.activeGalaxy = null;
+
       this.ignoredSolarSystems = [ 30000142 ]; // Jita
 
       this.routingCapabilities =
@@ -53,6 +55,11 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractP
       this.notifyActiveGalaxyChanged(undefined);
    },
 
+   getActiveGalaxy: function()
+   {
+      return this.activeGalaxy;
+   },
+
    setActiveGalaxy: function(galaxyId)
    {
       var sessionProxy = this.facade().retrieveProxy(upro.model.proxies.SessionControlProxy.NAME);
@@ -65,7 +72,8 @@ upro.model.proxies.UserSettingsProxy = Class.create(upro.model.proxies.AbstractP
 
    onCharacterActiveGalaxy: function(broadcastBody)
    {
-      this.notifyActiveGalaxyChanged(broadcastBody.galaxyId);
+      this.activeGalaxy = broadcastBody.galaxyId;
+      this.notifyActiveGalaxyChanged(this.activeGalaxy);
    },
 
    notifyActiveGalaxyChanged: function(galaxyId)

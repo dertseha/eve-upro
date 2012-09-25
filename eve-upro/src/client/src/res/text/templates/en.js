@@ -108,6 +108,11 @@ upro.res.text.templates["en"] =
    /** hide the UI */
    "view.setUiInvisible": "Hide UI",
 
+   /** Show New Eden galaxy */
+   "view.galaxy.newEden": "Show New Eden",
+   /** Show Wormhole galaxy */
+   "view.galaxy.wSpace": "Show Wormhole Space",
+
    /** Settings menu label */
    "settings.menuLabel": "Settings",
 

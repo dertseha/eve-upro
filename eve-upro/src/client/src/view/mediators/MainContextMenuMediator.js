@@ -113,6 +113,23 @@ upro.view.mediators.MainContextMenuMediator = Class
                      }, upro.res.text.Lang.format("view.setUiVisible"));
                      viewMenu.setCommand(3, this.createVectorIcon.bind(this, upro.res.menu.IconData.Windows),
                            this.commandUiView);
+
+                     this.commandShowNewEden = new upro.hud.SimpleCommandAdapter(function()
+                     {
+                        mediator.notify(upro.app.Notifications.SetActiveGalaxy,
+                              upro.model.proxies.UniverseProxy.GALAXY_ID_NEW_EDEN);
+                        mediator.cancel();
+                     }, upro.res.text.Lang.format("view.galaxy.newEden"));
+                     viewMenu.setCommand(4, this.createVectorIcon.bind(this, upro.res.menu.IconData.Galaxy),
+                           this.commandShowNewEden);
+                     this.commandShowWSpace = new upro.hud.SimpleCommandAdapter(function()
+                     {
+                        mediator.notify(upro.app.Notifications.SetActiveGalaxy,
+                              upro.model.proxies.UniverseProxy.GALAXY_ID_W_SPACE);
+                        mediator.cancel();
+                     }, upro.res.text.Lang.format("view.galaxy.wSpace"));
+                     viewMenu.setCommand(5, this.createVectorIcon.bind(this, upro.res.menu.IconData.StaticWormhole),
+                           this.commandShowWSpace);
                   }
                },
 
@@ -173,6 +190,7 @@ upro.view.mediators.MainContextMenuMediator = Class
                   this.updateCommandActiveRoute();
                   this.updateCommandRoutingCapabilities();
                   this.updateCommandRoutingRules();
+                  this.updateCommandView();
                },
 
                /**
@@ -278,6 +296,19 @@ upro.view.mediators.MainContextMenuMediator = Class
                         commandEntry.down.setPossible(i < (rules.length - 1));
                      }
                   }
+               },
+
+               updateCommandView: function()
+               {
+                  var settingsProxy = this.facade().retrieveProxy(upro.model.proxies.UserSettingsProxy.NAME);
+                  var activeGalaxyId = settingsProxy.getActiveGalaxy();
+                  var isNewEden = activeGalaxyId === upro.model.proxies.UniverseProxy.GALAXY_ID_NEW_EDEN;
+                  var isWSpace = activeGalaxyId === upro.model.proxies.UniverseProxy.GALAXY_ID_W_SPACE;
+
+                  this.commandShowNewEden.setPossible(!isNewEden);
+                  this.commandShowNewEden.setActive(isNewEden);
+                  this.commandShowWSpace.setPossible(!isWSpace);
+                  this.commandShowWSpace.setActive(isWSpace);
                },
 
                /** Notification handler */
