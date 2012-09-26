@@ -42,6 +42,28 @@ upro.view.mediators.SystemSearchOverlayMediator = Class.create(upro.view.mediato
    },
 
    /**
+    * Finds solar systems by their name and given (regex) search string
+    * 
+    * @param searchString the regular expression to apply
+    * @returns {Array} containing the matching systems
+    */
+   findSolarSystems: function(searchString)
+   {
+      var regexp = new RegExp(searchString, 'i');
+      var result = [];
+
+      this.galaxy.solarSystems.forEachObject(function(solarSystem)
+      {
+         if (regexp.test(solarSystem.name))
+         {
+            result.push(solarSystem);
+         }
+      });
+
+      return result;
+   },
+
+   /**
     * Searches the known solar systems for given fragment in their name
     * 
     * @param fragment to look for
@@ -59,25 +81,24 @@ upro.view.mediators.SystemSearchOverlayMediator = Class.create(upro.view.mediato
          var startsWithDash = startChar === "-";
          var startsWithUpperCase = startChar.match(/[A-Z]/);
          var isShort = (fragment.length <= 3);
-         var searchString = (!startsWithDash && (isShort || startsWithUpperCase)) ? "\\b" + fragment : fragment;
-         var regexp = new RegExp(searchString, 'i');
 
          rCode = true;
-         this.galaxy.solarSystems.forEachObject(function(solarSystem)
+         if (!startsWithDash && (isShort || startsWithUpperCase))
          {
-            if (regexp.test(solarSystem.name))
-            {
-               result.push(solarSystem);
-            }
+            result = this.findSolarSystems("\\b" + fragment);
+         }
+         if (!startsWithUpperCase && (result.length == 0))
+         {
+            result = this.findSolarSystems(fragment);
+         }
+         result.sort(function(solarSystemA, solarSystemB)
+         {
+            return solarSystemA.name.localeCompare(solarSystemB.name);
          });
+         result = result.slice(0, upro.view.mediators.SystemSearchOverlayMediator.MAX_RESULTS);
       }
-      result.sort(function(solarSystemA, solarSystemB)
-      {
-         return solarSystemA.name.localeCompare(solarSystemB.name);
-      });
 
       this.clearResultLines();
-      result = result.slice(0, upro.view.mediators.SystemSearchOverlayMediator.MAX_RESULTS);
       result.forEach(function(solarSystem)
       {
          that.addResultLine(solarSystem);
