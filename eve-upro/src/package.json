@@ -13,7 +13,6 @@
   "dependencies":
   {
     "amqp":             "0.1.x",
-    "connect-mongodb":  "1.1.x",
     "express":          "3.0.x",
     "js-schema":        "0.5.x",
     "limiter":          "1.0.x",

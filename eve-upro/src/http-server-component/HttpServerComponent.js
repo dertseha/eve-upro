@@ -6,7 +6,6 @@ var fs = require('fs');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 var express = require('express');
-var MongoStore = require('connect-mongodb');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var RateLimiter = require('limiter').RateLimiter;
@@ -18,6 +17,8 @@ var ConnectRateLimiter = require('../util/connect-rate-limit.js');
 
 var uglify = require('../util/connect-uglify.js');
 var clientInfo = require('../client/ClientInfo.js');
+
+var getMongoStore = require('../util/connect-sessionstore-mongodb.js');
 
 passport.serializeUser(function(user, done)
 {
@@ -165,12 +166,14 @@ function HttpServerComponent(services, options)
       }
 
       this.expressServer = expressServer;
-      this.sessionStore = new MongoStore(
+      this.sessionStore = getMongoStore(
       {
          db: this.mongodb.getDatabase(),
 
-         reapInterval: this.options.reapInterval,
-         collection: this.options.collection
+         collectionName: this.options.collection,
+         ttlSec: 60 * 10
+      }, function()
+      {
       });
 
       expressServer.configure(function()
