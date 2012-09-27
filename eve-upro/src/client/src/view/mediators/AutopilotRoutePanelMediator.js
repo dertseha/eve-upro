@@ -63,24 +63,21 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
 
    setRoute: function(route)
    {
-      var universeProxy = this.facade().retrieveProxy(upro.model.proxies.UniverseProxy.NAME);
       var data = [];
       var jumpType = upro.nav.JumpType.None;
 
-      for ( var i = 0; i < route.length; i++)
+      route.forEach(function(routeEntry)
       {
-         var routeEntry = route[i];
          var displayEntry =
          {
             routeEntry: routeEntry,
             isNext: false,
-            jumpType: jumpType,
-            solarSystem: universeProxy.findSolarSystemById(routeEntry.solarSystemId)
+            jumpType: jumpType
          };
 
          jumpType = routeEntry.nextJumpType;
          data.push(displayEntry);
-      }
+      });
 
       this.routeList.data(data);
       this.routeList.parent().layout();
@@ -109,7 +106,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       return '#' + colors[index];
    },
 
-   getImageForEntryType: function(routeEntry)
+   getImageForEntryType: function(entryType)
    {
       var entryTypes = {};
 
@@ -117,7 +114,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       entryTypes[upro.nav.SystemRouteEntry.EntryType.Waypoint] = upro.res.ImageData.Waypoint;
       entryTypes[upro.nav.SystemRouteEntry.EntryType.Transit] = upro.res.ImageData.Transparent;
 
-      return entryTypes[routeEntry.entryType];
+      return entryTypes[entryType];
    },
 
    getImageForJumpType: function(jumpType)
@@ -154,10 +151,10 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForJumpType(data.jumpType) + '">' + '</img></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;background:'
-            + this.getColorBySecurityLevel(data.solarSystem) + ';"></div>' + '</td>';
+            + this.getColorBySecurityLevel(data.routeEntry.getSolarSystem()) + ';"></div>' + '</td>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
-            + this.getImageForEntryType(data.routeEntry) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.solarSystem.name + '</td>';
+            + this.getImageForEntryType(data.routeEntry.getEntryType()) + '">' + '</img></div>' + '</td>';
+      result += '<td>' + data.routeEntry.getSolarSystem().name + '</td>';
       result += '</tr></table>';
 
       return result;
