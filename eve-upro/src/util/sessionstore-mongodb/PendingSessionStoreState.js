@@ -1,5 +1,5 @@
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.get('root');
 
 var getSessionStoreStateInterface = require('./SessionStoreStateInterface.js');
 var getActiveSessionStoreState = require('./ActiveSessionStoreState.js');

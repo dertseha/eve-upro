@@ -1,8 +1,8 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.get('root');
 
 /**
  * ServiceControl is a dependency injection system for components with service characteristics (which need to be started

@@ -1,7 +1,7 @@
 var util = require('util');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.get('root');
 
 var busMessages = require('../model/BusMessages.js');
 var RoutingRules = require('../model/navigation/RoutingRules.js').RoutingRules;

@@ -1,8 +1,8 @@
 var amqp = require('amqp');
 var util = require('util');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.get('root');
 
 var Component = require('./Component.js');
 var busMessages = require('../model/BusMessages.js');

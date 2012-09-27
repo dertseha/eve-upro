@@ -3,8 +3,8 @@ var http = require('http');
 var path = require('path');
 var fs = require('fs');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.get('root');
 var express = require('express');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -195,10 +195,6 @@ function HttpServerComponent(services, options)
          }));
          expressServer.use(express.limit('100kb'));
          expressServer.use(express.favicon(path.normalize(__dirname + '/public/images/favicon.ico')));
-         expressServer.use(log4js.connectLogger(logger,
-         {
-            level: log4js.levels.TRACE
-         }));
          expressServer.use(express.bodyParser());
          expressServer.use(express.methodOverride());
          expressServer.use(express.cookieParser(cookieSecret));
@@ -324,7 +320,7 @@ function HttpServerComponent(services, options)
       {
          if (req.session.cookie.maxAge > 0)
          {
-            logger.debug('Resetting maxAge of session cookie');
+            logger.verbose('Resetting maxAge of session cookie');
             req.session.cookie.maxAge = this.stayLoggedInAge;
          }
 
@@ -523,7 +519,7 @@ function HttpServerComponent(services, options)
       {
          if (req.body.stayLoggedIn == 'true')
          {
-            logger.debug("KeyId " + req.body.keyId + " requests to stay logged in...");
+            logger.verbose("KeyId " + req.body.keyId + " requests to stay logged in...");
             req.session.cookie.maxAge = this.stayLoggedInAge;
          }
          this.sessionHandler.onLogInRequest(keyId, vCode, done);

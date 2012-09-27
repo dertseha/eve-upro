@@ -1,8 +1,17 @@
 var path = require('path');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.add('root', {});
 var nconf = require('nconf');
+
+logger.remove(winston.transports.Console);
+logger.setLevels(winston.config.cli.levels);
+logger.add(winston.transports.Console,
+{
+   level: 'verbose',
+   colorize: true,
+   timestamp: true
+});
 
 logger.info('Initializing application...');
 
@@ -28,8 +37,6 @@ var RouteServiceComponentBuilder = require('./route-service-component/RouteServi
 var cloudMongo = null;
 var cloudRabbit = null;
 
-logger.setLevel(log4js.levels.DEBUG);
-
 function extractCloudConfiguration()
 {
    if (process.env.VCAP_SERVICES)
@@ -39,12 +46,14 @@ function extractCloudConfiguration()
       cloudMongo = env['mongodb-1.8'][0]['credentials'];
       cloudRabbit = env['rabbitmq-2.4'][0]['credentials'];
 
-      logger.setLevel(log4js.levels.INFO);
-      log4js.loadAppender('file');
-      log4js.clearAppenders();
-      log4js.addAppender(log4js.appenders.file(path.normalize(__dirname + '/../logs/upro.log'), null, 1024 * 1024 * 2));
-      // log4js.addAppender(log4js.appenders.console(log4js.layouts.basicLayout));
-      log4js.replaceConsole(logger);
+      logger.remove(winston.transports.Console);
+      logger.add(winston.add(winston.transports.File, options),
+      {
+         level: 'info',
+         timestamp: true,
+         maxsize: 1024 * 1024 * 2,
+         maxFiles: 10
+      });
    }
 }
 extractCloudConfiguration();

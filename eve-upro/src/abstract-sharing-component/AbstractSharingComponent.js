@@ -1,7 +1,7 @@
 var util = require('util');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var winston = require('winston');
+var logger = winston.loggers.get('root');
 
 var UuidFactory = require('../util/UuidFactory.js');
 var Functional = require('../util/Functional.js');
@@ -262,7 +262,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
          });
          if (!inUse[documentId])
          {
-            logger.debug('Shared Object ' + objectTypeBaseName + ' [' + documentId
+            logger.verbose('Shared Object ' + objectTypeBaseName + ' [' + documentId
                   + '] is not referenced anymore. Cleanup.');
             delete this.dataStatesById[documentId];
          }
