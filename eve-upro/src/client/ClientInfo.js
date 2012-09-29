@@ -167,6 +167,7 @@ exports.sourceFiles = [];
    'control/commands/NotifiedActiveInGameBrowserControlChangedCommand.js', //
    'control/commands/NotifiedAutopilotRouteChangedCommand.js', //
    'control/commands/NotifiedAutopilotNextRouteIndexChangedCommand.js', //
+   'control/commands/NotifiedClearAutopilotRouteRequestCommand.js', //
    'control/commands/NotifiedCharacterLocationStatusCommand.js', //
    'control/commands/NotifiedCharacterListInSolarSystemChangedCommand.js', //
    'control/commands/NotifiedModifyLocationStatusGroupSettingsCommand.js', //

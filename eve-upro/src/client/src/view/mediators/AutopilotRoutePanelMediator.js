@@ -11,6 +11,8 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       this.menuPath = menuPath;
       this.menuIndex = menuIndex;
 
+      this.clearButton = null;
+
       this.routeList = null;
    },
 
@@ -22,33 +24,46 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
 
       this.uiBase = uki(
       {
-         view: 'ScrollPane',
+         view: 'Box',
          rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
          anchors: 'left top right bottom',
          id: 'autopilotRoutePanel_base',
-         textSelectable: false,
-         style:
-         {
-            'border-style': 'solid',
-            'border-width': '2px',
-            'border-color': '#704010'
-         },
          childViews: [
          {
-            view: 'List',
-            rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height),
-            anchors: 'top left right bottom',
-            id: 'autopilotRoute',
+            view: 'Button',
+            rect: '0 0 ' + (dimension.width) + ' 25',
+            anchors: 'top right width',
+            text: upro.res.text.Lang.format("panels.autopilot.edit.clear.command"),
+            id: 'autopilotRoute_clear'
+         },
+         {
+            view: 'ScrollPane',
+            rect: '0 30 ' + (dimension.width) + ' ' + (dimension.height - 30),
+            anchors: 'left top right bottom',
+            textSelectable: false,
             style:
             {
-               fontSize: '12px',
-               lineHeight: '18px'
+               'border-style': 'solid',
+               'border-width': '2px',
+               'border-color': '#704010'
             },
-            render:
+            childViews: [
             {
-               render: this.routeRenderer.bind(this),
-               setSelected: this.setSelected.bind(this)
-            }
+               view: 'List',
+               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 30),
+               anchors: 'top left right bottom',
+               id: 'autopilotRoute_list',
+               style:
+               {
+                  fontSize: '12px',
+                  lineHeight: '18px'
+               },
+               render:
+               {
+                  render: this.routeRenderer.bind(this),
+                  setSelected: this.setSelected.bind(this)
+               }
+            } ]
          } ]
       });
       this.uiBase.attachTo(panel);
@@ -58,7 +73,10 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
       uiMediator.setBaseView(this.panelId, this.menuPath, this.menuIndex, upro.res.menu.IconData.Autopilot,
             upro.res.text.Lang.format("panels.autopilot.route.menuLabel"), "autopilotRoute", base);
 
-      this.routeList = uki('#autopilotRoute');
+      this.routeList = uki('#autopilotRoute_list');
+      this.clearButton = uki("#autopilotRoute_clear")[0];
+      this.clearButton.disabled(true);
+      this.clearButton.bind('click', this.onClearButton.bind(this));
    },
 
    setRoute: function(route)
@@ -81,6 +99,15 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
 
       this.routeList.data(data);
       this.routeList.parent().layout();
+
+      this.updateControls();
+   },
+
+   updateControls: function()
+   {
+      var isEmpty = this.routeList.data().length === 0;
+
+      this.clearButton.disabled(isEmpty);
    },
 
    setNextRouteIndex: function(index)
@@ -163,6 +190,14 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
    setSelected: function(item, data, state, hasFocus)
    {
 
+   },
+
+   onClearButton: function()
+   {
+      if (!this.clearButton.disabled())
+      {
+         this.facade().sendNotification(upro.app.Notifications.ClearAutopilotRouteRequest);
+      }
    }
 });
 

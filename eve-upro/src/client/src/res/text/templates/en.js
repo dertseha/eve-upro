@@ -126,6 +126,9 @@ upro.res.text.templates["en"] =
    /** Autopilot Route Panel menu label */
    "panels.autopilot.route.menuLabel": "Autopilot Route",
 
+   /** Clear the autopilot */
+   "panels.autopilot.edit.clear.command": "Clear",
+
    /** Hint for the route name */
    "panels.activeRoute.edit.nameHint": "Enter Name",
    /** Command name for creating a new route */
