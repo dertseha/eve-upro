@@ -186,7 +186,7 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
       result = '<table style="width:100%;height:100%"><tr>';
       result += '<td style="width:16px;">' + '<div style="height:16px;">' + '<img style="height:16px;" src="'
             + this.getImageForOwner(data.route) + '">' + '</img></div>' + '</td>';
-      result += '<td>' + data.route.getName().escapeHTML() + '</td>';
+      result += '<td>' + data.route.getName().escapeHTML() + ' (' + data.route.getRoute().length + ')</td>';
       result += '</tr></table>';
 
       return result;
