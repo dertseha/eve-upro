@@ -102,8 +102,10 @@ function MongoDbComponent(options)
             {
                collection.ensureIndex(def, function(err)
                {
-                  logger.info('Ensured index for [' + collectionName + ']: ' + JSON.stringify(def) + ', error: ['
-                        + JSON.stringify(err) + ']');
+                  logger.info('Ensured index for [' + collectionName + ']: ' + JSON.stringify(def),
+                  {
+                     error: err
+                  });
                });
             });
             self.onCollection(collection, callback);

@@ -13,26 +13,9 @@ logger.add(winston.transports.Console,
    timestamp: true
 });
 
-logger.info('Initializing application...');
-
-var ServiceControl = require('./components/ServiceControl.js');
-var ComponentBuilder = require("./components/ComponentBuilder.js");
-
-var AmqpComponentBuilder = require('./components/AmqpComponentBuilder.js');
-var MongoDbComponentBuilder = require('./components/MongoDbComponentBuilder.js');
-
-var EveApiMsgComponentBuilder = require('./eveapi-msg-component/EveApiMsgComponentBuilder.js');
-var EveApiComponentBuilder = require('./eveapi-component/EveApiComponentBuilder.js');
-var HttpServerComponentBuilder = require('./http-server-component/HttpServerComponentBuilder.js');
-var BodyRegisterComponentBuilder = require('./bodyregister-service-component/BodyRegisterServiceComponentBuilder.js');
-var CharacterAgentComponentBuilder = require('./character-agent-component/CharacterAgentComponentBuilder.js');
-var ClientSessionComponentBuilder = require('./client-session-component/ClientSessionComponentBuilder.js');
-var GroupServiceComponentBuilder = require('./group-service-component/GroupServiceComponentBuilder.js');
-var LocationServiceComponentBuilder = require('./location-service-component/LocationServiceComponentBuilder.js');
-var CharacterServiceComponentBuilder = require('./character-service-component/CharacterServiceComponentBuilder.js');
-var AutopilotServiceComponentBuilder = require('./autopilot-service-component/AutopilotServiceComponentBuilder.js');
-var JumpCorridorServiceComponentBuilder = require('./jumpcorridor-service-component/JumpCorridorServiceComponentBuilder.js');
-var RouteServiceComponentBuilder = require('./route-service-component/RouteServiceComponentBuilder.js');
+// ///////////////////////////////////////////////////////////////////////////
+// Configuration
+// ///////////////////////////////////////////////////////////////////////////
 
 var cloudMongo = null;
 var cloudRabbit = null;
@@ -47,10 +30,13 @@ function extractCloudConfiguration()
       cloudRabbit = env['rabbitmq-2.4'][0]['credentials'];
 
       logger.remove(winston.transports.Console);
-      logger.add(winston.add(winston.transports.File, options),
+      logger.add(winston.transports.File,
       {
          level: 'info',
          timestamp: true,
+         json: false,
+
+         filename: path.normalize(__dirname + '/../logs/upro.log'),
          maxsize: 1024 * 1024 * 2,
          maxFiles: 10
       });
@@ -105,8 +91,83 @@ nconf.defaults(
    },
    'client': {
 
+   },
+   'logging':
+   {
+      'loggly':
+      {
+         level: 'info',
+         timestamp: true,
+         json: true
+      },
+      'logentries':
+      {
+         level: 'info',
+         timestamp: true,
+         json: true,
+      }
    }
 });
+
+// ///////////////////////////////////////////////////////////////////////////
+// Essentials
+// ///////////////////////////////////////////////////////////////////////////
+
+(function(logentriesConfig)
+{
+   if (logentriesConfig && logentriesConfig.userKey)
+   {
+      require('./util/winston-logentries.js');
+
+      logger.add(winston.transports.Logentries, logentriesConfig);
+   }
+})(nconf.get('logging').logentries);
+
+(function(logglyConfig)
+{
+   if (logglyConfig && logglyConfig.subdomain)
+   {
+      require('winston-loggly');
+      var Loggly = winston.transports.Loggly;
+      var origLog = Loggly.prototype.log;
+      var logCounter = 0;
+
+      Loggly.prototype.log = function(level, msg, meta, callback)
+      {
+         var stampedMeta = meta || {};
+
+         stampedMeta.logId = logCounter++;
+         stampedMeta.serverTime = (new Date()).toISOString();
+         origLog.call(this, level, msg, stampedMeta, callback);
+      };
+      logger.add(Loggly, logglyConfig);
+   }
+})(nconf.get('logging').loggly);
+
+// ///////////////////////////////////////////////////////////////////////////
+// Application Logic
+// ///////////////////////////////////////////////////////////////////////////
+
+logger.info('Initializing application...');
+
+var ServiceControl = require('./components/ServiceControl.js');
+var ComponentBuilder = require("./components/ComponentBuilder.js");
+
+var AmqpComponentBuilder = require('./components/AmqpComponentBuilder.js');
+var MongoDbComponentBuilder = require('./components/MongoDbComponentBuilder.js');
+
+var EveApiMsgComponentBuilder = require('./eveapi-msg-component/EveApiMsgComponentBuilder.js');
+var EveApiComponentBuilder = require('./eveapi-component/EveApiComponentBuilder.js');
+var HttpServerComponentBuilder = require('./http-server-component/HttpServerComponentBuilder.js');
+var BodyRegisterComponentBuilder = require('./bodyregister-service-component/BodyRegisterServiceComponentBuilder.js');
+var CharacterAgentComponentBuilder = require('./character-agent-component/CharacterAgentComponentBuilder.js');
+var ClientSessionComponentBuilder = require('./client-session-component/ClientSessionComponentBuilder.js');
+var GroupServiceComponentBuilder = require('./group-service-component/GroupServiceComponentBuilder.js');
+var LocationServiceComponentBuilder = require('./location-service-component/LocationServiceComponentBuilder.js');
+var CharacterServiceComponentBuilder = require('./character-service-component/CharacterServiceComponentBuilder.js');
+var AutopilotServiceComponentBuilder = require('./autopilot-service-component/AutopilotServiceComponentBuilder.js');
+var JumpCorridorServiceComponentBuilder = require('./jumpcorridor-service-component/JumpCorridorServiceComponentBuilder.js');
+var RouteServiceComponentBuilder = require('./route-service-component/RouteServiceComponentBuilder.js');
 
 var serviceControl = new ServiceControl();
 
