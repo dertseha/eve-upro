@@ -12,6 +12,8 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
       this.menuIndex = menuIndex;
 
       this.setActiveButton = null;
+      this.addActiveButton = null;
+      this.setAutopilotButton = null;
       this.destroyButton = null;
       this.rejectButton = null;
 
@@ -46,19 +48,33 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
             view: 'Button',
             rect: (halfWidth + 2) + ' 0 ' + (halfWidth - 2) + ' 25',
             anchors: 'top right width',
+            text: upro.res.text.Lang.format("panels.routes.edit.addActive.command"),
+            id: 'routeListPanel_addActive'
+         },
+         {
+            view: 'Button',
+            rect: (halfWidth + 2) + ' 30 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top right width',
             text: upro.res.text.Lang.format("panels.routes.edit.destroy.command"),
             id: 'routeListPanel_destroy'
          },
          {
             view: 'Button',
-            rect: (halfWidth + 2) + ' 0 ' + (halfWidth - 2) + ' 25',
+            rect: (halfWidth + 2) + ' 30 ' + (halfWidth - 2) + ' 25',
             anchors: 'top right width',
             text: upro.res.text.Lang.format("panels.routes.edit.reject.command"),
             id: 'routeListPanel_reject'
          },
          {
+            view: 'Button',
+            rect: '0 30 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top left width',
+            text: upro.res.text.Lang.format("panels.routes.edit.setAutopilot.command"),
+            id: 'routeListPanel_setAutopilot'
+         },
+         {
             view: 'ScrollPane',
-            rect: '0 30 ' + (dimension.width) + ' ' + (dimension.height - 30),
+            rect: '0 60 ' + (dimension.width) + ' ' + (dimension.height - 60),
             anchors: 'left top right bottom',
             textSelectable: false,
             style:
@@ -70,7 +86,7 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
             childViews: [
             {
                view: 'List',
-               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 30),
+               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 60),
                anchors: 'top left right bottom',
                id: 'routeListPanel_list',
                style:
@@ -97,12 +113,19 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
       this.setActiveButton = uki("#routeListPanel_setActive")[0];
       this.setActiveButton.disabled(true);
       this.setActiveButton.bind('click', this.onSetActiveButton.bind(this));
+      this.addActiveButton = uki("#routeListPanel_addActive")[0];
+      this.addActiveButton.disabled(true);
+      this.addActiveButton.bind('click', this.onAddActiveButton.bind(this));
       this.destroyButton = uki("#routeListPanel_destroy")[0];
       this.destroyButton.disabled(true);
       this.destroyButton.bind('click', this.onDestroyButton.bind(this));
       this.rejectButton = uki("#routeListPanel_reject")[0];
       this.rejectButton.disabled(true);
       this.rejectButton.bind('click', this.onRejectButton.bind(this));
+      this.rejectButton.visible(false);
+      this.setAutopilotButton = uki("#routeListPanel_setAutopilot")[0];
+      this.setAutopilotButton.disabled(true);
+      this.setAutopilotButton.bind('click', this.onSetAutopilotButton.bind(this));
    },
 
    refillRouteList: function()
@@ -201,6 +224,8 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
          var isController = route.isClientAllowedControl();
 
          this.setActiveButton.disabled(false);
+         this.addActiveButton.disabled(false);
+         this.setAutopilotButton.disabled(false);
          this.destroyButton.disabled(!isController);
          this.destroyButton.visible(isController);
          this.rejectButton.disabled(isController);
@@ -209,6 +234,8 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
       else
       {
          this.setActiveButton.disabled(true);
+         this.addActiveButton.disabled(true);
+         this.setAutopilotButton.disabled(true);
          this.destroyButton.disabled(true);
          this.destroyButton.visible(true);
          this.rejectButton.disabled(true);
@@ -223,6 +250,27 @@ upro.view.mediators.RouteListPanelMediator = Class.create(upro.view.mediators.Ab
          var routeProxy = this.facade().retrieveProxy(upro.model.proxies.RouteProxy.NAME);
 
          this.facade().sendNotification(upro.app.Notifications.SetActiveRouteRequest, routeProxy.getSelectedInfo());
+      }
+   },
+
+   onAddActiveButton: function()
+   {
+      if (!this.addActiveButton.disabled())
+      {
+         var routeProxy = this.facade().retrieveProxy(upro.model.proxies.RouteProxy.NAME);
+
+         this.facade().sendNotification(upro.app.Notifications.AddActiveRouteRequest, routeProxy.getSelectedInfo());
+      }
+   },
+
+   onSetAutopilotButton: function()
+   {
+      if (!this.setAutopilotButton.disabled())
+      {
+         var routeProxy = this.facade().retrieveProxy(upro.model.proxies.RouteProxy.NAME);
+
+         this.facade().sendNotification(upro.app.Notifications.SetAutopilotRouteRequest,
+               routeProxy.getSelectedInfo().getRoute());
       }
    },
 

@@ -179,6 +179,10 @@ upro.app.Notifications =
    ActiveRouteUpdateRouteRequest: 0,
    /** Request to set the active route */
    SetActiveRouteRequest: 0,
+   /** Request to add to the active route */
+   AddActiveRouteRequest: 0,
+   /** Request to set to the autopilot route */
+   SetAutopilotRouteRequest: 0,
 
    /** Request to select a route */
    RouteSelectionRequest: 0,

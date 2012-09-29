@@ -225,6 +225,8 @@ exports.sourceFiles = [];
    'control/commands/NotifiedRouteSelectionRequestCommand.js', //
    'control/commands/NotifiedRouteSelectedCommand.js', //
    'control/commands/NotifiedSetActiveRouteRequestCommand.js', //
+   'control/commands/NotifiedAddActiveRouteRequestCommand.js', //
+   'control/commands/NotifiedSetAutopilotRouteRequestCommand.js', //
    'control/commands/NotifiedDestroyRouteRequestCommand.js', //
    'control/commands/NotifiedActiveRouteUpdateRouteRequestCommand.js', //
    'control/commands/NotifiedRejectSharedObjectRequestCommand.js', //

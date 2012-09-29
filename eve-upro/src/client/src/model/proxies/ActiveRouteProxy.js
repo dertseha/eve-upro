@@ -309,15 +309,30 @@ upro.model.proxies.ActiveRouteProxy = Class.create(upro.model.proxies.AbstractPr
     */
    setRoute: function(route)
    {
-      var that = this;
-
       this.resetRoute();
+      this.addRoute(route);
+   },
+
+   /**
+    * Adds given route at the end of the current route.
+    * 
+    * @param route array of SystemRouteEntry objects
+    * @returns {Array} containing the ID of the last segment which needs to be optimized
+    */
+   addRoute: function(route)
+   {
+      var that = this;
+      var ids = [];
+
+      this.lastSegment.addId(ids);
       route.forEach(function(systemRouteEntry)
       {
          that.lastSegment = that.lastSegment["add" + systemRouteEntry.getEntryType()].call(that.lastSegment,
                systemRouteEntry.getSolarSystem(), systemRouteEntry.getJumpType());
       });
       this.notify(upro.app.Notifications.ActiveRoutePathChanged);
+
+      return ids;
    },
 
    /**

@@ -253,8 +253,12 @@ upro.res.text.templates["en"] =
    "routeDataList.menuLabel": "Routes",
    /** Shared routes */
    "panels.routes.route.menuLabel": "Shared Routes",
-   /** Set active */
+   /** Set active route */
    "panels.routes.edit.setActive.command": "Set Active",
+   /** add to active route */
+   "panels.routes.edit.addActive.command": "Add to Active",
+   /** Set autopilot route */
+   "panels.routes.edit.setAutopilot.command": "Set Autopilot",
    /** Destroy info */
    "panels.routes.edit.destroy.command": "Destroy",
    /** Reject the shared route */
