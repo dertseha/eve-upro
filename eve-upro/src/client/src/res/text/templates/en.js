@@ -132,6 +132,10 @@ upro.res.text.templates["en"] =
    "panels.activeRoute.edit.create.command": "Create",
    /** Command name for updating a saved route */
    "panels.activeRoute.edit.update.command": "Update",
+   /** Command name for setting the autopilot route */
+   "panels.activeRoute.edit.setAutopilot.command": "Set Autopilot",
+   /** Command name for setting the autopilot route */
+   "panels.activeRoute.edit.clear.command": "Clear",
 
    /** Groups menu label (list) */
    "groupList.menuLabel": "Groups",

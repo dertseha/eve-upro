@@ -14,6 +14,8 @@ upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediat
       this.nameText = null;
       this.createButton = null;
       this.updateButton = null;
+      this.setAutopilotButton = null;
+      this.clearButton = null;
 
       this.routeList = null;
 
@@ -57,8 +59,22 @@ upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediat
             id: 'activeRouteListPanel_update'
          },
          {
+            view: 'Button',
+            rect: '0 60 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top left width',
+            text: upro.res.text.Lang.format("panels.activeRoute.edit.setAutopilot.command"),
+            id: 'activeRouteListPanel_setAutopilot'
+         },
+         {
+            view: 'Button',
+            rect: (halfWidth + 2) + ' 60 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top right width',
+            text: upro.res.text.Lang.format("panels.activeRoute.edit.clear.command"),
+            id: 'activeRouteListPanel_clear'
+         },
+         {
             view: 'ScrollPane',
-            rect: '0 60 ' + (dimension.width) + ' ' + (dimension.height - 60),
+            rect: '0 90 ' + (dimension.width) + ' ' + (dimension.height - 90),
             anchors: 'left top right bottom',
             textSelectable: false,
             style:
@@ -70,7 +86,7 @@ upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediat
             childViews: [
             {
                view: 'List',
-               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 60),
+               rect: '0 0 ' + (dimension.width) + ' ' + (dimension.height - 90),
                anchors: 'top left right bottom',
                id: 'activeRouteListPanel_list',
                style:
@@ -101,6 +117,12 @@ upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediat
       this.updateButton = uki("#activeRouteListPanel_update")[0];
       this.updateButton.disabled(true);
       this.updateButton.bind('click', this.onUpdateButton.bind(this));
+      this.setAutopilotButton = uki("#activeRouteListPanel_setAutopilot")[0];
+      this.setAutopilotButton.disabled(true);
+      this.setAutopilotButton.bind('click', this.onSetAutopilotButton.bind(this));
+      this.clearButton = uki("#activeRouteListPanel_clear")[0];
+      this.clearButton.disabled(true);
+      this.clearButton.bind('click', this.onClearButton.bind(this));
    },
 
    setRoute: function(route)
@@ -132,6 +154,8 @@ upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediat
 
       this.createButton.disabled(isEmpty);
       this.updateButton.disabled(isEmpty || !this.selectedRoute);
+      this.setAutopilotButton.disabled(isEmpty);
+      this.clearButton.disabled(isEmpty);
    },
 
    getColorBySecurityLevel: function(solarSystem)
@@ -227,6 +251,22 @@ upro.view.mediators.ActiveRouteListPanelMediator = Class.create(upro.view.mediat
 
          notifyBody.id = this.selectedRoute.getId();
          this.facade().sendNotification(upro.app.Notifications.ActiveRouteUpdateRouteRequest, notifyBody);
+      }
+   },
+
+   onSetAutopilotButton: function()
+   {
+      if (!this.setAutopilotButton.disabled())
+      {
+         this.facade().sendNotification(upro.app.Notifications.ActiveRouteSetAutopilot);
+      }
+   },
+
+   onClearButton: function()
+   {
+      if (!this.clearButton.disabled())
+      {
+         this.facade().sendNotification(upro.app.Notifications.ActiveRouteReset);
       }
    }
 });
