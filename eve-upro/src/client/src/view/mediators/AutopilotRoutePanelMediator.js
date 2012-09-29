@@ -32,7 +32,7 @@ upro.view.mediators.AutopilotRoutePanelMediator = Class.create(upro.view.mediato
          {
             view: 'Button',
             rect: '0 0 ' + (dimension.width) + ' 25',
-            anchors: 'top right width',
+            anchors: 'top left right',
             text: upro.res.text.Lang.format("panels.autopilot.edit.clear.command"),
             id: 'autopilotRoute_clear'
          },

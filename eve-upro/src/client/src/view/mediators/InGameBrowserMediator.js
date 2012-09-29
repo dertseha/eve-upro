@@ -76,13 +76,13 @@ upro.view.mediators.InGameBrowserMediator = Class.create(upro.view.mediators.Abs
       }
       if (this.lastReportedRouteIndex >= 0)
       {
-         lastJumpType = route[this.lastReportedRouteIndex].nextJumpType;
+         lastJumpType = route[this.lastReportedRouteIndex].getJumpType();
       }
 
       for (i = this.lastReportedRouteIndex + 1; (i < limit) && (lastJumpType == upro.nav.JumpType.JumpGate); i++)
       {
          routeEntry = route[i];
-         igb.addWaypoint(routeEntry.getSolarSystem.getId());
+         igb.addWaypoint(routeEntry.getSolarSystem().getId());
          this.lastReportedRouteIndex = i;
          lastJumpType = routeEntry.getJumpType();
       }
