@@ -268,9 +268,26 @@ function HttpServerComponent(services, options)
          self.onRequestRequestSink(req, res);
       });
 
-      var httpServer = http.createServer(expressServer);
-      var usedPort = expressServer.get('port');
+      this.startHttpServer();
+   };
 
+   this.startHttpServer = function()
+   {
+      var httpServer = http.createServer(this.expressServer);
+      var usedPort = this.expressServer.get('port');
+      var self = this;
+
+      httpServer.on('error', function(err)
+      {
+         logger.warn('Error on HTTP server; Restarting after timeout.',
+         {
+            error: err
+         });
+         setTimeout(function()
+         {
+            self.startHttpServer();
+         }, 5000);
+      });
       httpServer.listen(usedPort, this.options.host, function()
       {
          logger.info('HTTP server started on port ' + usedPort);

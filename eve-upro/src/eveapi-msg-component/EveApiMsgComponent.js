@@ -63,6 +63,7 @@ function EveApiMsgComponent(services)
 
       var q = this.amqp.getConnection().queue('eveapi-incoming', queueOptions, function(queue)
       {
+         logger.info('Allocated queue [' + queue.name + '], attempting binding');
          queue.bind(self.exchange.name, '#');
          queue.once('queueBindOk', function()
          {
@@ -71,8 +72,15 @@ function EveApiMsgComponent(services)
       });
       q.on('error', function(err)
       {
-         logger.error('failed queue! ' + err);
-      }); // TODO: we're lost right now
+         logger.warn('Error accessing queue for EveApiMsgComponent. Retrying after timeout.',
+         {
+            error: err
+         });
+         setTimeout(function()
+         {
+            self.allocateConsumerQueue(callback);
+         }, 5000);
+      });
    };
 
    this.request = function(apiFunctionName, parameters, responseQueueName, correlationId)

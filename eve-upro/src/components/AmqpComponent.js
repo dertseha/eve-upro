@@ -83,6 +83,7 @@ function AmqpComponent(options)
 
       this.connection.queue('', queueOptions, function(queue)
       {
+         logger.info('Allocated queue [' + queue.name + '], attempting binding');
          queue.bind('#'); // explicitly bind to the default exchange to receive the 'queueBindOk' event
          queue.on('queueBindOk', function()
          {
@@ -129,8 +130,15 @@ function AmqpComponent(options)
       });
       q.on('error', function(err)
       {
-         logger.error('failed queue! ' + err);
-      }); // TODO: we're lost right now
+         logger.warn('Error accessing queue for AmqpComponent. Retrying after timeout.',
+         {
+            error: err
+         });
+         setTimeout(function()
+         {
+            self.allocateConsumerQueue();
+         }, 5000);
+      });
    };
 
    this.getLocalQueueName = function()
