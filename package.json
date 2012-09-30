@@ -34,8 +34,9 @@
     "nodeunit":         "0.7.x"
   },
   "license": "MIT",
-  "engine":
+  "engines":
   {
-    "node":             ">=0.8.3"
+    "node":             "0.8.x",
+    "npm":              "1.1.x"
   }
 }
