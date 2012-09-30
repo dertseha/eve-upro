@@ -24,11 +24,11 @@ upro.nav.finder.RouteFinderGeneticTSP = Class.create(upro.nav.finder.RouteFinder
       $super(capabilities, rules, filters, sourceSystem, waypoints, destinationSystem);
 
       this.population = [];
-      this.populationLimit = 10; // amount of best solutions to keep across generations. parents selected random.
+      this.populationLimit = 25; // amount of best solutions to keep across generations. parents selected random.
       this.initialPopulationCount = 50; // how many to create randomly first
       this.generationLimit = 40000; // How many generations to run at most
-      this.uncontestetLimit = 4000; // If the best stays top for this amount, the algorithm stops
-      this.mutationPercentage = 0.5; // 0 turns it off
+      this.uncontestetLimit = 20000; // If the best stays top for this amount, the algorithm stops
+      this.mutationPercentage = 10.0; // 0 turns it off
    },
 
    /** {@inheritDoc} */
