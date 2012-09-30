@@ -1,4 +1,3 @@
-
 upro.nav.finder.PathFinderCostRuleJumps = Class.create(upro.nav.finder.PathFinderCostRule,
 {
    initialize: function(margin)
@@ -17,6 +16,13 @@ upro.nav.finder.PathFinderCostRuleJumps = Class.create(upro.nav.finder.PathFinde
       }
 
       return result;
+   },
+
+   addBasicCost: function(cost, solarSystem, isDestinationSystem)
+   {
+      cost.jumps = 1;
+
+      return cost;
    },
 
    add: function(costA, costB)

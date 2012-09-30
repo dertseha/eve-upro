@@ -5,17 +5,11 @@ upro.nav.finder.PathFinderCost = Class.create(
       this.costItems = {};
    },
 
-   setSecurity: function(system)
-   {
-      this.costItems.minSecurity = system.security;
-      this.costItems.maxSecurity = system.security;
-   },
-
    toString: function()
    {
       var text = "{";
 
-      for (var key in this.costItems)
+      for ( var key in this.costItems)
       {
          text += key + ": " + this.costItems[key] + ",";
       }
@@ -28,7 +22,7 @@ upro.nav.finder.PathFinderCost = Class.create(
    {
       var rCode = 0;
 
-      for (var i = 0; (rCode == 0) && (i < rules.length); i++)
+      for ( var i = 0; (rCode == 0) && (i < rules.length); i++)
       {
          var rule = rules[i];
 
@@ -42,11 +36,11 @@ upro.nav.finder.PathFinderCost = Class.create(
    {
       var result = new upro.nav.finder.PathFinderCost();
 
-      for (var item in this.costItems)
+      for ( var item in this.costItems)
       {
          result.costItems[item] = this.costItems[item];
       }
-      for (var i = 0; i < rules.length; i++)
+      for ( var i = 0; i < rules.length; i++)
       {
          var rule = rules[i];
 

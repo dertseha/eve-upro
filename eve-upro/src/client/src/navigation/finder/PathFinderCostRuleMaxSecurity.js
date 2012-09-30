@@ -1,4 +1,3 @@
-
 upro.nav.finder.PathFinderCostRuleMaxSecurity = Class.create(upro.nav.finder.PathFinderCostRule,
 {
    initialize: function(securityLimit)
@@ -8,31 +7,39 @@ upro.nav.finder.PathFinderCostRuleMaxSecurity = Class.create(upro.nav.finder.Pat
 
    comparator: function(costA, costB)
    {
-      // -10 for those systems not needing security - either source or destination systems.
-      var isGoodA = (costA.maxSecurity !== undefined) ? ((costA.maxSecurity < this.securityLimit) ? -1 : 0) : -10;
-      var isGoodB = (costB.maxSecurity !== undefined) ? ((costB.maxSecurity < this.securityLimit) ? -1 : 0) : -10;
+      var result = costA.maxSecurityAboveCount - costB.maxSecurityAboveCount;
 
-      if ((isGoodA == 0) && (isGoodB == 0))
-      {  // if both are above the limit, have the system with the lower status count
-         isGoodA = costA.maxSecurity - this.securityLimit;
-         isGoodB = costB.maxSecurity - this.securityLimit;
+      if ((result === 0) && (costA.security >= this.securityLimit))
+      {
+         result = costA.security - costB.security;
       }
 
-      return isGoodA - isGoodB;
+      return result;
+   },
+
+   addBasicCost: function(cost, solarSystem, isDestinationSystem)
+   {
+      var security = solarSystem.security;
+
+      cost.security = security;
+      cost.maxSecurityAboveCount = 0;
+      if (!isDestinationSystem && (security >= this.securityLimit))
+      {
+         cost.maxSecurityAboveCount = 1;
+      }
+
+      return cost;
    },
 
    add: function(costA, costB)
    {
-      if (costA.maxSecurity !== undefined)
+      if (costA.maxSecurityAboveCount !== undefined)
       {
-         if ((costB.maxSecurity !== undefined) && (costA.maxSecurity < costB.maxSecurity))
-         {
-            costA.maxSecurity = costB.maxSecurity;
-         }
+         costA.maxSecurityAboveCount += costB.maxSecurityAboveCount;
       }
       else
       {
-         costA.maxSecurity = costB.maxSecurity;
+         costA.maxSecurityAboveCount = costB.maxSecurityAboveCount;
       }
    }
 

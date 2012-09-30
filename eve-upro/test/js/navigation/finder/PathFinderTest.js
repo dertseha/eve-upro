@@ -471,3 +471,17 @@ PathFinderTest.prototype.testJumpGateCapabilityIgnoresNonGates = function()
 
    this.thenTheFoundRouteShouldBeInNames([ "Rens", "Frarn", "Gyng", "Onga", "Pator", "Eystur", "Hek" ]);
 };
+
+PathFinderTest.prototype.testNewEdenTararanToRensGoesOverMehatoorWithMinSecurity = function()
+{
+   this.givenNewEden();
+   this.givenARule(new upro.nav.finder.PathFinderCostRuleMinSecurity(0.5));
+   this.givenARule(new upro.nav.finder.PathFinderCostRuleJumps());
+   this.givenACapability(new upro.nav.finder.PathFinderCapabilityJumpGates());
+   this.givenAPathFinderForSystems("Tararan", "Rens");
+
+   this.whenPerformingASearch();
+
+   this.thenTheFoundRouteShouldBeInNames([ "Tararan", "Arzad", "Sifilar", "Raa", "Mehatoor", "Eredan", "Lisudeh",
+         "Lashesih", "Sasta", "Jark", "Odatrik", "Rens" ]);
+};

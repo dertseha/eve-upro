@@ -2,12 +2,22 @@ PathFinderCostRuleMinSecurityTest = TestCase("PathFinderCostRuleMinSecurityTest"
 
 PathFinderCostRuleMinSecurityTest.prototype.givenCostAOf = function(minSecurity)
 {
-   Fixture.costA.minSecurity = minSecurity;
+   var system =
+   {
+      security: minSecurity
+   };
+
+   Fixture.costA = Fixture.rule.addBasicCost(Fixture.costA, system, false);
 };
 
 PathFinderCostRuleMinSecurityTest.prototype.givenCostBOf = function(minSecurity)
 {
-   Fixture.costB.minSecurity = minSecurity;
+   var system =
+   {
+      security: minSecurity
+   };
+
+   Fixture.costB = Fixture.rule.addBasicCost(Fixture.costB, system, false);
 };
 
 PathFinderCostRuleMinSecurityTest.prototype.whenCallingComparator = function()
@@ -78,14 +88,4 @@ PathFinderCostRuleMinSecurityTest.prototype.testFirstBelowIsPositive = function(
 PathFinderCostRuleMinSecurityTest.prototype.testSecondBelowIsNegative = function()
 {
    this.verifyComparison(1.0, 0.0, -1);
-};
-
-PathFinderCostRuleMinSecurityTest.prototype.testUndefinedIsAlwaysBetterForFirst = function()
-{
-   this.verifyComparison(undefined, 1.0, -1);
-};
-
-PathFinderCostRuleMinSecurityTest.prototype.testUndefinedIsAlwaysBetterForSecond = function()
-{
-   this.verifyComparison(1.0, undefined, 1);
 };

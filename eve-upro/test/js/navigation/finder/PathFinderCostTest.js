@@ -9,10 +9,17 @@ PathFinderCostTest.prototype.setUp = function()
 
 PathFinderCostTest.prototype.givenAPathFinderCostFromSystem = function(securityValue)
 {
-   Fixture.costs.push(new upro.nav.finder.PathFinderCost(
+   var system =
    {
       security: securityValue
-   }));
+   };
+   var cost = new upro.nav.finder.PathFinderCost();
+
+   Fixture.rules.forEach(function(rule)
+   {
+      cost.costItems = rule.addBasicCost(cost.costItems, system, false);
+   });
+   Fixture.costs.push(cost);
 };
 
 PathFinderCostTest.prototype.givenAPathFinderCost = function(costItems)
@@ -61,10 +68,9 @@ PathFinderCostTest.prototype.thenTheComparisonResultShouldBePositive = function(
 
 PathFinderCostTest.prototype.testSimpleMinimumSecurity = function()
 {
-   this.givenAPathFinderCostFromSystem(1.0);
-   this.givenAPathFinderCostFromSystem(1.0);
-
    this.givenARule(new upro.nav.finder.PathFinderCostRuleMinSecurity(0.5));
+   this.givenAPathFinderCostFromSystem(1.0);
+   this.givenAPathFinderCostFromSystem(1.0);
 
    this.whenCallingCompare();
 
@@ -75,17 +81,17 @@ PathFinderCostTest.prototype.testAdd = function()
 {
    this.givenAPathFinderCost(
    {
-      minSecurity: 0.3,
+      minSecurityBelowCount: 2,
       jumps: 2
    });
    this.givenAPathFinderCost(
    {
-      minSecurity: 0.3,
+      minSecurityBelowCount: 1,
       jumps: 1
    });
    this.givenAPathFinderCost(
    {
-      minSecurity: 1.0,
+      minSecurityBelowCount: 1,
       jumps: 1
    });
 
