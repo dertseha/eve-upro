@@ -1,0 +1,41 @@
+{
+  "name": "eve-upro",
+  "version": "0.0.1",
+  "author": "Christian Haas <christian.haas@sevensuns.at>",
+  "description": "A strategic mapping application for EVE Online",
+  "keywords": [ "eve" ],
+
+  "private": true,
+  "scripts":
+  {
+    "start": "node eve-upro/src/app"
+  },
+  "dependencies":
+  {
+    "amqp":             "0.1.x",
+    "express":          "3.0.x",
+    "jade":             "0.26.x",
+    "js-schema":        "0.5.x",
+    "limiter":          "1.0.x",
+    "loggly":           "0.3.x",
+    "mongodb":          "1.1.x",
+    "nconf":            "0.6.x",
+    "node-uuid":        "1.3.x",
+    "passport":         "0.1.x",
+    "passport-local":   "0.1.x",
+    "uglify-js":        "1.3.x",
+    "winston":          "0.6.x",
+    "winston-loggly":   "0.6.x",
+    "xmldom":           "0.1.x",
+    "xpath.js":         "0.0.x"
+  },
+  "devDependencies":
+  {
+    "nodeunit":         "0.7.x"
+  },
+  "license": "MIT",
+  "engine":
+  {
+    "node":             ">=0.8.3"
+  }
+}
