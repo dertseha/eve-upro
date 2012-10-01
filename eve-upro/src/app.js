@@ -35,7 +35,7 @@ function extractCloudConfiguration()
       }
       cloudMongo = 'mongodb://' + mongoCredentials + mongoCore;
 
-      cloudRabbit = env['rabbitmq-2.4'][0]['credentials'];
+      cloudRabbit = env['rabbitmq-2.4'][0]['credentials'].url;
 
       logger.remove(winston.transports.Console);
       logger.add(winston.transports.File,
@@ -68,12 +68,12 @@ nconf.defaults(
 {
    'amqp':
    {
-      url: cloudRabbit ? cloudRabbit.url : 'amqp://localhost'
+      url: cloudRabbit || 'amqp://localhost'
    },
 
    'mongodb':
    {
-      url: cloudMongo ? cloudMongo : 'mongodb://localhost:27017/eve-upro_live'
+      url: cloudMongo || 'mongodb://localhost:27017/eve-upro_live'
    },
 
    'http':
