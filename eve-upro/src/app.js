@@ -23,7 +23,7 @@ var cloudRabbit = null;
 function extractCloudConfiguration()
 {
    if (process.env.VCAP_SERVICES)
-   {
+   { // CloudFoundry setup
       var env = JSON.parse(process.env.VCAP_SERVICES);
 
       cloudMongo = env['mongodb-1.8'][0]['credentials'];
@@ -40,6 +40,14 @@ function extractCloudConfiguration()
          maxsize: 1024 * 1024 * 2,
          maxFiles: 10
       });
+   }
+   if (process.env.CLOUDAMQP_URL)
+   {
+      cloudRabbit = process.env.CLOUDAMQP_URL;
+   }
+   if (process.env.MONGOLAB_URI)
+   {
+      cloudMongo = process.env.MONGOLAB_URI;
    }
 }
 extractCloudConfiguration();
