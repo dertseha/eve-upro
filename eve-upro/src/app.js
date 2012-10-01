@@ -25,8 +25,16 @@ function extractCloudConfiguration()
    if (process.env.VCAP_SERVICES)
    { // CloudFoundry setup
       var env = JSON.parse(process.env.VCAP_SERVICES);
+      var mongoConfig = env['mongodb-1.8'][0]['credentials'];
+      var mongoCore = mongoConfig.hostname + ':' + mongoConfig.port + '/' + mongoConfig.db;
+      var mongoCredentials = '';
 
-      cloudMongo = env['mongodb-1.8'][0]['credentials'];
+      if (mongoConfig.username)
+      {
+         mongoCredentials = mongoConfig.username + ':' + mongoConfig.password + '@';
+      }
+      cloudMongo = 'mongodb://' + mongoCredentials + mongoCore;
+
       cloudRabbit = env['rabbitmq-2.4'][0]['credentials'];
 
       logger.remove(winston.transports.Console);
