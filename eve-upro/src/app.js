@@ -41,10 +41,12 @@ function extractCloudConfiguration()
          maxFiles: 10
       });
    }
+   console.log('!!!!! AMQP: ' + process.env.CLOUDAMQP_URL);
    if (process.env.CLOUDAMQP_URL)
    {
       cloudRabbit = process.env.CLOUDAMQP_URL;
    }
+   console.log('!!!!! MongoDB: ' + process.env.MONGOLAB_URI);
    if (process.env.MONGOLAB_URI)
    {
       cloudMongo = process.env.MONGOLAB_URI;
