@@ -257,7 +257,7 @@ upro.view.mediators.CurrentLocationListPanelMediator = Class.create(upro.view.me
    {
       var link = "";
 
-      link = "http://image.eveonline.com/Character/" + bodyName.getId() + "_32.jpg";
+      link = "https://image.eveonline.com/Character/" + bodyName.getId() + "_32.jpg";
 
       return link;
    },

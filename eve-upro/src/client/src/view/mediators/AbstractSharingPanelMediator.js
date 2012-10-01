@@ -195,15 +195,15 @@ upro.view.mediators.AbstractSharingPanelMediator = Class.create(upro.view.mediat
 
       if (listEntry.type == "Character")
       {
-         link = "http://image.eveonline.com/Character/" + listEntry.bodyName.getId() + "_32.jpg";
+         link = "https://image.eveonline.com/Character/" + listEntry.bodyName.getId() + "_32.jpg";
       }
       else if (listEntry.type == "Corporation")
       {
-         link = "http://image.eveonline.com/Corporation/" + listEntry.bodyName.getId() + "_32.png";
+         link = "https://image.eveonline.com/Corporation/" + listEntry.bodyName.getId() + "_32.png";
       }
       else if (listEntry.type == "Alliance")
       {
-         link = "http://image.eveonline.com/Alliance/" + listEntry.bodyName.getId() + "_32.png";
+         link = "https://image.eveonline.com/Alliance/" + listEntry.bodyName.getId() + "_32.png";
       }
       else if (listEntry.type == "Group")
       {

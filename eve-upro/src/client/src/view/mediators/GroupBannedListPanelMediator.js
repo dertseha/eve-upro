@@ -83,7 +83,7 @@ upro.view.mediators.GroupBannedListPanelMediator = Class.create(upro.view.mediat
 
    getImageForBody: function(listEntry)
    {
-      var link = "http://image.eveonline.com/Character/" + listEntry.bodyName.getId() + "_32.jpg";
+      var link = "https://image.eveonline.com/Character/" + listEntry.bodyName.getId() + "_32.jpg";
 
       return link;
    },
