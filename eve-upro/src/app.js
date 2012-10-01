@@ -19,6 +19,11 @@ logger.add(winston.transports.Console,
 
 var cloudMongo = null;
 var cloudRabbit = null;
+var cloudHttp =
+{
+   host: null,
+   port: null
+};
 
 function extractCloudConfiguration()
 {
@@ -48,6 +53,9 @@ function extractCloudConfiguration()
          maxsize: 1024 * 1024 * 2,
          maxFiles: 10
       });
+
+      cloudHttp.host = process.env.VCAP_APP_HOST;
+      cloudHttp.port = process.env.VMC_APP_PORT;
    }
    if (process.env.CLOUDAMQP_URL)
    {
@@ -56,6 +64,10 @@ function extractCloudConfiguration()
    if (process.env.MONGOLAB_URI)
    {
       cloudMongo = process.env.MONGOLAB_URI;
+   }
+   if (process.env.PORT)
+   {
+      cloudHttp.port = process.env.PORT;
    }
 }
 extractCloudConfiguration();
@@ -78,8 +90,8 @@ nconf.defaults(
 
    'http':
    {
-      host: nconf.get('VCAP_APP_HOST') || 'localhost',
-      port: nconf.get('VMC_APP_PORT') || 3000,
+      host: cloudHttp.host || 'localhost',
+      port: cloudHttp.port || 3000,
       cookieSecret: null,
       sessionSecret: null
    },
