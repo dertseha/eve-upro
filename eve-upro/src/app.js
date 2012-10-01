@@ -41,12 +41,10 @@ function extractCloudConfiguration()
          maxFiles: 10
       });
    }
-   console.log('!!!!! AMQP: ' + process.env.CLOUDAMQP_URL);
    if (process.env.CLOUDAMQP_URL)
    {
       cloudRabbit = process.env.CLOUDAMQP_URL;
    }
-   console.log('!!!!! MongoDB: ' + process.env.MONGOLAB_URI);
    if (process.env.MONGOLAB_URI)
    {
       cloudMongo = process.env.MONGOLAB_URI;
@@ -67,11 +65,7 @@ nconf.defaults(
 
    'mongodb':
    {
-      host: cloudMongo ? cloudMongo.hostname : 'localhost',
-      port: cloudMongo ? cloudMongo.port : 27017,
-      db: cloudMongo ? cloudMongo.db : 'eve-upro_live',
-      username: cloudMongo ? cloudMongo.username : null,
-      password: cloudMongo ? cloudMongo.password : null
+      url: cloudMongo ? cloudMongo : 'mongodb://localhost:27017/eve-upro_live'
    },
 
    'http':
@@ -196,11 +190,7 @@ var serviceControl = new ServiceControl();
    var builder = new MongoDbComponentBuilder();
    var options =
    {
-      hostname: nconf.get('mongodb').host,
-      port: nconf.get('mongodb').port,
-      db: nconf.get('mongodb').db,
-      username: nconf.get('mongodb').username,
-      password: nconf.get('mongodb').password
+      url: nconf.get('mongodb').url
    };
 
    builder.setOptions(options);

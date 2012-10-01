@@ -25,17 +25,11 @@ function MongoDbComponentBuilder()
    {
       var options =
       {
-         hostname: this.options.hostname || 'localhost',
-         port: this.options.port,
-         db: this.options.db || 'eve-upro_live',
-
+         url: this.options.url,
          serverOptions: this.options.serverOptions ||
          {
             auto_reconnect: true
-         },
-
-         username: this.options.username,
-         password: this.options.password
+         }
       };
 
       return new MongoDbComponent(options);

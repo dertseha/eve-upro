@@ -33,14 +33,8 @@ function MongoDbComponent(options)
    this.requestServer = function()
    {
       var self = this;
-      var port = this.options.port || mongodb.Connection.DEFAULT_PORT;
-      var dbOptions = {};
 
-      this.server = new mongodb.Server(this.options.hostname, port, this.options.serverOptions);
-
-      var dbConnector = new mongodb.Db(this.options.db, this.server, dbOptions);
-
-      dbConnector.open(function(err, db)
+      mongodb.connect(this.options.url, function(err, db)
       {
          if (err)
          {
