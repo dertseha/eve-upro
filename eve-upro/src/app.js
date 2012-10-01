@@ -17,6 +17,7 @@ logger.add(winston.transports.Console,
 // Configuration
 // ///////////////////////////////////////////////////////////////////////////
 
+var configFileBase = __dirname;
 var cloudMongo = null;
 var cloudRabbit = null;
 var cloudHttp =
@@ -59,6 +60,7 @@ function extractCloudConfiguration()
    }
    if (process.env.CLOUDAMQP_URL)
    {
+      configFileBase += '/../..';
       cloudRabbit = process.env.CLOUDAMQP_URL;
    }
    if (process.env.MONGOLAB_URI)
@@ -73,7 +75,7 @@ function extractCloudConfiguration()
 extractCloudConfiguration();
 
 nconf.use('memory');
-nconf.file(__dirname + '/upro-config.json');
+nconf.file(configFileBase + '/upro-config.json');
 nconf.env();
 nconf.argv();
 nconf.defaults(
