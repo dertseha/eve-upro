@@ -60,7 +60,7 @@ function extractCloudConfiguration()
    }
    if (process.env.CLOUDAMQP_URL)
    {
-      configFileBase += '/../..';
+      configFileBase += '/../../..';
       cloudRabbit = process.env.CLOUDAMQP_URL;
    }
    if (process.env.MONGOLAB_URI)
@@ -75,7 +75,7 @@ function extractCloudConfiguration()
 extractCloudConfiguration();
 
 nconf.use('memory');
-nconf.file(configFileBase + '/upro-config.json');
+nconf.file(path.normalize(configFileBase + '/upro-config.json'));
 nconf.env();
 nconf.argv();
 nconf.defaults(
