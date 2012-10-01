@@ -75,9 +75,7 @@ function extractCloudConfiguration()
 extractCloudConfiguration();
 
 nconf.use('memory');
-var configFilePath = path.normalize(configFileBase + '/upro-config.json');
-logger.info('Using config file path: ' + configFilePath + ' | base: ' + __dirname);
-nconf.file(configFilePath);
+nconf.file(path.normalize(configFileBase + '/upro-config.json'));
 nconf.env();
 nconf.argv();
 nconf.defaults(

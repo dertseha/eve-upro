@@ -386,7 +386,7 @@ function HttpServerComponent(services, options)
       {
          var message = req.query.message;
          var hasInGameBrowserTrust = req.eveHeaders && (req.eveHeaders['trusted'] == 'Yes');
-         var isSslConnection = !!req.headers['sslsessionid'];
+         var isSslConnection = !!req.headers['sslsessionid'] || (req.headers['x-forwarded-proto'] === 'https');
 
          if (!message && !isSslConnection)
          {
