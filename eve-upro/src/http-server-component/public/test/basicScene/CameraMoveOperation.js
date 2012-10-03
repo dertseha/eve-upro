@@ -1,4 +1,3 @@
-
 CameraMoveOperation = Class.create(upro.sys.PointerOperation,
 {
    initialize: function(object, rotationBuffer)
@@ -23,7 +22,7 @@ CameraMoveOperation = Class.create(upro.sys.PointerOperation,
    onMove: function(position, buttonStates)
    {
       var realPos = sceneSystem.pixelToReal(-position.x, -position.y);
-      var temp = vec3.set([realPos.x, realPos.y, 0], this.temp);
+      var temp = vec3.set([ realPos.x, realPos.y, 0 ], this.temp);
 
       var diff = vec3.subtract(this.lastPos, temp);
       this.moveByVector(diff);
@@ -34,7 +33,7 @@ CameraMoveOperation = Class.create(upro.sys.PointerOperation,
    moveByVector: function(temp)
    {
       // scale the movement according to distance to center - faster if farther out
-      var scale = vec3.length(this.obj.position) / 1.5;
+      var scale = vec3.length(this.obj.positionTarget) / 1.5;
       if (scale < 5)
       {
          scale = 5;
@@ -43,13 +42,13 @@ CameraMoveOperation = Class.create(upro.sys.PointerOperation,
       // rotate movement around reference
       this.buffer.rotateVector(temp);
       // finally add to destination object
-      vec3.add(this.obj.position, temp);
+      vec3.add(this.obj.positionTarget, temp);
       this.obj.setOrientationModified(true);
    },
 
    onRotate: function(position, buttonStates, rotation)
    {
-      var temp = vec3.set([0, 0, rotation[1] / -120.0], this.temp);
+      var temp = vec3.set([ 0, 0, rotation[1] / -120.0 ], this.temp);
 
       this.moveByVector(temp);
    },

@@ -1,5 +1,3 @@
-precision mediump float;
-
 varying vec4 vColor;
 
 uniform mat4 uMVMatrix;

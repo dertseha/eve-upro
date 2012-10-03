@@ -268,6 +268,23 @@ function HttpServerComponent(services, options)
          self.onRequestRequestSink(req, res);
       });
 
+      expressServer.get('/testBasicScene', function(req, res)
+      {
+         self.serveClient(req, res, 'testBasicScene.jade',
+         {
+            characterName: 'Test',
+            corporationName: 'BasicScene'
+         });
+      });
+      expressServer.get('/testMouse', function(req, res)
+      {
+         self.serveClient(req, res, 'testMouse.jade',
+         {
+            characterName: 'Test',
+            corporationName: 'Mouse'
+         });
+      });
+
       this.startHttpServer();
    };
 
@@ -331,6 +348,22 @@ function HttpServerComponent(services, options)
       return limiter;
    };
 
+   this.serveClient = function(req, res, clientJade, user)
+   {
+      var renderArguments =
+      {
+         user: user,
+         runtime: req.query.runtime ? req.query.runtime : 'release',
+         shaders: [ getShaderInfo('vertex', 'basic-vertex-shader', 'basicVertexShader.c'),
+               getShaderInfo('fragment', 'basic-fragment-shader', 'basicFragmentShader.c'),
+               getShaderInfo('vertex', 'system-vertex-shader', 'solarSystemVertexShader.c'),
+               getShaderInfo('fragment', 'system-fragment-shader', 'solarSystemFragmentShader.c') ],
+         clientConfig: JSON.stringify(this.options.clientOptions)
+      };
+
+      res.render(clientJade, renderArguments);
+   },
+
    this.onGetIndex = function(req, res)
    {
       if (req.user)
@@ -341,16 +374,7 @@ function HttpServerComponent(services, options)
             req.session.cookie.maxAge = this.stayLoggedInAge;
          }
 
-         res.render('mainClient.jade',
-         {
-            user: req.user,
-            runtime: req.query.runtime ? req.query.runtime : 'release',
-            shaders: [ getShaderInfo('vertex', 'basic-vertex-shader', 'basicVertexShader.c'),
-                  getShaderInfo('fragment', 'basic-fragment-shader', 'basicFragmentShader.c'),
-                  getShaderInfo('vertex', 'system-vertex-shader', 'solarSystemVertexShader.c'),
-                  getShaderInfo('fragment', 'system-fragment-shader', 'solarSystemFragmentShader.c') ],
-            clientConfig: JSON.stringify(this.options.clientOptions)
-         });
+         this.serveClient(req, res, 'mainClient.jade', req.user);
       }
       else
       {

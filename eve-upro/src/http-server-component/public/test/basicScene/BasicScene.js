@@ -1,9 +1,9 @@
 function resetScene()
 {
-   vec3.set([ 0, 0, 20 ], sceneSystem.camera.position);
-   vec3.set([ 0, 0, 0 ], sceneSystem.camera.rotation);
-   vec3.set([ 0, 0, 0 ], cube.position);
-   vec3.set([ 0, 0, 0 ], cube.rotation);
+   vec3.set([ 0, 0, 20 ], sceneSystem.camera.positionTarget);
+   vec3.set([ 0, 0, 0 ], sceneSystem.camera.rotationTarget);
+   vec3.set([ 0, 0, 0 ], cube.positionTarget);
+   vec3.set([ 0, 0, 0 ], cube.rotationTarget);
    cube.setOrientationModified(true);
 }
 

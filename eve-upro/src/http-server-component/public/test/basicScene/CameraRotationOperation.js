@@ -1,4 +1,3 @@
-
 CameraRotationOperation = Class.create(upro.sys.PointerOperation,
 {
    initialize: function(object)
@@ -21,18 +20,19 @@ CameraRotationOperation = Class.create(upro.sys.PointerOperation,
    onMove: function(position, buttonStates)
    {
       var realPos = sceneSystem.pixelToReal(position.x, position.y);
-      var temp = vec3.set([-realPos.y, realPos.x, 0], this.temp);
+      var temp = vec3.set([ -realPos.y, realPos.x, 0 ], this.temp);
       var diff = vec3.subtract(this.lastPos, temp);
+      var rotation = this.obj.rotationTarget;
 
       vec3.scale(diff, 5);
 
-      vec3.add(this.obj.rotation, diff);
+      vec3.add(rotation, diff);
 
-      this.obj.rotation[0] = this.rotateValue(this.obj.rotation[0]);
-      this.obj.rotation[0] = this.limitValueMax(this.obj.rotation[0], 0);
-      this.obj.rotation[0] = this.limitValueMin(this.obj.rotation[0], Math.PI / -2);
-      this.obj.rotation[1] = this.rotateValue(this.obj.rotation[1]);
-      this.obj.rotation[2] = this.rotateValue(this.obj.rotation[2]);
+      rotation[0] = this.rotateValue(rotation[0]);
+      rotation[0] = this.limitValueMax(rotation[0], 0);
+      rotation[0] = this.limitValueMin(rotation[0], Math.PI / -2);
+      rotation[1] = this.rotateValue(rotation[1]);
+      rotation[2] = this.rotateValue(rotation[2]);
       this.obj.setOrientationModified(true);
 
       vec3.set(temp, this.lastPos);

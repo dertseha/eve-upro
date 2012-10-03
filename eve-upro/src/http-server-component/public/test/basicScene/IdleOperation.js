@@ -1,4 +1,3 @@
-
 IdleOperation = Class.create(upro.sys.PointerOperation,
 {
    initialize: function()
@@ -21,7 +20,11 @@ IdleOperation = Class.create(upro.sys.PointerOperation,
       this.centerPoint.attr("stroke-width", 10);
 
       this.info = temp.text(temp.w / 2, temp.h / 2, "");
-      this.info.attr({"fill": "#FF0", "font-size": 15});
+      this.info.attr(
+      {
+         "fill": "#FF0",
+         "font-size": 15
+      });
    },
 
    onDown: function(position, buttonStates, changeMask)
@@ -73,15 +76,27 @@ IdleOperation = Class.create(upro.sys.PointerOperation,
       this.cursorVert.toBack();
       this.cursorHorz.attr("path", "M0," + pixel.y + "L" + hudSystem.paper.w + "," + pixel.y);
       this.cursorVert.attr("path", "M" + pixel.x + ",0L" + pixel.x + "," + hudSystem.paper.h);
-      this.cursorHorz.animate({"stroke-opacity": 0.5}, 200);
-      this.cursorVert.animate({"stroke-opacity": 0.5}, 200);
+      this.cursorHorz.animate(
+      {
+         "stroke-opacity": 0.5
+      }, 200);
+      this.cursorVert.animate(
+      {
+         "stroke-opacity": 0.5
+      }, 200);
    },
 
    onStop: function(position)
    {
       this.showInfoAt(null, null);
-      this.cursorHorz.animate({"stroke-opacity": 0.0}, 200);
-      this.cursorVert.animate({"stroke-opacity": 0.0}, 200);
+      this.cursorHorz.animate(
+      {
+         "stroke-opacity": 0.0
+      }, 200);
+      this.cursorVert.animate(
+      {
+         "stroke-opacity": 0.0
+      }, 200);
    },
 
    showPosition: function()
@@ -94,7 +109,11 @@ IdleOperation = Class.create(upro.sys.PointerOperation,
       }
       else
       {
-         this.showInfoAt({ "x": 0, "y": 0}, "Not visible");
+         this.showInfoAt(
+         {
+            "x": 0,
+            "y": 0
+         }, "Not visible");
       }
    },
 

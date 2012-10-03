@@ -1,0 +1,22 @@
+extends abstractClient
+
+block startup
+   script(type='text/javascript', charset='utf-8', src='/test/mouse/TestHandler.js')
+
+   script
+      document.observe("dom:loaded", function()
+      {
+         $('ui').hide();
+         $('msg').hide();
+         context = new upro.sys.ResizableContextWindow("hud");
+         hudSystem = new upro.hud.HudSystem(context);
+
+         hudSystem.debugMessage("Mouse Testing. Play With It.");
+         hudSystem.debugMessage("ContextMenu & Selection: Disabled");
+
+         handler = new TestHandler();
+         listener = new upro.sys.MouseListener(handler);
+
+         hudSystem.debugMessage("Prototype Exists: " + !!Prototype);
+         hudSystem.debugMessage("Prototype Browser IGB: " + !!Prototype.Browser.IGB);
+      });

@@ -210,7 +210,6 @@ upro.scene.SceneSystem = Class.create(
 
       this.canvas = canvas;
 
-      canvas.style.backgroundColor = "yellow"; // should anything go wrong, we'd see it
       this.resizeCanvas();
    },
 
@@ -218,8 +217,7 @@ upro.scene.SceneSystem = Class.create(
    {
       var gl = this.canvas.getContext("experimental-webgl",
       {
-         premultipliedAlpha: false,
-         alpha: false
+         premultipliedAlpha: false
       });
 
       this.gl = gl;

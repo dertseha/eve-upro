@@ -1,0 +1,56 @@
+extends abstractClient
+
+block startup
+   script(type='text/javascript', charset='utf-8', src='/test/basicScene/BasicScene.js')
+   script(type='text/javascript', charset='utf-8', src='/test/basicScene/IdleOperation.js')
+   script(type='text/javascript', charset='utf-8', src='/test/basicScene/CameraMoveOperation.js')
+   script(type='text/javascript', charset='utf-8', src='/test/basicScene/CameraRotationOperation.js')
+   script(type='text/javascript', charset='utf-8', src='/test/basicScene/TestCube.js')
+   script
+      function createLabel(y, text)
+      {
+         hudSystem.paper.text(200, y, text).attr({"font-size": 15, "text-anchor": "end", "fill": "#FFF", });
+      }
+
+      function setupMouse()
+      {
+         opRegistry = new upro.sys.PointerOperationRegistry();
+         mouseListener = new upro.sys.MouseListener(opRegistry);
+      }
+
+      function setupScene()
+      {
+         sceneContext = new upro.sys.ResizableContextWindow("scene");
+         sceneSystem = new upro.scene.SceneSystem(sceneContext);
+
+         hudSystem.debugMessage("Window.innerDimension: " + sceneContext.getFrame().innerWidth + "x" + sceneContext.getFrame().innerHeight);
+      }
+
+      function setupHud()
+      {
+         hudContext = new upro.sys.ResizableContextWindow("hud");
+         hudSystem = new upro.hud.HudSystem(hudContext);
+      }
+
+      document.observe("dom:loaded", function()
+      {
+         $('ui').hide();
+         $('msg').hide();
+         setupMouse();
+         setupHud();
+
+         if (upro.scene.SceneSystem.SUPPORTED)
+         {
+            hudSystem.debugMessage("WebGL supported, starting system");
+            hudSystem.debugMessage("Right Mouse Button & Move: Translate");
+            hudSystem.debugMessage("Left Mouse Button & Move: Rotate");
+            hudSystem.debugMessage("Mouse operations:");
+            hudSystem.debugMessage("Press button on side to reset scene");
+            setupScene();
+            testScene();
+         }
+         else
+         {
+            hudSystem.debugMessage("This browser does not support WebGL.");
+         }
+      });
