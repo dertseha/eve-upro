@@ -26,6 +26,7 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
       var uiMediator = this.facade().retrieveMediator(upro.view.mediators.UiMediator.NAME);
       var panel = $(this.panelId);
       var dimension = panel.getDimensions();
+      var halfWidth = (dimension.width / 2);
 
       this.uiBase = uki(
       {
@@ -44,29 +45,29 @@ upro.view.mediators.GroupListPanelMediator = Class.create(upro.view.mediators.Ab
          },
          {
             view: 'Button',
-            rect: '0 30 100 25',
-            anchors: 'top left',
+            rect: '0 30 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top left width',
             text: upro.res.text.Lang.format("panels.group.edit.create"),
             id: 'groupList_create'
          },
          {
             view: 'Button',
-            rect: (dimension.width - 100) + ' 30 100 25',
-            anchors: 'top right',
+            rect: (halfWidth + 2) + ' 30 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top right width',
             text: upro.res.text.Lang.format("panels.group.edit.destroy"),
             id: 'groupList_destroy'
          },
          {
             view: 'Button',
-            rect: '0 60 100 25',
-            anchors: 'top left',
+            rect: '0 60 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top left width',
             text: upro.res.text.Lang.format("panels.group.edit.join"),
             id: 'groupList_join'
          },
          {
             view: 'Button',
-            rect: (dimension.width - 100) + ' 60 100 25',
-            anchors: 'top right',
+            rect: (halfWidth + 2) + ' 60 ' + (halfWidth - 2) + ' 25',
+            anchors: 'top right width',
             text: upro.res.text.Lang.format("panels.group.edit.leave"),
             id: 'groupList_leave'
          },
