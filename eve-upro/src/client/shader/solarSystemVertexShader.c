@@ -15,9 +15,9 @@ void main(void)
    gl_Position = pos4;
 
    gl_PointSize = 64.0 / pos4.w;
-   if (gl_PointSize > 24.0)
+   if (gl_PointSize > 128.0)
    {
-      gl_PointSize = 24.0;
+      gl_PointSize = 128.0;
    }
    else if (gl_PointSize < 5.0)
    {

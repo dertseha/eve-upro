@@ -176,20 +176,20 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       colors.push(color[0], color[1], color[2], baseAlpha * 0.0);
       vec3.add(pos1, diffVec);
       vertices.push(pos1[0], pos1[1], pos1[2]);
-      colors.push(color[0], color[1], color[2], baseAlpha * 0.3);
+      colors.push(color[0], color[1], color[2], baseAlpha * 0.5);
 
       // fade in from system 2 to line
       vertices.push(pos2[0], pos2[1], pos2[2]);
       colors.push(color[0], color[1], color[2], baseAlpha * 0.0);
       vec3.subtract(pos2, diffVec);
       vertices.push(pos2[0], pos2[1], pos2[2]);
-      colors.push(color[0], color[1], color[2], baseAlpha * 0.3);
+      colors.push(color[0], color[1], color[2], baseAlpha * 0.5);
 
       // actual line
       vertices.push(pos1[0], pos1[1], pos1[2]);
-      colors.push(color[0], color[1], color[2], baseAlpha * 0.3);
+      colors.push(color[0], color[1], color[2], baseAlpha * 0.5);
       vertices.push(pos2[0], pos2[1], pos2[2]);
-      colors.push(color[0], color[1], color[2], baseAlpha * 0.3);
+      colors.push(color[0], color[1], color[2], baseAlpha * 0.5);
    },
 
    addToScene: function($super, scene)
@@ -298,31 +298,15 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
       if (this.ready && this.visible)
       {
          var scene = this.scene;
+         var shader = null;
 
          scene.pushMatrix();
          mat4.translate(scene.mvMatrix, this.position);
 
-         { // systems
-            var shader = this.systemShader;
-
-            shader.use();
-
-            scene.gl.bindBuffer(scene.gl.ARRAY_BUFFER, this.systemVertexBuffer);
-            scene.gl.vertexAttribPointer(shader.positionAttribute, 3, scene.gl.FLOAT, false, 0, 0);
-
-            scene.gl.bindBuffer(scene.gl.ARRAY_BUFFER, this.systemColorBuffer);
-            scene.gl.vertexAttribPointer(shader.colorAttribute, 3, scene.gl.FLOAT, false, 0, 0);
-
-            scene.gl.uniformMatrix4fv(shader.mvMatrixUniform, false, scene.mvMatrix);
-            scene.gl.uniformMatrix4fv(shader.pMatrixUniform, false, scene.pMatrix);
-
-            scene.gl.drawArrays(scene.gl.POINTS, 0, this.systemVertices.length / 3);
-            scene.gl.flush();
-         }
          { // edges
-            var shader = this.basicShader;
             var i, segment;
 
+            shader = this.basicShader;
             shader.use();
 
             scene.gl.uniformMatrix4fv(shader.mvMatrixUniform, false, scene.mvMatrix);
@@ -354,6 +338,22 @@ upro.scene.GalaxyRenderObject = Class.create(upro.scene.SceneRenderObject,
                   scene.gl.flush();
                }
             }
+         }
+         { // systems
+            shader = this.systemShader;
+            shader.use();
+
+            scene.gl.bindBuffer(scene.gl.ARRAY_BUFFER, this.systemVertexBuffer);
+            scene.gl.vertexAttribPointer(shader.positionAttribute, 3, scene.gl.FLOAT, false, 0, 0);
+
+            scene.gl.bindBuffer(scene.gl.ARRAY_BUFFER, this.systemColorBuffer);
+            scene.gl.vertexAttribPointer(shader.colorAttribute, 3, scene.gl.FLOAT, false, 0, 0);
+
+            scene.gl.uniformMatrix4fv(shader.mvMatrixUniform, false, scene.mvMatrix);
+            scene.gl.uniformMatrix4fv(shader.pMatrixUniform, false, scene.pMatrix);
+
+            scene.gl.drawArrays(scene.gl.POINTS, 0, this.systemVertices.length / 3);
+            scene.gl.flush();
          }
 
          scene.popMatrix();
