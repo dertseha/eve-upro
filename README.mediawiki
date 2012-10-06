@@ -1,4 +1,17 @@
-= EVE upro - README =
+= upro - README =
+
+== About ==
+'''upro''' is an online application to support navigation for the pilots of New Eden ([http://www.eveonline.com EVE Online]).
+It uses a 3D projected map of the solar systems to display current locations and jump corridors such as of jump gates
+or wormholes. '''upro''' provides a routing system which refers to the existing and provided jump corridors, including
+wormholes and jump drive capabilities. Information such as for routes can be saved at the server, shared with others
+and downloaded to the autopilot of the NeoCom.
+
+'''upro''' is a server based service, running on node.js with a client written in JavaScript for a web browser.
+
+See the [https://github.com/dertseha/eve-upro/wiki wiki] for a complete documentation.
+
+This project is using the [http://opensource.org/licenses/mit-license.php MIT license].
 
 == Project Structure ==
 
@@ -15,9 +28,7 @@ I'm using
 *** MakeGood for PHP unit tests: http://redmine.piece-framework.com/
 *** JsTestDriver for JavaScript unit tests: http://code.google.com/p/js-test-driver/
 *** PlantUML: http://plantuml.sourceforge.net/eclipse.html
-* Node.js 0.8.2 (Live Runtime: 0.6.X)
-* XAMPP 1.7.7
-* Selenium RC 2.21.0
+* Node.js 0.8.2
 
 == Submodules ==
 * See package.json
@@ -44,10 +55,11 @@ not continue and halt there.
 This folder is meant to hold selenium based tests in PHP as I haven't found a working selenium driver for node yet.
 
 ===== eve-upro\test\manual\** =====
-Holding various tests with visual interaction, prototypes and 
+Holding various (legacy) tests with visual interaction and prototypes. Some of these tests are already moved to be
+provided online by upro during runtime. 
 
 ==== eve-upro\src\**\test\** ====
 Tests based on nodeunit for the server side units.
 
-eve-api has dedicated tests to be prepared as a dedicated package perhaps in the future.
+eve-api has dedicated tests to be prepared as a dedicated package perhaps in the future (as an option).
 
