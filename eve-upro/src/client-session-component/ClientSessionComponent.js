@@ -60,6 +60,12 @@ function ClientSessionComponent(services, options)
     */
    this.onBroadcast = function(broadcastHeader, broadcastBody)
    {
+      if (broadcastHeader.sessionId)
+      {
+         logger.info('Keeping session [' + broadcastHeader.sessionId + '] alive: ' + broadcastHeader.type);
+         this.restartDataPortTimer(broadcastHeader.sessionId);
+      }
+
       if (broadcastHeader.interest)
       {
          var dataPort = null;
@@ -306,6 +312,10 @@ function ClientSessionComponent(services, options)
             character: null
          };
 
+         dataPort.timer = setTimeout(function()
+         {
+            self.onDataPortTimeout(sessionId);
+         }, 15000);
          this.dataPorts[sessionId] = dataPort;
       }
       { // register close handler
@@ -318,10 +328,49 @@ function ClientSessionComponent(services, options)
             this.amqp.getLocalQueueName());
    };
 
+   this.restartDataPortTimer = function(sessionId)
+   {
+      var dataPort = this.dataPorts[sessionId];
+      var self = this;
+
+      if (dataPort)
+      {
+         clearTimeout(dataPort.timer);
+         dataPort.timer = setTimeout(function()
+         {
+            self.onDataPortTimeout(sessionId);
+         }, 15000);
+      }
+   };
+
+   this.onDataPortTimeout = function(sessionId)
+   {
+      var dataPort = this.dataPorts[sessionId];
+
+      if (dataPort)
+      {
+         logger.verbose('Timeout of session [' + sessionId + ']');
+         dataPort.stream.end();
+         this.deleteAndNotifyDataPort(sessionId, dataPort);
+      }
+   };
+
    this.onDataPortClosed = function(sessionId)
    {
       var dataPort = this.dataPorts[sessionId];
 
+      if (dataPort)
+      {
+         if (dataPort.timer)
+         {
+            clearTimeout(dataPort.timer);
+         }
+         this.deleteAndNotifyDataPort(sessionId, dataPort);
+      }
+   };
+
+   this.deleteAndNotifyDataPort = function(sessionId, dataPort)
+   {
       delete this.dataPorts[sessionId];
       this.broadcastClientConnectionStatus(busMessages.Broadcasts.ClientDisconnected.name, sessionId, dataPort.user);
    };
@@ -432,6 +481,17 @@ function ClientSessionComponent(services, options)
          {
             eveInfo: eveInfo
          };
+
+         this.amqp.broadcast(header, body);
+      }
+      else
+      {
+         var header =
+         {
+            type: busMessages.Broadcasts.SessionKeepAlive.name,
+            sessionId: clientRequest.header.sessionId
+         };
+         var body = {};
 
          this.amqp.broadcast(header, body);
       }
