@@ -284,6 +284,14 @@ function HttpServerComponent(services, options)
             corporationName: 'Mouse'
          });
       });
+      expressServer.get('/life', function(req, res)
+      {
+         self.serveClient(req, res, 'life.jade',
+         {
+            characterName: 'Test',
+            corporationName: 'Life'
+         });
+      });
 
       this.startHttpServer();
    };

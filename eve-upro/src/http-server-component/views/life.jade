@@ -1,0 +1,19 @@
+extends abstractClient
+
+block startup
+   script(type='text/javascript', charset='utf-8', src='/test/life/Life.js')
+   script(type='text/javascript', charset='utf-8', src='/test/life/LifeMouseHandler.js')
+
+   script
+      document.observe("dom:loaded", function()
+      {
+         $('ui').hide();
+         $('msg').hide();
+         context = new upro.sys.ResizableContextWindow("hud");
+         hudSystem = new upro.hud.HudSystem(context);
+
+         startWorld();
+
+         handler = new LifeMouseHandler();
+         listener = new upro.sys.MouseListener(handler);
+      });
