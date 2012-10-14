@@ -492,13 +492,11 @@ function HttpServerComponent(services, options)
             }, 10000);
             res.on('close', function()
             {
-               logger.info('!!!!! Result stream for event source closed');
                clearInterval(timer);
             });
          }
          req.on('close', function()
          {
-            logger.info('!!!!! Request stream for event source closed');
             res.end();
          });
 

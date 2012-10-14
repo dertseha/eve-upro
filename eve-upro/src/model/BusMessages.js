@@ -80,6 +80,28 @@ var broadcasts =
    },
 
    /**
+    * Caused periodically by clients to mark alive status of session.
+    */
+   SessionKeepAlive:
+   {
+      name: 0,
+      header:
+      {
+         schema:
+         {
+            type: String,
+            sessionId: String
+         },
+         isValid: null
+      },
+      body:
+      {
+         schema: {},
+         isValid: null
+      }
+   },
+
+   /**
     * Caused periodically by EVE data related clients, based on IGB header data. Can come more than once with the same
     * data when there are several IGB tabs open.
     */
