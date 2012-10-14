@@ -495,6 +495,10 @@ function HttpServerComponent(services, options)
                clearInterval(timer);
             });
          }
+         req.on('close', function()
+         {
+            res.end();
+         });
 
          this.sessionHandler.onDataPortOpened(req.user, res, sendFunction);
       }
