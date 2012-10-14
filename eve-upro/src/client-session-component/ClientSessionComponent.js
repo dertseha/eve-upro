@@ -62,7 +62,6 @@ function ClientSessionComponent(services, options)
    {
       if (broadcastHeader.sessionId)
       {
-         logger.info('Keeping session [' + broadcastHeader.sessionId + '] alive: ' + broadcastHeader.type);
          this.restartDataPortTimer(broadcastHeader.sessionId);
       }
 
