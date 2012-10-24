@@ -1,6 +1,6 @@
 {
   "name": "eve-upro",
-  "version": "0.0.1",
+  "version": "0.0.99",
   "author": "Christian Haas <christian.haas@sevensuns.at>",
   "description": "A strategic mapping application for EVE Online",
   "keywords": [ "eve" ],
