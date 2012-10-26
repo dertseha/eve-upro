@@ -133,7 +133,7 @@ function LoadingLocationStatusGroupState(service, character, groupId, documentId
             interest = [
             {
                scope: predefinedType,
-               id: idGetter.call(character)
+               id: idGetter.call(this.character)
             } ];
          }
       }

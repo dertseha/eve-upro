@@ -66,6 +66,11 @@ function Character(charId, charName, corpId, corpName, allyId, allyName)
          corporationId: this.corporationId,
          corporationName: this.corporationName
       };
+      if (this.isInAlliance())
+      {
+         info.allianceId = this.allianceId;
+         info.allianceName = this.allianceName;
+      }
 
       return info;
    };
