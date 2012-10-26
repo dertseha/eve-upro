@@ -566,6 +566,8 @@ function HttpServerComponent(services, options)
    {
       if (req.user)
       {
+         logger.info('Handling already logged in case');
+         res.redirect('/');
          done("Already logged in");
       }
       else
