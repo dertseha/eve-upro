@@ -235,9 +235,9 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
       var position = sceneSystem.camera.positionTarget;
       var finalValue = position[2] + delta;
 
-      if (finalValue > 20)
+      if (finalValue > upro.view.mediators.SceneMediator.ZOOM_MAX)
       {
-         finalValue = 20;
+         finalValue = upro.view.mediators.SceneMediator.ZOOM_MAX;
       }
       else if (finalValue < 2.5)
       {
@@ -321,3 +321,6 @@ upro.view.mediators.SceneMediator = Class.create(upro.view.mediators.AbstractMed
 });
 
 upro.view.mediators.SceneMediator.NAME = "Scene";
+
+/** The maximum zoom level */
+upro.view.mediators.SceneMediator.ZOOM_MAX = 60;
