@@ -245,7 +245,8 @@ function ClientSessionComponent(services, options)
       if (set)
       {
          rCode = (!set.characterIds || (set.characterIds.length == 0))
-               && (!set.corporationIds || (set.corporationIds.length == 0));
+               && (!set.corporationIds || (set.corporationIds.length == 0))
+               && (!set.allianceIds || (set.allianceIds.length == 0));
       }
 
       return rCode;
@@ -263,6 +264,10 @@ function ClientSessionComponent(services, options)
          rCode = true;
       }
       if (set.corporationIds && (set.corporationIds.indexOf(user.corporationId) >= 0))
+      {
+         rCode = true;
+      }
+      if (set.allianceIds && user.allianceId && (set.allianceIds.indexOf(user.allianceId) >= 0))
       {
          rCode = true;
       }

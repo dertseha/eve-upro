@@ -23,18 +23,9 @@ function LogInRequestStateKeyInfo(request)
             corporationId: character.corporationID,
             corporationName: character.corporationName
          };
+         var state = new LogInRequestStateCorpInfo(request, user);
 
-         if (request.getOwner().isUserAllowed(user))
-         {
-            var state = new LogInRequestStateCorpInfo(request, user);
-
-            state.activate();
-         }
-         else
-         {
-            logger.warn('Denied login request for character ' + user.characterId + ' [' + user.characterName + ']');
-            request.done(null, false);
-         }
+         state.activate();
       }
       else
       {

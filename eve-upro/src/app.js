@@ -106,12 +106,14 @@ nconf.defaults(
          allowed:
          {
             characterIds: [],
-            corporationIds: []
+            corporationIds: [],
+            allianceIds: []
          },
          denied:
          {
             characterIds: [],
-            corporationIds: []
+            corporationIds: [],
+            allianceIds: []
          }
       }
    },

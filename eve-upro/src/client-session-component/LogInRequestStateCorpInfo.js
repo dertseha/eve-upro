@@ -28,8 +28,16 @@ function LogInRequestStateCorpInfo(request, user)
          user.allianceName = struct.response.corporation.allianceName;
       }
 
-      logger.info('Successful login request for character ' + user.characterId + ' [' + user.characterName + ']');
-      request.done(null, user);
+      if (request.getOwner().isUserAllowed(user))
+      {
+         logger.info('Successful login request for character ' + user.characterId + ' [' + user.characterName + ']');
+         request.done(null, user);
+      }
+      else
+      {
+         logger.warn('Denied login request for character ' + user.characterId + ' [' + user.characterName + ']');
+         request.done(null, false);
+      }
    };
 }
 util.inherits(LogInRequestStateCorpInfo, AbstractLogInRequestState);
