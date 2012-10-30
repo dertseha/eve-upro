@@ -1,11 +1,8 @@
-
 upro.nav.finder.PathFinderCostRuleJumpFuel = Class.create(upro.nav.finder.PathFinderCostRule,
 {
    initialize: function(margin)
    {
-      var lightYearToMeters = 9460.7304725808; // this number is reduced by the factor also applied to the system positions
-
-      this.margin = margin * lightYearToMeters;
+      this.margin = margin;
    },
 
    comparator: function(costA, costB)
