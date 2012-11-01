@@ -4,6 +4,7 @@ var winston = require('winston');
 var logger = winston.loggers.get('root');
 
 var Component = require('../components/Component.js');
+var busMessages = require('../model/BusMessages.js');
 
 function EveApiMsgComponent(services)
 {
@@ -16,110 +17,44 @@ function EveApiMsgComponent(services)
    /** {@inheritDoc} */
    this.start = function()
    {
-      this.requestExchange();
+      this.onStarted();
    };
 
    /** {@inheritDoc} */
    this.tearDown = function()
    {
-      if (this.exchange)
-      {
-         // this.exchange.close();
-         this.exchange = null;
-      }
+
    };
 
-   this.requestExchange = function()
+   this.request = function(apiFunctionName, parameters, correlationId)
    {
-      var self = this;
-      var exchangeOptions =
+      var header =
       {
-         type: 'fanout'
+         type: busMessages.Broadcasts.EveApiRequest.name,
+         correlationId: correlationId
+      };
+      var body =
+      {
+         apiFunctionName: apiFunctionName,
+         parameters: parameters
       };
 
-      this.amqp.getConnection().exchange('eveapi', exchangeOptions, function(exchange)
-      {
-         self.exchange = exchange;
-         self.onStartProgress();
-      });
+      this.amqp.broadcast(header, body);
    };
 
-   this.onStartProgress = function(callback)
+   this.respond = function(correlationId, response)
    {
-      if (this.exchange)
+      var header =
       {
-         this.onStarted();
-      }
-   };
-
-   this.allocateConsumerQueue = function(callback)
-   {
-      var self = this;
-      var queueOptions =
-      {
-         exclusive: true
-      // autoDelete: false
+         type: busMessages.Broadcasts.EveApiResponse.name,
+         correlationId: correlationId
       };
-
-      var q = this.amqp.getConnection().queue('eveapi-incoming', queueOptions, function(queue)
-      {
-         logger.info('Allocated queue [' + queue.name + '], attempting binding');
-         queue.bind(self.exchange.name, '#');
-         queue.once('queueBindOk', function()
-         {
-            callback(queue);
-         });
-      });
-      q.on('error', function(err)
-      {
-         logger.warn('Error accessing queue for EveApiMsgComponent. Retrying after timeout.',
-         {
-            error: err
-         });
-         setTimeout(function()
-         {
-            self.allocateConsumerQueue(callback);
-         }, 5000);
-      });
-   };
-
-   this.request = function(apiFunctionName, parameters, responseQueueName, correlationId)
-   {
-      var data =
-      {
-         request:
-         {
-            apiFunctionName: apiFunctionName,
-            parameters: parameters
-         }
-      };
-      var routingKey = '';
-
-      this.exchange.publish(routingKey, JSON.stringify(data),
-      {
-         replyTo: responseQueueName,
-         correlationId: '' + correlationId,
-         // contentType: 'text/plain',
-         // contentEncoding: 'utf8',
-         // mandatory: true,
-         // immediate: true,
-         deliveryMode: 1
-      });
-
-   };
-
-   this.respond = function(responseQueueName, correlationId, response)
-   {
-      var data =
+      var body =
       {
          response: response
       };
-      var routingKey = responseQueueName;
 
-      this.amqp.getConnection().publish(routingKey, JSON.stringify(data),
-      {
-         correlationId: correlationId
-      });
+      this.amqp.broadcast(header, body);
    };
 }
 util.inherits(EveApiMsgComponent, Component);

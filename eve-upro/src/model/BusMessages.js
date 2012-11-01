@@ -29,6 +29,57 @@ var interestSchema = [
 var broadcasts =
 {
    /**
+    * Describes an EVE API request
+    */
+   EveApiRequest:
+   {
+      name: 0,
+      header:
+      {
+         schema:
+         {
+            type: String,
+            correlationId: Number
+         },
+         isValid: null
+      },
+      body:
+      {
+         schema:
+         {
+            apiFunctionName: String,
+            parameters: undefined
+         },
+         isValid: null
+      }
+   },
+
+   /**
+    * Sent in response to a request
+    */
+   EveApiResponse:
+   {
+      name: 0,
+      header:
+      {
+         schema:
+         {
+            type: String,
+            correlationId: Number
+         },
+         isValid: null
+      },
+      body:
+      {
+         schema:
+         {
+            response: undefined
+         },
+         isValid: null
+      }
+   },
+
+   /**
     * Sent for each new client connection
     */
    ClientConnected:

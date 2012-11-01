@@ -1,6 +1,7 @@
 var util = require('util');
 
 var Component = require('../components/Component.js');
+var busMessages = require('../model/BusMessages.js');
 
 var eveapi = require('../eveapi/lib/index.js');
 var MongoDbStorage = require('../eveapi-storage-mongodb/lib/index.js');
@@ -26,34 +27,18 @@ function EveApiComponent(services, options, remoteApi)
       var self = this;
       var storage = new MongoDbStorage(this.mongodb.getDatabase());
 
+      this.registerBroadcastHandler(busMessages.Broadcasts.EveApiRequest.name);
+
       eveapi.initStorage(storage, function(err)
       {
          self.storage = storage;
          self.onStartProgress();
       });
-
-      this.eveapiMsg.allocateConsumerQueue(function(queue)
-      {
-         self.onIncomingQueue(queue);
-      });
-   };
-
-   this.onIncomingQueue = function(queue)
-   {
-      var self = this;
-
-      this.queue = queue;
-
-      this.queue.subscribe(function(message, headers, deliveryInfo)
-      {
-         self.onIncomingMessage(message, headers, deliveryInfo);
-      });
-      this.onStartProgress();
    };
 
    this.onStartProgress = function()
    {
-      if (this.storage && this.queue)
+      if (this.storage)
       {
          this.api = eveapi.create(this.options, this.storage, this.remoteApi);
 
@@ -61,14 +46,25 @@ function EveApiComponent(services, options, remoteApi)
       }
    };
 
-   this.onIncomingMessage = function(message, headers, deliveryInfo)
+   this.registerBroadcastHandler = function(broadcastName)
    {
-      var request = JSON.parse(message.data).request;
-      var apiFunctionName = request.apiFunctionName;
-      var parameters = request.parameters;
-      var responseQueueName = deliveryInfo.replyTo;
-      var correlationId = deliveryInfo.correlationId;
-      var apiFunction = eveapi.ApiFunctions[apiFunctionName];
+      var self = this;
+      var handler = this['onBroadcast' + broadcastName];
+
+      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      {
+         handler.call(self, header, body);
+      });
+   };
+
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastEveApiRequest = function(header, body)
+   {
+      var parameters = body.parameters;
+      var correlationId = header.correlationId;
+      var apiFunction = eveapi.ApiFunctions[body.apiFunctionName];
 
       if (apiFunction)
       {
@@ -76,28 +72,28 @@ function EveApiComponent(services, options, remoteApi)
 
          this.api.request(apiFunction, parameters, function(err, result)
          {
-            self.onApiResult(responseQueueName, correlationId, err, result);
+            self.onApiResult(correlationId, err, result);
          });
       }
       else
       {
          var response = this.createErrorResponse(404, 'Unknown API function [' + apiFunctionName + ']');
 
-         this.eveapiMsg.respond(responseQueueName, correlationId, response);
+         this.eveapiMsg.respond(correlationId, response);
       }
    };
 
-   this.onApiResult = function(responseQueueName, correlationId, err, result)
+   this.onApiResult = function(correlationId, err, result)
    {
       if (err)
       {
          var response = this.createErrorResponse(500, 'Server Error');
 
-         this.eveapiMsg.respond(responseQueueName, correlationId, response);
+         this.eveapiMsg.respond(correlationId, response);
       }
       else
       {
-         this.eveapiMsg.respond(responseQueueName, correlationId, result);
+         this.eveapiMsg.respond(correlationId, result);
       }
    };
 

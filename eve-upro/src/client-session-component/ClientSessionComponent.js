@@ -35,15 +35,12 @@ function ClientSessionComponent(services, options)
    {
       var self = this;
 
-      this.amqp.allocateResponseQueue(function(queue)
-      {
-         self.onResponseQueue(queue);
-      });
-
       this.amqp.on('broadcast', function(header, body)
       {
          self.onBroadcast(header, body);
       });
+      this.registerBroadcastHandler(busMessages.Broadcasts.EveApiResponse.name);
+
       this.characterAgent.on('SessionAdded', function(character, sessionId)
       {
          self.onCharacterSessionAdded(character, sessionId);
@@ -51,6 +48,21 @@ function ClientSessionComponent(services, options)
       this.characterAgent.on('CharacterGroupMemberRemoved', function(character, groupId)
       {
          self.onCharacterGroupMemberRemoved(character, groupId);
+      });
+
+      this.httpServer.setSessionHandler(this);
+
+      this.onStarted();
+   };
+
+   this.registerBroadcastHandler = function(broadcastName)
+   {
+      var self = this;
+      var handler = this['onBroadcast' + broadcastName];
+
+      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      {
+         handler.call(self, header, body);
       });
    };
 
@@ -160,45 +172,16 @@ function ClientSessionComponent(services, options)
    };
 
    /**
-    * Callback for the allocation of a response queue from EVE API
-    * 
-    * @param queue the response queue
+    * Broadcast handler
     */
-   this.onResponseQueue = function(queue)
+   this.onBroadcastEveApiResponse = function(header, body)
    {
-      var self = this;
-
-      this.responseQueue = queue;
-      this.responseQueue.subscribe(function(message, headers, deliveryInfo)
-      {
-         self.onMessage(message, headers, deliveryInfo);
-      });
-
-      this.onStartProgress();
-   };
-
-   /** Start progress */
-   this.onStartProgress = function()
-   {
-      if (this.responseQueue)
-      {
-         this.httpServer.setSessionHandler(this);
-         this.onStarted();
-      }
-   };
-
-   /**
-    * Handles a message received from the response queue
-    * 
-    * @param message the message object
-    * @param headers message headers
-    * @param deliveryInfo routing of message
-    */
-   this.onMessage = function(message, headers, deliveryInfo)
-   {
-      var correlationId = deliveryInfo.correlationId;
+      var correlationId = header.correlationId;
       var request = this.logInRequests[correlationId];
-      var struct = JSON.parse(message.data);
+      var struct =
+      {
+         response: body.response
+      };
 
       if (request)
       {
@@ -299,7 +282,7 @@ function ClientSessionComponent(services, options)
 
    this.eveApiRequest = function(name, parameters, id)
    {
-      this.eveapiMsg.request(name, parameters, this.responseQueue.name, id);
+      this.eveapiMsg.request(name, parameters, id);
    };
 
    this.onDataPortOpened = function(user, stream, sendFunction)
