@@ -11,7 +11,7 @@ function BodyRegisterServiceComponent(services)
 {
    BodyRegisterServiceComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
    this.mongodb = services['mongodb'];
 
    /** {@inheritDoc} */
@@ -39,7 +39,7 @@ function BodyRegisterServiceComponent(services)
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });
@@ -230,7 +230,7 @@ function BodyRegisterServiceComponent(services)
          alliances: result.listAlliance
       };
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 
    /**
@@ -254,7 +254,7 @@ function BodyRegisterServiceComponent(services)
          alliances: result.listAlliance
       };
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 }
 util.inherits(BodyRegisterServiceComponent, Component);

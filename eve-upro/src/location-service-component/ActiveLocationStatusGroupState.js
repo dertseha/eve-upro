@@ -102,7 +102,7 @@ function ActiveLocationStatusGroupState(service, character, group)
       };
       var body = this.group.getSettingsBody();
 
-      this.service.amqp.broadcast(header, body, queueName);
+      this.service.msgBus.broadcast(header, body, queueName);
    };
 
    /**

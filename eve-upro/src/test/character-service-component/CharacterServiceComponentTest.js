@@ -14,7 +14,7 @@ function Fixture()
 
    this.characterService = new CharacterServiceComponent(
    {
-      amqp: this.amqp,
+      msgBus: this.msgBus,
       mongodb: this.mongodb,
       'character-agent': this.characterAgent
    });
@@ -43,7 +43,7 @@ function Fixture()
 
    this.expectingCharacterClientControlSelection = function(test, charId, activeSessionId)
    {
-      this.amqp.broadcast = function(header, body)
+      this.msgBus.broadcast = function(header, body)
       {
          if (header.type == busMessages.Broadcasts.CharacterClientControlSelection.name)
          {
@@ -70,7 +70,7 @@ function Fixture()
 
    this.expectingCharacterActiveGalaxy = function(test, charId, galaxyId, interest)
    {
-      this.amqp.broadcast = function(header, body)
+      this.msgBus.broadcast = function(header, body)
       {
          if (header.type == busMessages.Broadcasts.CharacterActiveGalaxy.name)
          {

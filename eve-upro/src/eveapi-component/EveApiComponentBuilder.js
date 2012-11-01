@@ -24,7 +24,7 @@ function EveApiComponentBuilder()
    /** {@inheritDoc} */
    this.getServiceDependencies = function()
    {
-      return [ 'amqp', 'eveapi-msg', 'mongodb' ];
+      return [ 'msgBus', 'eveapi-msg', 'mongodb' ];
    };
 
    /** {@inheritDoc} */

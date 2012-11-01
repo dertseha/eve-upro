@@ -13,7 +13,7 @@ function Fixture()
 
    this.bodyRegisterService = new BodyRegisterServiceComponent(
    {
-      amqp: this.amqp,
+      msgBus: this.msgBus,
       mongodb: this.mongodb
    });
 

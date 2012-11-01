@@ -8,11 +8,11 @@ var busMessages = require('../model/BusMessages.js');
 
 function Fixture()
 {
-   this.amqp = new EventEmitter();
+   this.msgBus = new EventEmitter();
 
    this.component = new Component(
    {
-      amqp: this.amqp
+      msgBus: this.msgBus
    });
 
    this.givenExistingCharacterSession = function(charId, sessionId)
@@ -77,8 +77,8 @@ function Fixture()
          type: type
       };
 
-      this.amqp.emit('broadcast', header, body);
-      this.amqp.emit('broadcast:' + type, header, body);
+      this.msgBus.emit('broadcast', header, body);
+      this.msgBus.emit('broadcast:' + type, header, body);
    };
 
    this.createUser = function(charId, charName, corpId, corpName)

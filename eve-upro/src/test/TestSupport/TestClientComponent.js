@@ -1,61 +1,46 @@
 var util = require('util');
 
 var Component = require('../../components/Component.js');
+var busMessages = require('../../model/BusMessages.js');
 
 function TestClientComponent(services)
 {
    TestClientComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
    this.eveapiMsg = services['eveapi-msg'];
-
-   this.responseQueue = null;
-
-   this.getResponseQueueName = function()
-   {
-      return this.responseQueue.name;
-   };
 
    /** {@inheritDoc} */
    this.start = function()
    {
-      this.requestResponseQueue();
+      this.registerBroadcastHandler(busMessages.Broadcasts.EveApiResponse.name);
+
+      this.onStarted();
    };
 
-   this.requestResponseQueue = function()
+   this.registerBroadcastHandler = function(broadcastName)
    {
       var self = this;
+      var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.allocateResponseQueue(function(queue)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
-         self.onResponseQueue(queue);
+         handler.call(self, header, body);
       });
    };
 
-   this.onStartProgress = function(callback)
+   /**
+    * Broadcast handler
+    */
+   this.onBroadcastEveApiResponse = function(header, body)
    {
-      if (this.responseQueue)
+      var correlationId = header.correlationId;
+      var struct =
       {
-         this.onStarted();
-      }
-   };
+         response: body.response
+      };
 
-   this.onResponseQueue = function(queue)
-   {
-      var self = this;
-
-      this.responseQueue = queue;
-      this.responseQueue.subscribe(function(message, headers, deliveryInfo)
-      {
-         self.onMessage(message, headers, deliveryInfo);
-      });
-
-      this.onStartProgress();
-   };
-
-   this.onMessage = function(message, headers, deliveryInfo)
-   {
-      this.emit('reply', JSON.parse(message.data), deliveryInfo.correlationId);
+      this.emit('reply', struct, correlationId);
    };
 }
 util.inherits(TestClientComponent, Component);

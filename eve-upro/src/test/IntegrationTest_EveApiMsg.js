@@ -3,7 +3,7 @@ var util = require('util');
 var ServiceControl = require('../components/ServiceControl.js');
 var ComponentBuilder = require('../components/ComponentBuilder.js');
 
-var AmqpComponentBuilder = require('../components/AmqpComponentBuilder.js');
+var MsgBusComponentBuilder = require('../components/MsgBusComponentBuilder.js');
 var MongoDbComponentBuilder = require('../components/MongoDbComponentBuilder.js');
 
 var EveApiMsgComponentBuilder = require('../eveapi-msg-component/EveApiMsgComponentBuilder.js');
@@ -41,9 +41,8 @@ function Fixture()
    this.whenRequestingFunction = function(apiFunctionName, parameters, correlationId)
    {
       var msg = this.serviceControl.getService('eveapi-msg');
-      var client = this.serviceControl.getService('test-client');
 
-      msg.request(apiFunctionName, parameters, client.getResponseQueueName(), correlationId);
+      msg.request(apiFunctionName, parameters, correlationId);
    };
 }
 
@@ -51,12 +50,9 @@ exports.setUp = function(callback)
 {
    this.fixture = new Fixture();
 
-   { // amqp
-      var builder = new AmqpComponentBuilder();
-      var options =
-      {
-         host: 'localhost'
-      };
+   { // msg bus
+      var builder = new MsgBusComponentBuilder();
+      var options = {};
 
       builder.setOptions(options);
       this.fixture.serviceControl.setBuilder(builder);

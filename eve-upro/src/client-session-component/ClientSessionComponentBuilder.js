@@ -18,7 +18,7 @@ function ClientSessionComponentBuilder()
    /** {@inheritDoc} */
    this.getServiceDependencies = function()
    {
-      return [ 'amqp', 'eveapi-msg', 'http-server', 'character-agent' ];
+      return [ 'msgBus', 'eveapi-msg', 'http-server', 'character-agent' ];
    };
 
    /** {@inheritDoc} */

@@ -16,7 +16,7 @@ function RouteServiceComponent(services)
 {
    RouteServiceComponent.super_.call(this, services, RouteDataObject, 'Route');
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
 
    var superStart = this.start;
 

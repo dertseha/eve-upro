@@ -17,13 +17,13 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
 {
    AbstractSharingComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
    this.mongodb = services['mongodb'];
    this.characterAgent = services['character-agent'];
 
    this.dataStatesById = {};
    this.dataObjectConstructor = dataObjectConstructor;
-   this.broadcaster = new StandardDataBroadcaster(this.amqp, objectTypeBaseName);
+   this.broadcaster = new StandardDataBroadcaster(this.msgBus, objectTypeBaseName);
    this.dataStateFactory = new DataStateFactory(this);
 
    /** {@inheritDoc} */
@@ -87,7 +87,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });
@@ -100,7 +100,7 @@ function AbstractSharingComponent(services, dataObjectConstructor, objectTypeBas
    {
       var self = this;
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          self.onDataBroadcast(header, body);
       });

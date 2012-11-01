@@ -18,7 +18,7 @@ function Fixture()
 
    this.locationService = new LocationServiceComponent(
    {
-      amqp: this.amqp,
+      msgBus: this.msgBus,
       mongodb: this.mongodb,
       'character-agent': this.characterAgent
    });
@@ -101,9 +101,9 @@ function Fixture()
 
    this.expectingCharacterLocationStatus = function(test, charId, solarSystemId, interest, disinterest)
    {
-      var prev = this.amqp.broadcast;
+      var prev = this.msgBus.broadcast;
 
-      this.amqp.broadcast = function(header, body)
+      this.msgBus.broadcast = function(header, body)
       {
          if (header.type == busMessages.Broadcasts.CharacterLocationStatus.name)
          {
@@ -127,9 +127,9 @@ function Fixture()
 
    this.expectingSpecificCharacterLocationStatus = function(test, charId, solarSystemId, checker)
    {
-      var prev = this.amqp.broadcast;
+      var prev = this.msgBus.broadcast;
 
-      this.amqp.broadcast = function(header, body)
+      this.msgBus.broadcast = function(header, body)
       {
          if ((header.type == busMessages.Broadcasts.CharacterLocationStatus.name) && checker(header, body))
          {

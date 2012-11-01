@@ -16,7 +16,7 @@ function JumpCorridorServiceComponent(services)
 {
    JumpCorridorServiceComponent.super_.call(this, services, JumpCorridorDataObject, 'JumpCorridor');
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
 
    var superStart = this.start;
 

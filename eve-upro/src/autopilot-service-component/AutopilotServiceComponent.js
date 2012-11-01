@@ -11,7 +11,7 @@ function AutopilotServiceComponent(services)
 {
    AutopilotServiceComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
    this.mongodb = services['mongodb'];
    this.characterAgent = services['character-agent'];
 
@@ -58,7 +58,7 @@ function AutopilotServiceComponent(services)
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });
@@ -321,7 +321,7 @@ function AutopilotServiceComponent(services)
          route: serviceData.rawData.route
       };
 
-      this.amqp.broadcast(header, body, queueName);
+      this.msgBus.broadcast(header, body, queueName);
    };
 
    /**
@@ -345,7 +345,7 @@ function AutopilotServiceComponent(services)
          nextRouteIndex: serviceData.rawData.nextRouteIndex
       };
 
-      this.amqp.broadcast(header, body, queueName);
+      this.msgBus.broadcast(header, body, queueName);
    };
 
 }

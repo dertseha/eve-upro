@@ -16,7 +16,7 @@ function BodyRegisterServiceComponentBuilder()
    /** {@inheritDoc} */
    this.getServiceDependencies = function()
    {
-      return [ 'amqp', 'mongodb' ];
+      return [ 'msgBus', 'mongodb' ];
    };
 
    /** {@inheritDoc} */

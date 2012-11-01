@@ -10,7 +10,7 @@ function EveApiMsgComponent(services)
 {
    EveApiMsgComponent.super_.call(this);
 
-   this.amqp = services.amqp;
+   this.msgBus = services['msgBus'];
 
    this.exchange = null;
 
@@ -39,7 +39,7 @@ function EveApiMsgComponent(services)
          parameters: parameters
       };
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 
    this.respond = function(correlationId, response)
@@ -54,7 +54,7 @@ function EveApiMsgComponent(services)
          response: response
       };
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 }
 util.inherits(EveApiMsgComponent, Component);

@@ -9,9 +9,9 @@ var busMessages = require('../model/BusMessages.js');
 /**
  * 
  */
-function AmqpComponent(options)
+function MsgBusComponent(options)
 {
-   AmqpComponent.super_.call(this);
+   MsgBusComponent.super_.call(this);
 
    this.options = options;
 
@@ -59,6 +59,6 @@ function AmqpComponent(options)
       this.emit('broadcast', header, body);
    };
 }
-util.inherits(AmqpComponent, Component);
+util.inherits(MsgBusComponent, Component);
 
-module.exports = AmqpComponent;
+module.exports = MsgBusComponent;

@@ -10,7 +10,7 @@ function EveApiComponent(services, options, remoteApi)
 {
    EveApiComponent.super_.call(this);
 
-   this.amqp = services.amqp;
+   this.msgBus = services['msgBus'];
    this.mongodb = services.mongodb;
    this.eveapiMsg = services['eveapi-msg'];
    this.remoteApi = remoteApi;
@@ -51,7 +51,7 @@ function EveApiComponent(services, options, remoteApi)
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });
@@ -64,7 +64,8 @@ function EveApiComponent(services, options, remoteApi)
    {
       var parameters = body.parameters;
       var correlationId = header.correlationId;
-      var apiFunction = eveapi.ApiFunctions[body.apiFunctionName];
+      var apiFunctionName = body.apiFunctionName;
+      var apiFunction = eveapi.ApiFunctions[apiFunctionName];
 
       if (apiFunction)
       {

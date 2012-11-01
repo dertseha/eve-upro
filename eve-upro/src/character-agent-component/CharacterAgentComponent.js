@@ -13,7 +13,7 @@ function CharacterAgentComponent(services)
 {
    CharacterAgentComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
 
    this.characters = {};
    this.charactersBySession = {};
@@ -34,7 +34,7 @@ function CharacterAgentComponent(services)
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });

@@ -19,7 +19,7 @@ function ClientSessionComponent(services, options)
 {
    ClientSessionComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
    this.characterAgent = services['character-agent'];
    this.eveapiMsg = services['eveapi-msg'];
    this.httpServer = services['http-server'];
@@ -35,7 +35,7 @@ function ClientSessionComponent(services, options)
    {
       var self = this;
 
-      this.amqp.on('broadcast', function(header, body)
+      this.msgBus.on('broadcast', function(header, body)
       {
          self.onBroadcast(header, body);
       });
@@ -60,7 +60,7 @@ function ClientSessionComponent(services, options)
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });
@@ -312,7 +312,7 @@ function ClientSessionComponent(services, options)
          });
       }
       this.broadcastClientConnectionStatus(busMessages.Broadcasts.ClientConnected.name, sessionId, dataPort.user,
-            this.amqp.getLocalQueueName());
+            this.msgBus.getLocalQueueName());
    };
 
    this.restartDataPortTimer = function(sessionId)
@@ -385,7 +385,7 @@ function ClientSessionComponent(services, options)
 
       logger.info('ConnectionStatus change: ' + type + '[' + sessionId + '] for character ' + user.characterId + ' ['
             + user.characterName + ']');
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 
    /**
@@ -469,7 +469,7 @@ function ClientSessionComponent(services, options)
             eveInfo: eveInfo
          };
 
-         this.amqp.broadcast(header, body);
+         this.msgBus.broadcast(header, body);
       }
       else
       {
@@ -480,7 +480,7 @@ function ClientSessionComponent(services, options)
          };
          var body = {};
 
-         this.amqp.broadcast(header, body);
+         this.msgBus.broadcast(header, body);
       }
 
       return rCode;
@@ -568,7 +568,7 @@ function ClientSessionComponent(services, options)
       };
       var body = clientRequest.body;
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 }
 util.inherits(ClientSessionComponent, Component);

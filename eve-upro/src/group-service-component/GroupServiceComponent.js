@@ -18,7 +18,7 @@ function GroupServiceComponent(services)
 {
    GroupServiceComponent.super_.call(this, services, GroupDataObject, 'Group');
 
-   this.setBroadcaster(new GroupDataBroadcaster(this.amqp, 'Group'));
+   this.setBroadcaster(new GroupDataBroadcaster(this.msgBus, 'Group'));
 
    var superStart = this.start;
    var superSetDataState = this.setDataState;
@@ -35,7 +35,7 @@ function GroupServiceComponent(services)
 
       this.registerCharacterHandler('CharacterGroupSyncFinished', '');
 
-      this.amqp.on('broadcast', function(header, body)
+      this.msgBus.on('broadcast', function(header, body)
       {
          self.onBroadcast(header, body);
       });
@@ -92,7 +92,7 @@ function GroupServiceComponent(services)
    this.onCharacterOnline = function(character)
    {
       var characterId = character.getCharacterId();
-      var syncState = new CharacterGroupDataSync(this.amqp, characterId);
+      var syncState = new CharacterGroupDataSync(this.msgBus, characterId);
       var filter =
       {
          "data.members": characterId

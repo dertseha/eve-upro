@@ -16,7 +16,7 @@ function TestClientBuilder()
    /** {@inheritDoc} */
    this.getServiceDependencies = function()
    {
-      return [ 'amqp', 'eveapi-msg' ];
+      return [ 'msgBus', 'eveapi-msg' ];
    };
 
    /** {@inheritDoc} */

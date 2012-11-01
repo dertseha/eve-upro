@@ -1,11 +1,11 @@
 var util = require('util');
 
 var ComponentBuilder = require('./ComponentBuilder.js');
-var AmqpComponent = require('./AmqpComponent.js');
+var MsgBusComponent = require('./MsgBusComponent.js');
 
-function AmqpComponentBuilder()
+function MsgBusComponentBuilder()
 {
-   AmqpComponentBuilder.super_.call(this);
+   MsgBusComponentBuilder.super_.call(this);
 
    this.options = {};
 
@@ -17,15 +17,15 @@ function AmqpComponentBuilder()
    /** {@inheritDoc} */
    this.getServiceName = function()
    {
-      return 'amqp';
+      return 'msgBus';
    };
 
    /** {@inheritDoc} */
    this.getInstance = function(services)
    {
-      return new AmqpComponent(this.options);
+      return new MsgBusComponent(this.options);
    };
 }
-util.inherits(AmqpComponentBuilder, ComponentBuilder);
+util.inherits(MsgBusComponentBuilder, ComponentBuilder);
 
-module.exports = AmqpComponentBuilder;
+module.exports = MsgBusComponentBuilder;

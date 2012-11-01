@@ -19,7 +19,6 @@ logger.add(winston.transports.Console,
 
 var configFileBase = __dirname;
 var cloudMongo = null;
-var cloudRabbit = null;
 var cloudHttp =
 {
    host: null,
@@ -41,8 +40,6 @@ function extractCloudConfiguration()
       }
       cloudMongo = 'mongodb://' + mongoCredentials + mongoCore;
 
-      cloudRabbit = env['rabbitmq-2.4'][0]['credentials'].url;
-
       logger.remove(winston.transports.Console);
       logger.add(winston.transports.File,
       {
@@ -58,13 +55,9 @@ function extractCloudConfiguration()
       cloudHttp.host = process.env.VCAP_APP_HOST;
       cloudHttp.port = process.env.VMC_APP_PORT;
    }
-   if (process.env.CLOUDAMQP_URL)
-   {
-      configFileBase += '/../../..';
-      cloudRabbit = process.env.CLOUDAMQP_URL;
-   }
    if (process.env.MONGOLAB_URI)
    {
+      configFileBase += '/../../..';
       cloudMongo = process.env.MONGOLAB_URI;
    }
    if (process.env.PORT)
@@ -80,11 +73,6 @@ nconf.env();
 nconf.argv();
 nconf.defaults(
 {
-   'amqp':
-   {
-      url: cloudRabbit || 'amqp://localhost'
-   },
-
    'mongodb':
    {
       url: cloudMongo || 'mongodb://localhost:27017/eve-upro_live'
@@ -100,7 +88,7 @@ nconf.defaults(
 
    'upro':
    {
-      validateBroadcasts: cloudRabbit ? false : true,
+      validateBroadcasts: cloudHttp.port ? false : true,
       security:
       {
          allowed:
@@ -181,7 +169,7 @@ logger.info('Initializing application...');
 var ServiceControl = require('./components/ServiceControl.js');
 var ComponentBuilder = require("./components/ComponentBuilder.js");
 
-var AmqpComponentBuilder = require('./components/AmqpComponentBuilder.js');
+var MsgBusComponentBuilder = require('./components/MsgBusComponentBuilder.js');
 var MongoDbComponentBuilder = require('./components/MongoDbComponentBuilder.js');
 
 var EveApiMsgComponentBuilder = require('./eveapi-msg-component/EveApiMsgComponentBuilder.js');
@@ -199,11 +187,10 @@ var RouteServiceComponentBuilder = require('./route-service-component/RouteServi
 
 var serviceControl = new ServiceControl();
 
-{ // amqp
-   var builder = new AmqpComponentBuilder();
+{ // MsgBus
+   var builder = new MsgBusComponentBuilder();
    var options =
    {
-      url: nconf.get('amqp').url,
       validateBroadcasts: nconf.get('upro').validateBroadcasts
    };
 

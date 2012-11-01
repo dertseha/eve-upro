@@ -161,7 +161,7 @@ function CharacterServiceData(service, character)
          } ]
       };
 
-      this.service.amqp.broadcast(header, body, queueName);
+      this.service.msgBus.broadcast(header, body, queueName);
    };
 
    /**

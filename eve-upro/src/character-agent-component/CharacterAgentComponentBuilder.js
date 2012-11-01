@@ -16,7 +16,7 @@ function CharacterAgentComponentBuilder()
    /** {@inheritDoc} */
    this.getServiceDependencies = function()
    {
-      return [ 'amqp' ];
+      return [ 'msgBus' ];
    };
 
    /** {@inheritDoc} */

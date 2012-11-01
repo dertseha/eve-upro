@@ -15,19 +15,19 @@ function AbstractServiceComponentFixture()
 
    this.broadcastedMessages = [];
 
-   this.amqp = new EventEmitter();
-   this.amqp.broadcast = function(header, body)
+   this.msgBus = new EventEmitter();
+   this.msgBus.broadcast = function(header, body)
    {
       self.broadcast(header, body);
    };
 
    this.broadcast = function(header, body)
    {
-      this.amqp.emit('broadcast:' + header.type, header, body);
-      this.amqp.emit('broadcast', header, body);
+      this.msgBus.emit('broadcast:' + header.type, header, body);
+      this.msgBus.emit('broadcast', header, body);
    };
 
-   this.amqp.on('broadcast', function(header, body)
+   this.msgBus.on('broadcast', function(header, body)
    {
       var message =
       {
@@ -87,7 +87,7 @@ function AbstractServiceComponentFixture()
    };
    this.characterAgent = new CharacterAgentComponent(
    {
-      amqp: this.amqp
+      msgBus: this.msgBus
    });
 
    this.givenExistingCharacterSession = function(charId, sessionId, corpId)
@@ -230,7 +230,7 @@ function AbstractServiceComponentFixture()
          finished: finished
       };
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 
    this.whenCharacterJoinsGroup = function(charId, groupId)
@@ -271,7 +271,7 @@ function AbstractServiceComponentFixture()
 
    this.expectingBroadcastInterest = function(test, expectedType, expectedInterest)
    {
-      this.amqp.broadcast = function(header, body)
+      this.msgBus.broadcast = function(header, body)
       {
          if (header.type && (header.type == expectedType))
          {

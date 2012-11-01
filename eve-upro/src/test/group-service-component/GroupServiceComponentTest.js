@@ -18,7 +18,7 @@ function Fixture()
 
    this.groupService = new GroupServiceComponent(
    {
-      amqp: this.amqp,
+      msgBus: this.msgBus,
       mongodb: this.mongodb,
       'character-agent': this.characterAgent
    });

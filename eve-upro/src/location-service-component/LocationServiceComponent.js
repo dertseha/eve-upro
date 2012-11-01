@@ -14,7 +14,7 @@ function LocationServiceComponent(services)
 {
    LocationServiceComponent.super_.call(this);
 
-   this.amqp = services['amqp'];
+   this.msgBus = services['msgBus'];
    this.mongodb = services['mongodb'];
    this.characterAgent = services['character-agent'];
 
@@ -59,7 +59,7 @@ function LocationServiceComponent(services)
       var self = this;
       var handler = this['onBroadcast' + broadcastName];
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          handler.call(self, header, body);
       });
@@ -69,7 +69,7 @@ function LocationServiceComponent(services)
    {
       var self = this;
 
-      this.amqp.on('broadcast:' + broadcastName, function(header, body)
+      this.msgBus.on('broadcast:' + broadcastName, function(header, body)
       {
          self.onGroupBroadcast(header, body);
       });
@@ -389,7 +389,7 @@ function LocationServiceComponent(services)
          solarSystemId: serviceData.lastKnownLocation
       };
 
-      this.amqp.broadcast(header, body, queueName);
+      this.msgBus.broadcast(header, body, queueName);
    };
 
    /**
@@ -414,7 +414,7 @@ function LocationServiceComponent(services)
          solarSystemId: undefined
       };
 
-      this.amqp.broadcast(header, body);
+      this.msgBus.broadcast(header, body);
    };
 }
 util.inherits(LocationServiceComponent, Component);

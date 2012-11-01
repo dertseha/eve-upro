@@ -14,7 +14,7 @@ function Fixture()
 
    this.autopilotService = new AutopilotServiceComponent(
    {
-      amqp: this.amqp,
+      msgBus: this.msgBus,
       mongodb: this.mongodb,
       'character-agent': this.characterAgent
    });
@@ -51,7 +51,7 @@ function Fixture()
 
    this.expectingCharacterAutopilotRoute = function(test, charId, route, interest)
    {
-      this.amqp.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRoute.name, function(header, body)
+      this.msgBus.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRoute.name, function(header, body)
       {
          test.deepEqual(body.route, route);
          if (interest)
@@ -63,7 +63,7 @@ function Fixture()
 
    this.expectingCharacterAutopilotRouteIndex = function(test, charId, nextRouteIndex, interest)
    {
-      this.amqp.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRouteIndex.name, function(header, body)
+      this.msgBus.on('broadcast:' + busMessages.Broadcasts.CharacterAutopilotRouteIndex.name, function(header, body)
       {
          test.equal(body.nextRouteIndex, nextRouteIndex);
          if (interest)

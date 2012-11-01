@@ -19,7 +19,7 @@ function Fixture()
       security: {}
    };
 
-   this.amqp.allocateResponseQueue = function(callback)
+   this.msgBus.allocateResponseQueue = function(callback)
    {
       process.nextTick(function()
       {
@@ -39,7 +39,7 @@ function Fixture()
 
    this.clientSession = new ClientSessionComponent(
    {
-      amqp: this.amqp,
+      msgBus: this.msgBus,
       'character-agent': this.characterAgent,
       'eveapi-msg': this,
       'http-server': this
@@ -360,7 +360,7 @@ exports.testGroupMembershipShouldBeSent_WhenDroppingMember = function(test)
    };
 
    this.fixture.givenExistingCharacterSession(charId, sessionId);
-   this.fixture.givenCharacterHasInterestInGroups(charId, groupId);
+   this.fixture.givenCharacterHasInterestInGroups(charId, [ groupId ]);
    this.fixture.givenExistingDataPort(charId, sessionId);
 
    this.fixture.whenBroadcastReceived(busMessages.Broadcasts.GroupMembership.name, undefined, messageBody,
