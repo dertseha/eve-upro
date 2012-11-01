@@ -34,7 +34,6 @@ I'm using
 * See package.json
 
 == Test Environment ==
-* RabbitMQ, default setup
 * MongoDB, default setup
 * Node.js 0.8.X
 
