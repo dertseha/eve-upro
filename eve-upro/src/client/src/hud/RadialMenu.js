@@ -67,7 +67,12 @@ upro.hud.RadialMenu = Class.create(
       for ( var index in this.commands)
       {
          offset = upro.hud.Button.getOffset[index](upro.hud.RadialMenu.PADDING);
-         this.commands[index].show(paperContext, viewCoord.x + offset.x, viewCoord.y + offset.y);
+         this.commands[index].show(paperContext, viewCoord.x + offset.x, viewCoord.y + offset.y,
+         {
+            anchor: upro.hud.RadialMenu.LABEL_STARTS[index],
+            x: viewCoord.x + offset.x * 2,
+            y: viewCoord.y + offset.y * 2
+         });
       }
    },
 
@@ -115,3 +120,6 @@ upro.hud.RadialMenu = Class.create(
 
 /** The padding to be used between the buttons */
 upro.hud.RadialMenu.PADDING = 2;
+
+/** text offsets for the labels per command index */
+upro.hud.RadialMenu.LABEL_STARTS = [ "start", "start", "start", "end", "end", "end" ];
