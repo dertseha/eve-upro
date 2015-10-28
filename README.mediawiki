@@ -1,5 +1,16 @@
 = upro - README =
 
+== Obsolete ==
+'''This project has long been discontinued'''
+
+Usage and interest in this application was never high, so it remained as a learning project in various fields for me.
+
+If you are interested in the path-finding algorithm, the core has been extracted and re-implemented in these libraries:
+* eve-route.js: https://github.com/dertseha/eve-route.js - in JavaScript, superseded by
+* everoute: https://github.com/dertseha/everoute - in Go
+
+If you still can extract anything useful from this project, I'd be happy about a reference.
+
 == About ==
 '''upro''' is an online application to support navigation for the pilots of New Eden ([http://www.eveonline.com EVE Online]).
 It uses a 3D projected map of the solar systems to display current locations and jump corridors such as of jump gates
